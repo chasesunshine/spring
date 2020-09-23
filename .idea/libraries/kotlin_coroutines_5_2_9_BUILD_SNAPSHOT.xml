@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="kotlin-coroutines-5.2.9.BUILD-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/spring-core/kotlin-coroutines/build/libs/kotlin-coroutines-5.2.9.BUILD-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
