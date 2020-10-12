@@ -609,18 +609,22 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			logger.debug("Executing prepared SQL statement" + (sql != null ? " [" + sql + "]" : ""));
 		}
 
+		// 获取数据库连接
 		Connection con = DataSourceUtils.getConnection(obtainDataSource());
 		PreparedStatement ps = null;
 		try {
 			ps = psc.createPreparedStatement(con);
+			// 应用用户设定的输入参数
 			applyStatementSettings(ps);
 			T result = action.doInPreparedStatement(ps);
+			// 调用回调函数
 			handleWarnings(ps);
 			return result;
 		}
 		catch (SQLException ex) {
 			// Release Connection early, to avoid potential connection pool deadlock
 			// in the case when the exception translator hasn't been initialized yet.
+			// 释放数据库连接避免异常转换器没有被初始化的时候出现潜在的连接池死锁
 			if (psc instanceof ParameterDisposer) {
 				((ParameterDisposer) psc).cleanupParameters();
 			}
@@ -673,6 +677,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 				ResultSet rs = null;
 				try {
 					if (pss != null) {
+						// 设置PreparedStatement所需的全部参数
 						pss.setValues(ps);
 					}
 					rs = ps.executeQuery();
@@ -854,7 +859,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return result(query(sql, args, new SqlRowSetResultSetExtractor()));
 	}
 
-	protected int update(final PreparedStatementCreator psc, @Nullable final PreparedStatementSetter pss)
+	protected int
+
+	update(final PreparedStatementCreator psc, @Nullable final PreparedStatementSetter pss)
 			throws DataAccessException {
 
 		logger.debug("Executing prepared SQL update");
@@ -862,6 +869,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return updateCount(execute(psc, ps -> {
 			try {
 				if (pss != null) {
+					// 设置PreparedStatement所需的全部参数
 					pss.setValues(ps);
 				}
 				int rows = ps.executeUpdate();
@@ -1403,8 +1411,10 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
 	protected void handleWarnings(Statement stmt) throws SQLException {
+		// 当设置为忽略警告时只尝试打印日志
 		if (isIgnoreWarnings()) {
 			if (logger.isDebugEnabled()) {
+				// 如果日志开启的情况下打印日志
 				SQLWarning warningToLog = stmt.getWarnings();
 				while (warningToLog != null) {
 					logger.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '" +

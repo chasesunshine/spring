@@ -80,6 +80,15 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	private Boolean isAfterAdvice;
 
 
+	/**
+	 * 将信息封装在类的实例中，只是单纯的赋值
+	 * @param declaredPointcut
+	 * @param aspectJAdviceMethod
+	 * @param aspectJAdvisorFactory
+	 * @param aspectInstanceFactory
+	 * @param declarationOrder
+	 * @param aspectName
+	 */
 	public InstantiationModelAwarePointcutAdvisorImpl(AspectJExpressionPointcut declaredPointcut,
 			Method aspectJAdviceMethod, AspectJAdvisorFactory aspectJAdvisorFactory,
 			MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {

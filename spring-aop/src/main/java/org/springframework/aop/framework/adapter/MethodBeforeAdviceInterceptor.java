@@ -41,6 +41,8 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 
 
 	/**
+	 * 为指定的advice创建对应的MethodBeforeAdviceInterceptor对象
+	 *
 	 * Create a new MethodBeforeAdviceInterceptor for the given advice.
 	 * @param advice the MethodBeforeAdvice to wrap
 	 */
@@ -50,6 +52,7 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 	}
 
 
+	// 这个invoke方法是拦截器的回调方法，会在代理对应的方法被调用时触发回调
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());

@@ -307,6 +307,7 @@ public abstract class AopUtils {
 			return candidateAdvisors;
 		}
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
+		// 处理增强器
 		for (Advisor candidate : candidateAdvisors) {
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
@@ -314,10 +315,12 @@ public abstract class AopUtils {
 		}
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 		for (Advisor candidate : candidateAdvisors) {
+			// 增强器已经处理
 			if (candidate instanceof IntroductionAdvisor) {
 				// already processed
 				continue;
 			}
+			// 对于普通bean的处理
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}
@@ -339,6 +342,7 @@ public abstract class AopUtils {
 			throws Throwable {
 
 		// Use reflection to invoke the method.
+		// 使用反射调用target对象方法的地方
 		try {
 			ReflectionUtils.makeAccessible(method);
 			return method.invoke(target, args);
@@ -346,6 +350,7 @@ public abstract class AopUtils {
 		catch (InvocationTargetException ex) {
 			// Invoked method threw a checked exception.
 			// We must rethrow it. The client won't see the interceptor.
+			// 抛出AOP异常，对异常进行转换
 			throw ex.getTargetException();
 		}
 		catch (IllegalArgumentException ex) {

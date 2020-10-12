@@ -36,6 +36,8 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
 
 	/**
+	 * 创建一个新的解析器来处理给定的属性资源
+	 *
 	 * Create a new resolver against the given property sources.
 	 * @param propertySources the set of {@link PropertySource} objects to use
 	 */

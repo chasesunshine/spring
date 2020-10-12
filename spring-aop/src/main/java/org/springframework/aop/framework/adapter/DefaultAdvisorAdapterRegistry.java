@@ -40,10 +40,13 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 @SuppressWarnings("serial")
 public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Serializable {
 
+	// 持有一个AdvisorAdapter的List，这个List中的adapter是与实现Spring AOP的advice增强功能相对应的
 	private final List<AdvisorAdapter> adapters = new ArrayList<>(3);
 
 
 	/**
+	 * 此方法把已有的advice实现的adapter加入进来
+	 *
 	 * Create a new DefaultAdvisorAdapterRegistry, registering well-known adapters.
 	 */
 	public DefaultAdvisorAdapterRegistry() {
@@ -55,17 +58,21 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 
 	@Override
 	public Advisor wrap(Object adviceObject) throws UnknownAdviceTypeException {
+		// 如果要封装的对象本身就是Advisor类型，那么无须做任何处理
 		if (adviceObject instanceof Advisor) {
 			return (Advisor) adviceObject;
 		}
+		// 如果类型不是Advisor和Advice两种类型的数据，那么将不能进行封装
 		if (!(adviceObject instanceof Advice)) {
 			throw new UnknownAdviceTypeException(adviceObject);
 		}
 		Advice advice = (Advice) adviceObject;
 		if (advice instanceof MethodInterceptor) {
 			// So well-known it doesn't even need an adapter.
+			// 如果是MethodInterceptor类型则使用DefaultPointcutAdvisor封装
 			return new DefaultPointcutAdvisor(advice);
 		}
+		// 如果存在Advisor的适配器那么也同样需要进行封装
 		for (AdvisorAdapter adapter : this.adapters) {
 			// Check that it is supported.
 			if (adapter.supportsAdvice(advice)) {

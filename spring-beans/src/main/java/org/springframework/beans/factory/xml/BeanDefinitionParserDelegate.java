@@ -438,7 +438,7 @@ public class BeanDefinitionParserDelegate {
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
-		// 解析bean定义信息的元素
+		// 对bean元素的详细解析
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
@@ -742,6 +742,7 @@ public class BeanDefinitionParserDelegate {
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 判断是否是property元素，然后对其进行解析操作
 			if (isCandidateElement(node) && nodeNameEquals(node, PROPERTY_ELEMENT)) {
 				parsePropertyElement((Element) node, bd);
 			}
@@ -892,11 +893,13 @@ public class BeanDefinitionParserDelegate {
 		}
 		this.parseState.push(new PropertyEntry(propertyName));
 		try {
-			// 不允许多次对同一属性配置
+			// 不允许多次对同一属性配置，如果已经存在同名的property属性，那么就不进行解析
 			if (bd.getPropertyValues().contains(propertyName)) {
 				error("Multiple 'property' definitions for property '" + propertyName + "'", ele);
 				return;
 			}
+			// 此处用来解析property值，返回的对象对应对bean定义的property属性设置的解析结果，这个解析结果会封装到PropertyValue对象中，然后
+			// 设置到BeanDefinitionHolder中去
 			Object val = parsePropertyValue(ele, bd, propertyName);
 			PropertyValue pv = new PropertyValue(propertyName, val);
 			parseMetaElements(ele, pv);
@@ -1206,6 +1209,7 @@ public class BeanDefinitionParserDelegate {
 		target.setSource(extractSource(collectionEle));
 		target.setElementTypeName(defaultElementType);
 		target.setMergeEnabled(parseMergeAttribute(collectionEle));
+		// 解析list元素
 		parseCollectionElements(nl, target, bd, defaultElementType);
 		return target;
 	}
@@ -1229,7 +1233,9 @@ public class BeanDefinitionParserDelegate {
 
 		for (int i = 0; i < elementNodes.getLength(); i++) {
 			Node node = elementNodes.item(i);
+			// 遍历所有的元素节点，并判断其类型是否是element
 			if (node instanceof Element && !nodeNameEquals(node, DESCRIPTION_ELEMENT)) {
+				// 将解析后的元素添加到target,target是一个集合对象，同时出发对下一层子元素的解析过程
 				target.add(parsePropertySubElement((Element) node, bd, defaultElementType));
 			}
 		}

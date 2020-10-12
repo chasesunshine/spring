@@ -247,7 +247,9 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	@Override
 	@Nullable
 	public Object getObject() throws BeansException {
+		// 初始化通知器链
 		initializeAdvisorChain();
+		// 对singleton和prototype的类型进行区分，生成对应的proxy
 		if (isSingleton()) {
 			return getSingletonInstance();
 		}
@@ -317,14 +319,17 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 			this.targetSource = freshTargetSource();
 			if (this.autodetectInterfaces && getProxiedInterfaces().length == 0 && !isProxyTargetClass()) {
 				// Rely on AOP infrastructure to tell us what interfaces to proxy.
+				// 根据AOP框架来判断需要代理的接口
 				Class<?> targetClass = getTargetClass();
 				if (targetClass == null) {
 					throw new FactoryBeanNotInitializedException("Cannot determine target class for proxy");
 				}
+				// 这里设置代理对象的接口
 				setInterfaces(ClassUtils.getAllInterfacesForClass(targetClass, this.proxyClassLoader));
 			}
 			// Initialize the shared singleton instance.
 			super.setFrozen(this.freezeProxy);
+			// 使用proxyFactory来生成需要的proxy
 			this.singletonInstance = getProxy(createAopProxy());
 		}
 		return this.singletonInstance;
@@ -367,6 +372,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 * @see AopProxy#getProxy(ClassLoader)
 	 */
 	protected Object getProxy(AopProxy aopProxy) {
+		// 通过createAopProxy返回AopProxy来得到代理对象
 		return aopProxy.getProxy(this.proxyClassLoader);
 	}
 
@@ -438,6 +444,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 			}
 
 			// Materialize interceptor chain from bean names.
+			// 添加advisor链的调用，是通过interceptorNames属性进行配置的
 			for (String name : this.interceptorNames) {
 				if (name.endsWith(GLOBAL_SUFFIX)) {
 					if (!(this.beanFactory instanceof ListableBeanFactory)) {
@@ -451,14 +458,18 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 				else {
 					// If we get here, we need to add a named interceptor.
 					// We must check if it's a singleton or prototype.
+					// 如果程序在这里被调用，那么需要加入命名的连接器advice，并且需要检查这个bean是singleton还是prototype类型
 					Object advice;
+					// 如果是singleton类型的bean
 					if (this.singleton || this.beanFactory.isSingleton(name)) {
 						// Add the real Advisor/Advice to the chain.
+						// 加入advice或者advisor
 						advice = this.beanFactory.getBean(name);
 					}
 					else {
 						// It's a prototype Advice or Advisor: replace with a prototype.
 						// Avoid unnecessary creation of prototype bean just for advisor chain initialization.
+						// 对prototype类型bean的处理
 						advice = new PrototypePlaceholderAdvisor(name);
 					}
 					addAdvisorOnChainCreation(advice);

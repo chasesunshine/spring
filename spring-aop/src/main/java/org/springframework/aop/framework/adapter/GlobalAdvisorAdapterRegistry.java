@@ -31,11 +31,15 @@ public final class GlobalAdvisorAdapterRegistry {
 
 
 	/**
+	 * 单例模式的使用，使用静态类变量来保持一个唯一实例
+	 *
 	 * Keep track of a single instance so we can return it to classes that request it.
 	 */
 	private static AdvisorAdapterRegistry instance = new DefaultAdvisorAdapterRegistry();
 
 	/**
+	 * 返回单例对象
+	 *
 	 * Return the singleton {@link DefaultAdvisorAdapterRegistry} instance.
 	 */
 	public static AdvisorAdapterRegistry getInstance() {

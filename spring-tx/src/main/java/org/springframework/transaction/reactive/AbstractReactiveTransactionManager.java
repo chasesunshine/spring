@@ -508,11 +508,13 @@ public abstract class AbstractReactiveTransactionManager implements ReactiveTran
 	private Mono<Void> processRollback(TransactionSynchronizationManager synchronizationManager,
 			GenericReactiveTransaction status) {
 
+		// 激活所有TransactionSynchronizationManager中对应的方法
 		return triggerBeforeCompletion(synchronizationManager, status).then(Mono.defer(() -> {
 			if (status.isNewTransaction()) {
 				if (status.isDebug()) {
 					logger.debug("Initiating transaction rollback");
 				}
+				// 如果当前事务为独立的新事务，则直接回退
 				return doRollback(synchronizationManager, status);
 			}
 			else {
@@ -522,6 +524,7 @@ public abstract class AbstractReactiveTransactionManager implements ReactiveTran
 					if (status.isDebug()) {
 						logger.debug("Participating transaction failed - marking existing transaction as rollback-only");
 					}
+					// 如果当前事务不是独立的事务，那么只能标记状态，等到事务链执行完毕后统一回滚
 					beforeCompletion = doSetRollbackOnly(synchronizationManager, status);
 				}
 				else {
