@@ -1,5 +1,6 @@
 package com.mashibing;
 
+import com.mashibing.selftag.User;
 import javafx.application.Application;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -14,5 +15,7 @@ public class Test {
 //        A bean1 = ac.getBean(A.class);
 //        System.out.println(bean1);
 //        ac.close();
+        User user = (User) ac.getBean("msb");
+        System.out.println(user.getUsername());
     }
 }
