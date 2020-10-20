@@ -20,6 +20,8 @@ import org.springframework.core.SpringProperties;
 import org.springframework.lang.Nullable;
 
 /**
+ * spring表达式解析器的配置对象
+ *
  * Configuration object for the SpEL expression parser.
  *
  * @author Juergen Hoeller

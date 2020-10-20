@@ -1,7 +1,12 @@
 package com.mashibing;
 
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.Assert;
 
 public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationContext {
 
@@ -22,4 +27,5 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
         super.setAllowCircularReferences(false);
         super.customizeBeanFactory(beanFactory);
     }
+
 }

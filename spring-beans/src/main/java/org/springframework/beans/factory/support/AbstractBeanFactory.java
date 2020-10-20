@@ -160,10 +160,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** BeanPostProcessors to apply. */
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
-	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
+	/**
+	 * 表明InstantiationAwareBeanPostProcessors是否被注册
+	 *
+	 * Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
 
-	/** Indicates whether any DestructionAwareBeanPostProcessors have been registered. */
+	/**
+	 * 表明DestructionAwareBeanPostProcessors是否被注册
+	 *
+	 * Indicates whether any DestructionAwareBeanPostProcessors have been registered. */
 	private volatile boolean hasDestructionAwareBeanPostProcessors;
 
 	/** Map from scope identifier String to corresponding Scope. */
@@ -950,6 +956,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
 		Assert.notNull(beanPostProcessor, "BeanPostProcessor must not be null");
 		// Remove from old position, if any
+		// 从老的位置移除此beanPostProcessor
 		this.beanPostProcessors.remove(beanPostProcessor);
 		// Track whether it is instantiation/destruction aware
 		if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {

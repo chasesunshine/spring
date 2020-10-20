@@ -39,12 +39,14 @@ import org.springframework.lang.Nullable;
  *
  * @author Juergen Hoeller
  * @since 03.11.2003
- * @see org.springframework.context.support.AbstractApplicationContext#getBeanFactory()
+ * see org.springframework.context.support.AbstractApplicationContext#getBeanFactory()
  */
 public interface ConfigurableListableBeanFactory
 		extends ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory {
 
 	/**
+	 * 自动装配时忽略的类
+	 *
 	 * Ignore the given dependency type for autowiring:
 	 * for example, String. Default is none.
 	 * @param type the dependency type to ignore
@@ -52,6 +54,8 @@ public interface ConfigurableListableBeanFactory
 	void ignoreDependencyType(Class<?> type);
 
 	/**
+	 * 自动装配时忽略的接口
+	 *
 	 * Ignore the given dependency interface for autowiring.
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through
@@ -60,7 +64,7 @@ public interface ConfigurableListableBeanFactory
 	 * For further types to ignore, invoke this method for each type.
 	 * @param ifc the dependency interface to ignore
 	 * @see org.springframework.beans.factory.BeanFactoryAware
-	 * @see org.springframework.context.ApplicationContextAware
+	 * see org.springframework.context.ApplicationContextAware
 	 */
 	void ignoreDependencyInterface(Class<?> ifc);
 

@@ -56,28 +56,37 @@ public abstract class ScopedProxyUtils {
 	public static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
 			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
 
+		// 拿到原始bean的beanName
 		String originalBeanName = definition.getBeanName();
+		// 拿到原始bean的BeanDefinition
 		BeanDefinition targetDefinition = definition.getBeanDefinition();
+		// 为原始bean生成一个新的beanName，加了一个前缀scopedTarget
 		String targetBeanName = getTargetBeanName(originalBeanName);
 
 		// Create a scoped proxy definition for the original bean name,
 		// "hiding" the target bean in an internal target definition.
+		// 使用ScopedProxyFactoryBean作为beanClass创建代理BeanDefinition
 		RootBeanDefinition proxyDefinition = new RootBeanDefinition(ScopedProxyFactoryBean.class);
+		// 将原始bean封装成BeanDefinitionHolder，设置到代理的decoratedDefinition属性
 		proxyDefinition.setDecoratedDefinition(new BeanDefinitionHolder(targetDefinition, targetBeanName));
+		// 设置代理的原始BeanDefinition属性值
 		proxyDefinition.setOriginatingBeanDefinition(targetDefinition);
 		proxyDefinition.setSource(definition.getSource());
 		proxyDefinition.setRole(targetDefinition.getRole());
 
 		proxyDefinition.getPropertyValues().add("targetBeanName", targetBeanName);
 		if (proxyTargetClass) {
+			// 根据类做代理，proxyTargetClass属性默认为true，
 			targetDefinition.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
 			// ScopedProxyFactoryBean's "proxyTargetClass" default is TRUE, so we don't need to set it explicitly here.
 		}
 		else {
+			// 根据接口做代理，设置proxyTargetClass属性值为false
 			proxyDefinition.getPropertyValues().add("proxyTargetClass", Boolean.FALSE);
 		}
 
 		// Copy autowire settings from original bean definition.
+		// 从原始bean定义复制autowire设置
 		proxyDefinition.setAutowireCandidate(targetDefinition.isAutowireCandidate());
 		proxyDefinition.setPrimary(targetDefinition.isPrimary());
 		if (targetDefinition instanceof AbstractBeanDefinition) {
@@ -85,14 +94,17 @@ public abstract class ScopedProxyUtils {
 		}
 
 		// The target bean should be ignored in favor of the scoped proxy.
+		// 隐藏原始的bean
 		targetDefinition.setAutowireCandidate(false);
 		targetDefinition.setPrimary(false);
 
 		// Register the target bean as separate bean in the factory.
+		// 注册原始bean的BeanDefinition
 		registry.registerBeanDefinition(targetBeanName, targetDefinition);
 
 		// Return the scoped proxy definition as primary bean definition
 		// (potentially an inner bean).
+		// 将代理bean封装成BeanDefinitionHolder对象并返回
 		return new BeanDefinitionHolder(proxyDefinition, originalBeanName, definition.getAliases());
 	}
 

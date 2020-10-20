@@ -32,6 +32,9 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.lang.Nullable;
 
 /**
+ * 一个后置处理器
+ * 注册ClassPreProcessorAgentAdapter到spring applicationContext中，默认是LoadTimeWeaver
+ *
  * Post-processor that registers AspectJ's
  * {@link org.aspectj.weaver.loadtime.ClassPreProcessorAgentAdapter}
  * with the Spring application context's default

@@ -84,6 +84,7 @@ abstract class ConfigurationClassUtils {
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
+		// 获取当前BeanDefinition的元数据对象
 		String className = beanDef.getBeanClassName();
 		if (className == null || beanDef.getFactoryMethodName() != null) {
 			return false;
@@ -121,10 +122,13 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		// 判断元数据中是否包含@Configuration注解
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// 如果包含@Configuration注解，同时包含proxyBeanMethods属性，那么设置configurationClass属性为full
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		// 如果包含@Bean,@Component,@ComponentScan,@Import,@ImportSource注解，则设置为lite
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
