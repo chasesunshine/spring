@@ -25,6 +25,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 检测废弃的bean对象，并记录用户指定的bean类型
+ *
  * Bean factory post processor that logs a warning for {@link Deprecated @Deprecated} beans.
  *
  * @author Arjen Poutsma

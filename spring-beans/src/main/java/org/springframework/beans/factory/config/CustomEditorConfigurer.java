@@ -29,6 +29,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 此类用来方便的注册一个用户自定义的属性编辑器
+ *
  * {@link BeanFactoryPostProcessor} implementation that allows for convenient
  * registration of custom {@link PropertyEditor property editors}.
  *
@@ -81,7 +83,7 @@ import org.springframework.util.ClassUtils;
  *
  * <p><b>NOTE:</b> Custom property editors registered with this configurer do
  * <i>not</i> apply to data binding. Custom editors for data binding need to
- * be registered on the {@link org.springframework.validation.DataBinder}:
+ * be registered on the {link org.springframework.validation.DataBinder}:
  * Use a common base class or delegate to common PropertyEditorRegistrar
  * implementations to reuse editor registration there.
  *
@@ -91,7 +93,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.beans.PropertyEditorRegistrar
  * @see ConfigurableBeanFactory#addPropertyEditorRegistrar
  * @see ConfigurableBeanFactory#registerCustomEditor
- * @see org.springframework.validation.DataBinder#registerCustomEditor
+ * see org.springframework.validation.DataBinder#registerCustomEditor
  */
 public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered {
 
@@ -119,7 +121,7 @@ public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered
 	 * Specify the {@link PropertyEditorRegistrar PropertyEditorRegistrars}
 	 * to apply to beans defined within the current application context.
 	 * <p>This allows for sharing {@code PropertyEditorRegistrars} with
-	 * {@link org.springframework.validation.DataBinder DataBinders}, etc.
+	 * {link org.springframework.validation.DataBinder DataBinders}, etc.
 	 * Furthermore, it avoids the need for synchronization on custom editors:
 	 * A {@code PropertyEditorRegistrar} will always create fresh editor
 	 * instances for each bean creation attempt.
@@ -142,12 +144,17 @@ public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		// 如果属性编辑注册器不等于空
 		if (this.propertyEditorRegistrars != null) {
+			// 遍历属性编辑注册器的集合
 			for (PropertyEditorRegistrar propertyEditorRegistrar : this.propertyEditorRegistrars) {
+				// 将属性编辑注册器添加到beanFactory
 				beanFactory.addPropertyEditorRegistrar(propertyEditorRegistrar);
 			}
 		}
+		// 如果自定义编辑器不等于空
 		if (this.customEditors != null) {
+			// 遍历自定义编辑器集合将自定义编辑器添加到beanFactory中
 			this.customEditors.forEach(beanFactory::registerCustomEditor);
 		}
 	}

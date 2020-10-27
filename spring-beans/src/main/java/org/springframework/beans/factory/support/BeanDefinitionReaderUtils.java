@@ -71,6 +71,8 @@ public abstract class BeanDefinitionReaderUtils {
 	}
 
 	/**
+	 * 为给定的顶级BeanDefinition定义生成一个bean名称，该名称在给定的bean工厂中是唯一的
+	 *
 	 * Generate a bean name for the given top-level bean definition,
 	 * unique within the given bean factory.
 	 * @param beanDefinition the bean definition to generate a bean name for
@@ -88,14 +90,17 @@ public abstract class BeanDefinitionReaderUtils {
 	}
 
 	/**
+	 * 为给定的顶级BeanDefinition定义生成一个bean名称，该名称在给定的bean工厂中是唯一的
+	 *
+	 *
 	 * Generate a bean name for the given bean definition, unique within the
 	 * given bean factory.
-	 * @param definition the bean definition to generate a bean name for
+	 * @param definition the bean definition to generate a bean name for  beanDefinition定义
 	 * @param registry the bean factory that the definition is going to be
-	 * registered with (to check for existing bean names)
+	 * registered with (to check for existing bean names)  注册bean的工厂类
 	 * @param isInnerBean whether the given bean definition will be registered
 	 * as inner bean or as top-level bean (allowing for special name generation
-	 * for inner beans versus top-level beans)
+	 * for inner beans versus top-level beans) 给定的BeanDefinition是注册为内部bean还是顶级bean
 	 * @return the generated bean name
 	 * @throws BeanDefinitionStoreException if no unique name can be generated
 	 * for the given bean definition
@@ -104,12 +109,15 @@ public abstract class BeanDefinitionReaderUtils {
 			BeanDefinition definition, BeanDefinitionRegistry registry, boolean isInnerBean)
 			throws BeanDefinitionStoreException {
 
+		// 获取bean定义的类名
 		String generatedBeanName = definition.getBeanClassName();
 		if (generatedBeanName == null) {
 			if (definition.getParentName() != null) {
+				// 当bean定义名称不存在并且存在父类时命名方式
 				generatedBeanName = definition.getParentName() + "$child";
 			}
 			else if (definition.getFactoryBeanName() != null) {
+				// 读取生成该bean的factoryBean名称做前缀
 				generatedBeanName = definition.getFactoryBeanName() + "$created";
 			}
 		}
@@ -120,14 +128,18 @@ public abstract class BeanDefinitionReaderUtils {
 
 		if (isInnerBean) {
 			// Inner bean: generate identity hashcode suffix.
+			// 当为内部类的时候，使用#号分割和系统的唯一hash码作为后缀
 			return generatedBeanName + GENERATED_BEAN_NAME_SEPARATOR + ObjectUtils.getIdentityHexString(definition);
 		}
 
 		// Top-level bean: use plain class name with unique suffix if necessary.
+		// 定义bean，使用普通类名加唯一后缀
 		return uniqueBeanName(generatedBeanName, registry);
 	}
 
 	/**
+	 * 将给定的bean名称转换为给定bean工厂的唯一bean名称，如果有必要，附加一个唯一的计数器做后缀
+	 *
 	 * Turn the given bean name into a unique bean name for the given bean factory,
 	 * appending a unique counter as suffix if necessary.
 	 * @param beanName the original bean name
@@ -141,6 +153,7 @@ public abstract class BeanDefinitionReaderUtils {
 		int counter = -1;
 
 		// Increase counter until the id is unique.
+		// 自增计数器，直到id唯一
 		String prefix = beanName + GENERATED_BEAN_NAME_SEPARATOR;
 		while (counter == -1 || registry.containsBeanDefinition(id)) {
 			counter++;

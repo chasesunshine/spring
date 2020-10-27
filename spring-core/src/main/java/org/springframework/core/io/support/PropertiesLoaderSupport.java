@@ -44,19 +44,25 @@ public abstract class PropertiesLoaderSupport {
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 本地属性，通过设置Properties对象直接设置进来的属性
 	@Nullable
 	protected Properties[] localProperties;
 
+	// 本地属性和其他设置属性的优先级设置，false表示外来属性优先级高于本地属性，true表示本地属性优先级高于外来属性
 	protected boolean localOverride = false;
 
+	// 外部属性对应资源，通过设置外部资源位置设置要加载的属性
 	@Nullable
 	private Resource[] locations;
 
+	// 如果遇到不存在的资源路径，那么false，输入日志，继续执行其他逻辑，true，抛出异常
 	private boolean ignoreResourceNotFound = false;
 
+	// 设置文件的编码格式
 	@Nullable
 	private String fileEncoding;
 
+	// 外部属性加载工具
 	private PropertiesPersister propertiesPersister = new DefaultPropertiesPersister();
 
 
@@ -141,6 +147,8 @@ public abstract class PropertiesLoaderSupport {
 
 
 	/**
+	 * 返回一个合并的属性实例包含加载的属性和设置在factorybean中的属性
+	 *
 	 * Return a merged Properties instance containing both the
 	 * loaded properties and properties set on this FactoryBean.
 	 */
@@ -149,10 +157,12 @@ public abstract class PropertiesLoaderSupport {
 
 		if (this.localOverride) {
 			// Load properties from file upfront, to let local properties override.
+			// 加载外部属性到结果对象中
 			loadProperties(result);
 		}
 
 		if (this.localProperties != null) {
+			// 将本地属性合并到结果对象
 			for (Properties localProp : this.localProperties) {
 				CollectionUtils.mergePropertiesIntoMap(localProp, result);
 			}
@@ -160,6 +170,7 @@ public abstract class PropertiesLoaderSupport {
 
 		if (!this.localOverride) {
 			// Load properties from file afterwards, to let those properties override.
+			// 加载外部属性到结果对象中
 			loadProperties(result);
 		}
 
@@ -174,15 +185,18 @@ public abstract class PropertiesLoaderSupport {
 	 */
 	protected void loadProperties(Properties props) throws IOException {
 		if (this.locations != null) {
+			// 读取每一个属性文件资源
 			for (Resource location : this.locations) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Loading properties file from " + location);
 				}
 				try {
+					// 使用指定的字符集从外部资源路径location读取属性到props，使用的属性读取工具是propertiesPersister
 					PropertiesLoaderUtils.fillProperties(
 							props, new EncodedResource(location, this.fileEncoding), this.propertiesPersister);
 				}
 				catch (FileNotFoundException | UnknownHostException | SocketException ex) {
+					// 出现异常时的处理
 					if (this.ignoreResourceNotFound) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("Properties resource not found: " + ex.getMessage());

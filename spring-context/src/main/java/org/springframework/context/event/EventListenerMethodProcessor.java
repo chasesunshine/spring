@@ -51,6 +51,9 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * 此类用来对@EventListener提供支持
+ * 1、解析@EventListener,获取拦截方法
+ * 2、对拦截方法进行转换，编程ApplicationListener
+ * 3、将转换的ApplicationListener放到Spring容器中
  *
  * Registers {@link EventListener} methods as individual {@link ApplicationListener} instances.
  * Implements {@link BeanFactoryPostProcessor} (as of 5.1) primarily for early retrieval,
@@ -67,17 +70,21 @@ public class EventListenerMethodProcessor
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 用于记录检测发现@EventListener注解方法，生成和注册ApplicationListener实例的应用上下文
 	@Nullable
 	private ConfigurableApplicationContext applicationContext;
 
+	// 记录当前BeanFactory
 	@Nullable
 	private ConfigurableListableBeanFactory beanFactory;
 
+	// 记录从容器中找到的所有EventListenerFactory
 	@Nullable
 	private List<EventListenerFactory> eventListenerFactories;
 
 	private final EventExpressionEvaluator evaluator = new EventExpressionEvaluator();
 
+	// 缓存机制，记住那些任何方法上没有使用注解@EventListener的类，避免二次处理
 	private final Set<Class<?>> nonAnnotatedClasses = Collections.newSetFromMap(new ConcurrentHashMap<>(64));
 
 
@@ -92,6 +99,10 @@ public class EventListenerMethodProcessor
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
 
+		// 从容器中找到所有的EventListenerFactory组件，比如常见的TransactionalEventListenerFactory，用于支持使用@TransactionalEventListener注解的事件监听器
+		// @TransactionalEventListener是一种特殊的@EventListener，它定义的事件监听器应用于事务提交或者回滚的某些特殊时机
+		// 由ProxyTransactionManagementConfiguration注册到容器
+		// DefaultEventListenerFactory最低的优先级，如果其他EventListenerFactory都不支持的时候使用
 		Map<String, EventListenerFactory> beans = beanFactory.getBeansOfType(EventListenerFactory.class, false, false);
 		List<EventListenerFactory> factories = new ArrayList<>(beans.values());
 		AnnotationAwareOrderComparator.sort(factories);
@@ -103,8 +114,10 @@ public class EventListenerMethodProcessor
 	public void afterSingletonsInstantiated() {
 		ConfigurableListableBeanFactory beanFactory = this.beanFactory;
 		Assert.state(this.beanFactory != null, "No ConfigurableListableBeanFactory set");
+		// 获取容器中所有bean组件的名称
 		String[] beanNames = beanFactory.getBeanNamesForType(Object.class);
 		for (String beanName : beanNames) {
+			// 遍历每个bean组件，检测其中@EventListener注解方法，生成和注册ApplicationListener实例
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
 				Class<?> type = null;
 				try {
@@ -133,6 +146,7 @@ public class EventListenerMethodProcessor
 						}
 					}
 					try {
+						// 针对一个bean的真正的@EventListener注解方法检测，ApplicationListener实例生成和注册
 						processBean(beanName, type);
 					}
 					catch (Throwable ex) {
@@ -144,6 +158,11 @@ public class EventListenerMethodProcessor
 		}
 	}
 
+	/**
+	 * 该方法拿到某个bean的名称和它的目标类，再这个范围上检测@EventListener注解方法，生成和注册ApplicationListener实例
+	 * @param beanName
+	 * @param targetType
+	 */
 	private void processBean(final String beanName, final Class<?> targetType) {
 		if (!this.nonAnnotatedClasses.contains(targetType) &&
 				AnnotationUtils.isCandidateClass(targetType, EventListener.class) &&
@@ -151,6 +170,7 @@ public class EventListenerMethodProcessor
 
 			Map<Method, EventListener> annotatedMethods = null;
 			try {
+				// 检测当前类targetType上使用了注解@EventListener的方法
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
 						(MethodIntrospector.MetadataLookup<EventListener>) method ->
 								AnnotatedElementUtils.findMergedAnnotation(method, EventListener.class));
@@ -163,6 +183,8 @@ public class EventListenerMethodProcessor
 			}
 
 			if (CollectionUtils.isEmpty(annotatedMethods)) {
+				// 如果当前类targetType中没有任何使用了注解@EventListener的方法，则将该类保存到缓存nonAnnotatedClasses，从而
+				// 避免当前处理方法重入该类，避免二次处理
 				this.nonAnnotatedClasses.add(targetType);
 				if (logger.isTraceEnabled()) {
 					logger.trace("No @EventListener annotations found on bean class: " + targetType.getName());
@@ -170,19 +192,23 @@ public class EventListenerMethodProcessor
 			}
 			else {
 				// Non-empty set of methods
+				// 如果当前类targetType中有些方法使用了注解@EventListener，那么根据方法上的信息对应的创建和注册ApplicationListener实例
 				ConfigurableApplicationContext context = this.applicationContext;
 				Assert.state(context != null, "No ApplicationContext set");
+				// 此处使用了this.eventListenerFactories,这些EventListenerFactory是在该类postProcessBeanFactory方法调用时被记录的
 				List<EventListenerFactory> factories = this.eventListenerFactories;
 				Assert.state(factories != null, "EventListenerFactory List not initialized");
 				for (Method method : annotatedMethods.keySet()) {
 					for (EventListenerFactory factory : factories) {
 						if (factory.supportsMethod(method)) {
 							Method methodToUse = AopUtils.selectInvocableMethod(method, context.getType(beanName));
+							// 如果当前EventListenerFactory支持处理该@EventListener注解的方法，则使用它创建ApplicationListener
 							ApplicationListener<?> applicationListener =
 									factory.createApplicationListener(beanName, targetType, methodToUse);
 							if (applicationListener instanceof ApplicationListenerMethodAdapter) {
 								((ApplicationListenerMethodAdapter) applicationListener).init(context, this.evaluator);
 							}
+							// 将创建的ApplicationListener加入到容器中
 							context.addApplicationListener(applicationListener);
 							break;
 						}

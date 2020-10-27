@@ -25,6 +25,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.Nullable;
 
 /**
+ * BeanFactoryPostProcessor的实现类，应用spring aop到指定的bean中
+ *
  * Base class for {@link BeanPostProcessor} implementations that apply a
  * Spring AOP {@link Advisor} to specific beans.
  *
@@ -56,13 +58,27 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 	}
 
 
+	/**
+	 * 直接返回目标对象，任何处理都不做
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		return bean;
 	}
 
+	/**
+	 * 根据目标bean类型判断目标bean是否需要被添加Advisor，需要的话向其添加Advisor
+	 *
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
+		// 如果advisor为空或者bean归属于AopInfrastructureBean子类，直接返回
 		if (this.advisor == null || bean instanceof AopInfrastructureBean) {
 			// Ignore AOP infrastructure such as scoped proxies.
 			return bean;

@@ -20,7 +20,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 
 /**
- *
+ * BeanFactoryPostProcessor的子接口，在常规的BeanFactoryPostProcessor检测之前注册bean定义信息
  *
  * Extension to the standard {@link BeanFactoryPostProcessor} SPI, allowing for
  * the registration of further bean definitions <i>before</i> regular
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
  *
  * @author Juergen Hoeller
  * @since 3.0.1
- * @see org.springframework.context.annotation.ConfigurationClassPostProcessor
+ * see org.springframework.context.annotation.ConfigurationClassPostProcessor
  */
 public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProcessor {
 

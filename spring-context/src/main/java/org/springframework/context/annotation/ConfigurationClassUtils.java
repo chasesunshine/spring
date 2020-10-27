@@ -74,6 +74,9 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
+	 * 检查当前给定的beanDefinition中是否是一个配置类的候选者，
+	 * 判断在嵌套的关系中是否包含配置类或者组件类或者自动注册进去的，并做相应的标记
+	 *
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.
@@ -91,26 +94,37 @@ abstract class ConfigurationClassUtils {
 		}
 
 		AnnotationMetadata metadata;
+		// 通过注解注入的db都是AnnotatedGenericBeanDefinition，实现了AnnotatedBeanDefinition
+		// spring内部的bd是RootBeanDefinition，实现了AbstractBeanDefinition
+		// 此处主要用于判断是否归属于AnnotatedBeanDefinition
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
+			// 从当前bean的定义信息中国获取元数据信息
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
+		// 判断是否是spring中默认的BeanDefinition
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
+			// 获取当前bean对象的Class对象
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
+			// 判断该类是否是指定类的子类
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
 					AopInfrastructureBean.class.isAssignableFrom(beanClass) ||
 					EventListenerFactory.class.isAssignableFrom(beanClass)) {
 				return false;
 			}
+			// 根据beanClass生成对应的AnnotationMetadata对象
 			metadata = AnnotationMetadata.introspect(beanClass);
 		}
+		// 如果上述两种情况都不符合
 		else {
 			try {
+				// 获取元数据读取器
 				MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
+				// 通过元数据读取器获取注解元数据
 				metadata = metadataReader.getAnnotationMetadata();
 			}
 			catch (IOException ex) {
@@ -122,7 +136,7 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
-		// 判断元数据中是否包含@Configuration注解
+		// 判断当前BeanDefinition是否存在@Configuration注解，如果存在
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
 		// 如果包含@Configuration注解，同时包含proxyBeanMethods属性，那么设置configurationClass属性为full
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
@@ -137,7 +151,9 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		// 获取具体的执行顺序
 		Integer order = getOrder(metadata);
+		// 如果值不为空的话，那么直接设置值到具体的beanDefinition
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
 		}

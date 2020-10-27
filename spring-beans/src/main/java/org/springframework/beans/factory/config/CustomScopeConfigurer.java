@@ -28,6 +28,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 简单BeanFactoryPostProcessor实现类，自定义作用域的配置器
+ *
  * Simple {@link BeanFactoryPostProcessor} implementation that registers
  * custom {@link Scope Scope(s)} with the containing {@link ConfigurableBeanFactory}.
  *
@@ -96,19 +98,27 @@ public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClas
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		// 如果scopes不等于空
 		if (this.scopes != null) {
+			// 遍历scopes集合，
 			this.scopes.forEach((scopeKey, value) -> {
+				// 如果是Scope类型，
 				if (value instanceof Scope) {
+					// 注册到beanFactory中
 					beanFactory.registerScope(scopeKey, (Scope) value);
 				}
+				// 如果是Class类型
 				else if (value instanceof Class) {
 					Class<?> scopeClass = (Class<?>) value;
 					Assert.isAssignable(Scope.class, scopeClass, "Invalid scope class");
+					// 注册到beanFactory
 					beanFactory.registerScope(scopeKey, (Scope) BeanUtils.instantiateClass(scopeClass));
 				}
+				// 如果是String类型
 				else if (value instanceof String) {
 					Class<?> scopeClass = ClassUtils.resolveClassName((String) value, this.beanClassLoader);
 					Assert.isAssignable(Scope.class, scopeClass, "Invalid scope class");
+					// 注册到beanFactory
 					beanFactory.registerScope(scopeKey, (Scope) BeanUtils.instantiateClass(scopeClass));
 				}
 				else {

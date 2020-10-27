@@ -103,9 +103,11 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	protected void processProperties(ConfigurableListableBeanFactory beanFactory, Properties props)
 			throws BeansException {
 
+		// 遍历所有的配置文件的属性名
 		for (Enumeration<?> names = props.propertyNames(); names.hasMoreElements();) {
 			String key = (String) names.nextElement();
 			try {
+				// 执行processkey方法
 				processKey(beanFactory, key, props.getProperty(key));
 			}
 			catch (BeansException ex) {
@@ -126,14 +128,19 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	protected void processKey(ConfigurableListableBeanFactory factory, String key, String value)
 			throws BeansException {
 
+		// 获取properties中属性名中字符"."第一次出现的位置
 		int separatorIndex = key.indexOf(this.beanNameSeparator);
 		if (separatorIndex == -1) {
+			// 若properties的属性中不存在".",则抛出异常
 			throw new BeanInitializationException("Invalid key '" + key +
 					"': expected 'beanName" + this.beanNameSeparator + "property'");
 		}
+		// 获取“.”之前的字符串作为beanName
 		String beanName = key.substring(0, separatorIndex);
+		// 获取.之后的作为属性名称，作为applyPropertyValue方法的入参
 		String beanProperty = key.substring(separatorIndex + 1);
 		this.beanNames.add(beanName);
+		// 执行属性值的赋值操作
 		applyPropertyValue(factory, beanName, beanProperty, value);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Property '" + key + "' set to value [" + value + "]");
@@ -146,14 +153,18 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	protected void applyPropertyValue(
 			ConfigurableListableBeanFactory factory, String beanName, String property, String value) {
 
+		// 根据前面解析到的beanName来获取BeanDefinition
 		BeanDefinition bd = factory.getBeanDefinition(beanName);
+		// 将bd赋值给bdToUse
 		BeanDefinition bdToUse = bd;
 		while (bd != null) {
 			bdToUse = bd;
 			bd = bd.getOriginatingBeanDefinition();
 		}
+		// 构造propertyValue对象
 		PropertyValue pv = new PropertyValue(property, value);
 		pv.setOptional(this.ignoreInvalidKeys);
+		// 调用方法对值进行处理
 		bdToUse.getPropertyValues().addPropertyValue(pv);
 	}
 

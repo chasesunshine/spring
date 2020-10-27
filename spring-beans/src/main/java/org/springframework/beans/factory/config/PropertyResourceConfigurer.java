@@ -28,6 +28,8 @@ import org.springframework.core.io.support.PropertiesLoaderSupport;
 import org.springframework.util.ObjectUtils;
 
 /**
+ *
+ *
  * Allows for configuration of individual bean property values from a property resource,
  * i.e. a properties file. Useful for custom config files targeted at system
  * administrators that override bean properties configured in the application context.
@@ -77,12 +79,15 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		try {
+			// 获取所有属性
 			Properties mergedProps = mergeProperties();
 
 			// Convert the merged properties, if necessary.
+			// 转换合并属性
 			convertProperties(mergedProps);
 
 			// Let the subclass process the properties.
+			// 子类实现属性替换过程
 			processProperties(beanFactory, mergedProps);
 		}
 		catch (IOException ex) {
@@ -91,6 +96,8 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	}
 
 	/**
+	 * 对指定属性对象中的属性值进行必要的转换
+	 *
 	 * Convert the given merged properties, converting property values
 	 * if necessary. The result will then be processed.
 	 * <p>The default implementation will invoke {@link #convertPropertyValue}
@@ -111,6 +118,8 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	}
 
 	/**
+	 * 对指定名称的属性的属性值进行必要的转换
+	 *
 	 * Convert the given property from the properties source to the value
 	 * which should be applied.
 	 * <p>The default implementation calls {@link #convertPropertyValue(String)}.
@@ -124,6 +133,8 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	}
 
 	/**
+	 * 对属性值的必要转换，此处没有做任何实现，直接返回原值，实现类可以覆盖该方法
+	 *
 	 * Convert the given property value from the properties source to the value
 	 * which should be applied.
 	 * <p>The default implementation simply returns the original value.

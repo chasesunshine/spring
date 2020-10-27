@@ -1311,10 +1311,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
+		// 从缓存中获取
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
 		if (mbd != null && !mbd.stale) {
 			return mbd;
 		}
+		// 如果缓存中没有找到，那么就到beanFactory中查找
 		return getMergedBeanDefinition(beanName, getBeanDefinition(beanName));
 	}
 
@@ -1351,18 +1353,23 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			RootBeanDefinition previous = null;
 
 			// Check with full lock now in order to enforce the same merged instance.
+			// 如果包含BeanDefinition为空，从缓存中获取合并BeanDefinition，因为被包含的BeanDefinition不会被缓存
 			if (containingBd == null) {
 				mbd = this.mergedBeanDefinitions.get(beanName);
 			}
 
+			// 如果缓存中没有
 			if (mbd == null || mbd.stale) {
 				previous = mbd;
+				// 如果父BeanDefinition为空格
 				if (bd.getParentName() == null) {
 					// Use copy of given root bean definition.
+					// 进行克隆操作
 					if (bd instanceof RootBeanDefinition) {
 						mbd = ((RootBeanDefinition) bd).cloneBeanDefinition();
 					}
 					else {
+						// 复制对应的属性，创建一个RootBeanDefinition对象
 						mbd = new RootBeanDefinition(bd);
 					}
 				}
@@ -1370,10 +1377,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// Child bean definition: needs to be merged with parent.
 					BeanDefinition pbd;
 					try {
+						// 获取父bean的名称，并进行转换
 						String parentBeanName = transformedBeanName(bd.getParentName());
+						// 如果当前beanName和父beanName不相同，那么递归调用合并方法
 						if (!beanName.equals(parentBeanName)) {
 							pbd = getMergedBeanDefinition(parentBeanName);
 						}
+						// 如果相同的beanName，那么它来自于父容器
 						else {
 							BeanFactory parent = getParentBeanFactory();
 							if (parent instanceof ConfigurableBeanFactory) {
@@ -1391,11 +1401,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 								"Could not resolve parent bean definition '" + bd.getParentName() + "'", ex);
 					}
 					// Deep copy with overridden values.
+					// 复制父BeanDefinition的属性构建新的RootBeanDefinition
 					mbd = new RootBeanDefinition(pbd);
+					// 将子BeanDefinition的属性覆盖的设置
 					mbd.overrideFrom(bd);
 				}
 
 				// Set default singleton scope, if not configured before.
+				// 如果没有指定scope，那么设置默认的scope为单例
 				if (!StringUtils.hasLength(mbd.getScope())) {
 					mbd.setScope(SCOPE_SINGLETON);
 				}
@@ -1404,12 +1417,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// Let's correct this on the fly here, since this might be the result of
 				// parent-child merging for the outer bean, in which case the original inner bean
 				// definition will not have inherited the merged outer bean's singleton status.
+				// 如果当前bean为被包含bean，它的scope是单例的而其包含bean的scope不是单例的，那么继承包含bean的scope
 				if (containingBd != null && !containingBd.isSingleton() && mbd.isSingleton()) {
 					mbd.setScope(containingBd.getScope());
 				}
 
 				// Cache the merged bean definition for the time being
 				// (it might still get re-merged later on in order to pick up metadata changes)
+				// 如果当前bean不是被包含的bean，那么进行缓存，为什么不缓存被包含的bean，原因也很简单，就是被包含的bean的值可能发生改变
 				if (containingBd == null && isCacheBeanMetadata()) {
 					this.mergedBeanDefinitions.put(beanName, mbd);
 				}
@@ -1623,6 +1638,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		// 获取目标类型
 		Class<?> targetType = mbd.getTargetType();
 		if (targetType != null) {
 			return targetType;
@@ -1639,12 +1655,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param mbd the corresponding bean definition
 	 */
 	protected boolean isFactoryBean(String beanName, RootBeanDefinition mbd) {
+		// 获取RootBeanDefinition的isFactoryBean属性
 		Boolean result = mbd.isFactoryBean;
+		// 如果结果为空
 		if (result == null) {
+			// 判断当前bean的类型
 			Class<?> beanType = predictBeanType(beanName, mbd, FactoryBean.class);
+			// 根据类型来判断结果值
 			result = (beanType != null && FactoryBean.class.isAssignableFrom(beanType));
 			mbd.isFactoryBean = result;
 		}
+		// 如果不为空，直接返回
 		return result;
 	}
 
