@@ -25,6 +25,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 主要用于程序测试，它允许通过编程的方式提供国际化消息
+ *
  * Simple implementation of {@link org.springframework.context.MessageSource}
  * which allows messages to be registered programmatically.
  * This MessageSource supports basic internationalization.
@@ -68,6 +70,8 @@ public class StaticMessageSource extends AbstractMessageSource {
 	}
 
 	/**
+	 * 将给定的消息与给定的代码相关联
+	 *
 	 * Associate the given message with the given code.
 	 * @param code the lookup code
 	 * @param locale the locale that the message should be found within
@@ -84,6 +88,8 @@ public class StaticMessageSource extends AbstractMessageSource {
 	}
 
 	/**
+	 * 批量将给定的消息与给定的代码相关联
+	 *
 	 * Associate the given message values with the given keys as codes.
 	 * @param messages the messages to register, with messages codes
 	 * as keys and message texts as values

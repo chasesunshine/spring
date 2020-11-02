@@ -265,6 +265,11 @@ final class PostProcessorRegistrationDelegate {
         beanFactory.clearMetadataCache();
     }
 
+    /**
+     * 注册beanPostProcessor
+     * @param beanFactory
+     * @param applicationContext
+     */
     public static void registerBeanPostProcessors(
             ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
@@ -275,7 +280,7 @@ final class PostProcessorRegistrationDelegate {
         // a bean is created during BeanPostProcessor instantiation, i.e. when
         // a bean is not eligible for getting processed by all BeanPostProcessors.
         // 记录下BeanPostProcessor的目标计数
-        // 此处为什么要+1呢，原因非常简单，在此方法的最后会添加一个ApplicationListenerDetector的类
+        // 此处为什么要+1呢，原因非常简单，在此方法的最后会添加一个BeanPostProcessorChecker的类
         int beanProcessorTargetCount = beanFactory.getBeanPostProcessorCount() + 1 + postProcessorNames.length;
         // 添加BeanPostProcessorChecker(主要用于记录信息)到beanFactory中
         beanFactory.addBeanPostProcessor(new BeanPostProcessorChecker(beanFactory, beanProcessorTargetCount));
@@ -410,14 +415,17 @@ final class PostProcessorRegistrationDelegate {
      */
     private static void registerBeanPostProcessors(
             ConfigurableListableBeanFactory beanFactory, List<BeanPostProcessor> postProcessors) {
-
+        // 遍历postProcessors
         for (BeanPostProcessor postProcessor : postProcessors) {
+            // 将postProcessor添加到BeanFactory中的beanPostProcessors缓存
             beanFactory.addBeanPostProcessor(postProcessor);
         }
     }
 
 
     /**
+     * bean后置处理器，用来记录后置处理器实例化时的输出信息
+     *
      * BeanPostProcessor that logs an info message when a bean is created during
      * BeanPostProcessor instantiation, i.e. when a bean is not eligible for
      * getting processed by all BeanPostProcessors.
@@ -435,13 +443,27 @@ final class PostProcessorRegistrationDelegate {
             this.beanPostProcessorTargetCount = beanPostProcessorTargetCount;
         }
 
+        /**
+         * 后置处理器的before方法，什么都不做，直接返回对象
+         * @param bean the new bean instance
+         * @param beanName the name of the bean
+         * @return
+         */
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) {
             return bean;
         }
 
+        /**
+         * 后置处理器的after方法，用来判断哪些是不需要检测的bean
+         * @param bean the new bean instance
+         * @param beanName the name of the bean
+         * @return
+         */
         @Override
         public Object postProcessAfterInitialization(Object bean, String beanName) {
+            // 1、BeanPostProcessor类型不检测
+            // 2、ROLE_INFRASTRUCTURE这种类型的bean不检测（spring自己的bean）
             if (!(bean instanceof BeanPostProcessor) && !isInfrastructureBean(beanName) &&
                     this.beanFactory.getBeanPostProcessorCount() < this.beanPostProcessorTargetCount) {
                 if (logger.isInfoEnabled()) {
@@ -453,6 +475,11 @@ final class PostProcessorRegistrationDelegate {
             return bean;
         }
 
+        /**
+         * 检测当前bean是否是spring自己的bean
+         * @param beanName
+         * @return
+         */
         private boolean isInfrastructureBean(@Nullable String beanName) {
             if (beanName != null && this.beanFactory.containsBeanDefinition(beanName)) {
                 BeanDefinition bd = this.beanFactory.getBeanDefinition(beanName);

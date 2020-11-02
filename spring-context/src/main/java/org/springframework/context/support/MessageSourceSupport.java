@@ -28,6 +28,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 用于支持消息源解析的抽象类
+ *
  * Base class for message source implementations, providing support infrastructure
  * such as {@link java.text.MessageFormat} handling but not implementing concrete
  * methods defined in the {@link org.springframework.context.MessageSource}.
@@ -41,14 +43,18 @@ import org.springframework.util.ObjectUtils;
  */
 public abstract class MessageSourceSupport {
 
+	// 默认的消息格式组件
 	private static final MessageFormat INVALID_MESSAGE_FORMAT = new MessageFormat("");
 
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 是否始终应用“消息格式组件”，解析没有参数的消息（如：AbstractMessageSource中的commonMessages中的消息）
 	private boolean alwaysUseMessageFormat = false;
 
 	/**
+	 * 缓存来保存已解决消息的消息格式组件，用于传入的默认消息
+	 *
 	 * Cache to hold already generated MessageFormats per message.
 	 * Used for passed-in default messages. MessageFormats for resolved
 	 * codes are cached on a specific basis in subclasses.
@@ -57,6 +63,8 @@ public abstract class MessageSourceSupport {
 
 
 	/**
+	 * 设置是否始终应用消息格式组件，解析没有参数的消息
+	 *
 	 * Set whether to always apply the {@code MessageFormat} rules,
 	 * parsing even messages without arguments.
 	 * <p>Default is "false": Messages without arguments are by default
@@ -75,6 +83,8 @@ public abstract class MessageSourceSupport {
 	}
 
 	/**
+	 * 返回是否始终应用消息格式组件，解析没有参数的消息
+	 *
 	 * Return whether to always apply the MessageFormat rules, parsing even
 	 * messages without arguments.
 	 */
@@ -84,6 +94,8 @@ public abstract class MessageSourceSupport {
 
 
 	/**
+	 * 渲染给定的默认消息字符串
+	 *
 	 * Render the given default message String. The default message is
 	 * passed in as specified by the caller and can be rendered into
 	 * a fully formatted default message shown to the user.
@@ -102,6 +114,8 @@ public abstract class MessageSourceSupport {
 	}
 
 	/**
+	 * 渲染给定的消息字符串
+	 *
 	 * Format the given message String, using cached MessageFormats.
 	 * By default invoked for passed-in default messages, to resolve
 	 * any argument placeholders found in them.
@@ -117,14 +131,17 @@ public abstract class MessageSourceSupport {
 		}
 		MessageFormat messageFormat = null;
 		synchronized (this.messageFormatsPerMessage) {
+			// 先尝试获取缓存消息格式组件
 			Map<Locale, MessageFormat> messageFormatsPerLocale = this.messageFormatsPerMessage.get(msg);
 			if (messageFormatsPerLocale != null) {
 				messageFormat = messageFormatsPerLocale.get(locale);
 			}
 			else {
+				// 缓存为空，设置初始化空map值
 				messageFormatsPerLocale = new HashMap<>();
 				this.messageFormatsPerMessage.put(msg, messageFormatsPerLocale);
 			}
+			// 消息格式组件为空，则初始化一个messageFormat
 			if (messageFormat == null) {
 				try {
 					messageFormat = createMessageFormat(msg, locale);
@@ -132,24 +149,31 @@ public abstract class MessageSourceSupport {
 				catch (IllegalArgumentException ex) {
 					// Invalid message format - probably not intended for formatting,
 					// rather using a message structure with no arguments involved...
+					// 如果alwaysUseMessageFormat为true，则抛出异常
 					if (isAlwaysUseMessageFormat()) {
 						throw ex;
 					}
 					// Silently proceed with raw message if format not enforced...
+					// 如果格式未被强制执行，则默认继续处理原始消息
 					messageFormat = INVALID_MESSAGE_FORMAT;
 				}
+				// 缓存当前消息的消息格式组件
 				messageFormatsPerLocale.put(locale, messageFormat);
 			}
 		}
+		// 消息解析对象为默认消息解析器，直接返回msg
 		if (messageFormat == INVALID_MESSAGE_FORMAT) {
 			return msg;
 		}
+		// 使用messageFormat解析消息
 		synchronized (messageFormat) {
 			return messageFormat.format(resolveArguments(args, locale));
 		}
 	}
 
 	/**
+	 * 为给定的消息和区域设置创建一个MessageFormat
+	 *
 	 * Create a MessageFormat for the given message and Locale.
 	 * @param msg the message to create a MessageFormat for
 	 * @param locale the Locale to create a MessageFormat for
@@ -160,6 +184,8 @@ public abstract class MessageSourceSupport {
 	}
 
 	/**
+	 * 子类可以覆盖，否则只是按原样返回给定的参数数组
+	 *
 	 * Template method for resolving argument objects.
 	 * <p>The default implementation simply returns the given argument array as-is.
 	 * Can be overridden in subclasses in order to resolve special argument types.

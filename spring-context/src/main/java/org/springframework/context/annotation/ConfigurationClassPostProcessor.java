@@ -229,6 +229,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 
 	/**
+	 * 定位、加载、解析、注册相关注解
+	 *
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 */
 	@Override
@@ -251,6 +253,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 	/**
+	 * 添加CGLIB增强处理及ImportAwareBeanPostProcessor后置处理类
+	 *
 	 * Prepare the Configuration classes for servicing bean requests at runtime
 	 * by replacing them with CGLIB-enhanced subclasses.
 	 */
@@ -286,7 +290,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		// 当前registry就是DefaultListableBeanFactory，获取所有已经注册的BeanDefinition的beanName
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
-		// 遍历所有要处理的beanDefinition的名称
+		// 遍历所有要处理的beanDefinition的名称,筛选对应的beanDefinition（被注解修饰的）
 		for (String beanName : candidateNames) {
 			// 获取指定名称的BeanDefinition对象
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
@@ -296,7 +300,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
-			// 判断当前BeanDefinition是否加了@Configuration注解或者其他@Bean,@Component,@ComponentScan,@Import,@ImportSource注解
+			// 判断当前BeanDefinition是否是一个配置类，并为BeanDefinition设置属性为lite或者full，此处设置属性值是为了后续进行调用
+			// 如果Configuration配置proxyBeanMethods代理为true则为full
+			// 如果加了@Bean、@Component、@ComponentScan、@Import、@ImportResource注解，则设置为lite
+			// 如果配置类上被@Order注解标注，则设置BeanDefinition的order属性值
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				// 添加到对应的集合对象中
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
@@ -304,13 +311,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Return immediately if no @Configuration classes were found
-		// 判断集合中是否有包含了注解的BeanDefinition
+		// 如果没有发现任何配置类，则直接返回
 		if (configCandidates.isEmpty()) {
 			return;
 		}
 
 		// Sort by previously determined @Order value, if applicable
-		// 如果同时添加了@Order注解，那么进行排序操作
+		// 如果适用，则按照先前确定的@Order的值排序
 		configCandidates.sort((bd1, bd2) -> {
 			int i1 = ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());
 			int i2 = ConfigurationClassUtils.getOrder(bd2.getBeanDefinition());
@@ -350,29 +357,31 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 
 		// 创建两个集合对象，
-		// candidates用于将之前加入的configCandidates去重
-		// alreadyParsed用于判断是否应处理过了
+		// 存放相关的BeanDefinitionHolder对象
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
+		// 存放扫描包下的所有bean
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
 			// 解析带有@Controller、@Import、@ImportResource、@ComponentScan、@ComponentScans、@Bean的BeanDefinition
 			parser.parse(candidates);
+			// 将解析完的Configuration配置类进行校验，1、配置类不能是final，2、@Bean修饰的方法必须可以重写以支持CGLIB
 			parser.validate();
 
-			// 移除掉已经解析的配置类
+			// 获取所有的bean,包括扫描的bean对象，@Import导入的bean对象
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
+			// 清除掉已经解析处理过的配置类
 			configClasses.removeAll(alreadyParsed);
 
 			// Read the model and create bean definitions based on its content
+			// 判断读取器是否为空，如果为空的话，就创建完全填充好的ConfigurationClass实例的读取器
 			if (this.reader == null) {
 				this.reader = new ConfigurationClassBeanDefinitionReader(
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
-			// 将上一步parser解析出的ConfigurationClass类加载成BeanDefinition，实际上经过上一步的parser后，解析出来的bean已经放入到BeanDefinition中
-			// 但是由于这些bean可能会引入新的bean，（例如实现了ImportBeanDefinitionRegistrar或者ImportSelector接口的bean,或者bean中存在被@Bean注解的方法）
-			// 因此需要执行一次loadBeanDefinition（），这样就会执行ImportBeanDefinitionRegistrar或者ImportSelector接口
+			// 核心方法，将完全填充好的ConfigurationClass实例转化为BeanDefinition注册入IOC容器
 			this.reader.loadBeanDefinitions(configClasses);
+			// 添加到已经处理的集合中
 			alreadyParsed.addAll(configClasses);
 
 			candidates.clear();

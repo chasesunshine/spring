@@ -1,16 +1,13 @@
 package com.mashibing;
 
-import com.mashibing.selfEditor.Customer;
-import com.mashibing.selftag.User;
-import javafx.application.Application;
-import org.springframework.context.ApplicationContext;
+import com.mashibing.config.MyPropertySource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Test {
 
     public static void main(String[] args) {
         MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
+//        System.out.println(ac.getBean(MyPropertySource.class).getName());
 //        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-${username}.xml");
 //        Person bean = ac.getBean(Person.class);
 //        System.out.println(bean);
@@ -23,5 +20,6 @@ public class Test {
 //        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("selfEditor.xml");
 //        Customer bean = ac.getBean(Customer.class);
 //        System.out.println(bean);
+
     }
 }

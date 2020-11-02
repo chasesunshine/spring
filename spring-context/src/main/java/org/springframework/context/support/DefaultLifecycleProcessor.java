@@ -136,24 +136,37 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 
 	// Internal helpers
-
+	// 内部的帮助类
 	private void startBeans(boolean autoStartupOnly) {
+		// 获取所有的lifecycle bean
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
+		// 将lifecycle bean按照阶段分组，阶段通过实现Phased接口得到
 		Map<Integer, LifecycleGroup> phases = new HashMap<>();
+		// 遍历所有lifecycle bean,按阶段值分组
 		lifecycleBeans.forEach((beanName, bean) -> {
+			// autoStartupOnly=true代表是ApplicationContext刷新时容器自动启动；autoStartupOnly=false代表是通过显示的调用启动
+			// 3.当autoStartupOnly=false，也就是通过显示的调用启动，会触发全部的Lifecycle；
+			// 当autoStartupOnly=true，也就是ApplicationContext刷新时容器自动启动，只会触发isAutoStartup方法返回true的SmartLifecycle
 			if (!autoStartupOnly || (bean instanceof SmartLifecycle && ((SmartLifecycle) bean).isAutoStartup())) {
+				// 获取bean的阶段值，如果没有实现phased接口，则值为0
 				int phase = getPhase(bean);
+				// 拿到存放该阶段值的lifecycleGroup
 				LifecycleGroup group = phases.get(phase);
 				if (group == null) {
+					// 如果该阶段值的lifecycleGroup为null，则新建一个
 					group = new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly);
 					phases.put(phase, group);
 				}
+				// 将bean添加到该lifecycleGroup
 				group.add(beanName, bean);
 			}
 		});
+		// 如果phases不为空
 		if (!phases.isEmpty()) {
 			List<Integer> keys = new ArrayList<>(phases.keySet());
+			// 按阶段值进行排序
 			Collections.sort(keys);
+			// 调用lifecycleGroup中的所有lifecycle的start方法
 			for (Integer key : keys) {
 				phases.get(key).start();
 			}

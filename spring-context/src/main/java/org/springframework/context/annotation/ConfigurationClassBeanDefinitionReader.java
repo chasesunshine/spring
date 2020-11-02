@@ -123,6 +123,8 @@ class ConfigurationClassBeanDefinitionReader {
 	}
 
 	/**
+	 * 读取一个单独的ConfigurationClass类，注册bean本身(@Import引入的普通类)或者@Configuration配置类的Bean方法
+	 *
 	 * Read a particular {@link ConfigurationClass}, registering bean definitions
 	 * for the class itself and all of its {@link Bean} methods.
 	 */
@@ -147,6 +149,7 @@ class ConfigurationClassBeanDefinitionReader {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
+		// 将@ImportResource引入的资源注入IOC容器
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
 		// 如果bean上存在@Import注解，且import的是一个实现了ImportBeanDefinitionRegistrar接口,则执行ImportBeanDefinitionRegistrar的registerBeanDefinitions()方法
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
@@ -383,6 +386,10 @@ class ConfigurationClassBeanDefinitionReader {
 		});
 	}
 
+	/**
+	 * 循环调用注册bean的方法
+	 * @param registrars
+	 */
 	private void loadBeanDefinitionsFromRegistrars(Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> registrars) {
 		registrars.forEach((registrar, metadata) ->
 				registrar.registerBeanDefinitions(metadata, this.registry, this.importBeanNameGenerator));

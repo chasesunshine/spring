@@ -19,6 +19,8 @@ package org.springframework.core;
 import org.springframework.lang.Nullable;
 
 /**
+ * 定义用于附加和访问BeanDefinition元数据的通用的接口，来自任何对象
+ *
  * Interface defining a generic contract for attaching and accessing metadata
  * to/from arbitrary objects.
  *
@@ -28,6 +30,8 @@ import org.springframework.lang.Nullable;
 public interface AttributeAccessor {
 
 	/**
+	 * 设置属性
+	 *
 	 * Set the attribute defined by {@code name} to the supplied {@code value}.
 	 * If {@code value} is {@code null}, the attribute is {@link #removeAttribute removed}.
 	 * <p>In general, users should take care to prevent overlaps with other
@@ -39,6 +43,8 @@ public interface AttributeAccessor {
 	void setAttribute(String name, @Nullable Object value);
 
 	/**
+	 * 获取属性
+	 *
 	 * Get the value of the attribute identified by {@code name}.
 	 * Return {@code null} if the attribute doesn't exist.
 	 * @param name the unique attribute key
@@ -48,6 +54,8 @@ public interface AttributeAccessor {
 	Object getAttribute(String name);
 
 	/**
+	 * 移除属性
+	 *
 	 * Remove the attribute identified by {@code name} and return its value.
 	 * Return {@code null} if no attribute under {@code name} is found.
 	 * @param name the unique attribute key
@@ -57,6 +65,8 @@ public interface AttributeAccessor {
 	Object removeAttribute(String name);
 
 	/**
+	 * 判断是否包含属性
+	 *
 	 * Return {@code true} if the attribute identified by {@code name} exists.
 	 * Otherwise return {@code false}.
 	 * @param name the unique attribute key
@@ -64,6 +74,8 @@ public interface AttributeAccessor {
 	boolean hasAttribute(String name);
 
 	/**
+	 * 返回所有的属性名称
+	 *
 	 * Return the names of all attributes.
 	 */
 	String[] attributeNames();

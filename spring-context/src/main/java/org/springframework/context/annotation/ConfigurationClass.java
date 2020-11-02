@@ -35,6 +35,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * ConfigurationClass类代表一个用户定义的配置类，包括@Bean注解标注的方法，包括所有在类的父类中定义的方法
+ *
  * Represents a user-defined {@link Configuration @Configuration} class.
  * Includes a set of {@link Bean} methods, including all such methods
  * defined in the ancestry of the class, in a 'flattened-out' manner.
@@ -48,23 +50,32 @@ import org.springframework.util.ClassUtils;
  */
 final class ConfigurationClass {
 
+	// 配置类的注解元数据
 	private final AnnotationMetadata metadata;
 
+	// 配置类的资源对象
 	private final Resource resource;
 
+	// bean名称
 	@Nullable
 	private String beanName;
 
+	// 存放通过@Import注解引入的候选类是通过哪个配置类引入的，包括ImportSelector选择器类中引入的候选类、DeferredImportSelector选择器中引入的候选类、@Import引入的普通类
 	private final Set<ConfigurationClass> importedBy = new LinkedHashSet<>(1);
 
+	// 普通类的Bean方法对象
 	private final Set<BeanMethod> beanMethods = new LinkedHashSet<>();
 
+	// 存放通过@ImportResource注解引入资源类及BeanDefinitionReader读取器对应关系
 	private final Map<String, Class<? extends BeanDefinitionReader>> importedResources =
 			new LinkedHashMap<>();
 
+	// 存放通过@Import注解引入的ImportBeanDefinitionRegistrar实现类，用于注册自定义bean到IOC容器
+	// value值是引入当前类的类的注解元数据
 	private final Map<ImportBeanDefinitionRegistrar, AnnotationMetadata> importBeanDefinitionRegistrars =
 			new LinkedHashMap<>();
 
+	// 存放将BeanMethod标记为按其条件跳过
 	final Set<String> skippedBeanMethods = new HashSet<>();
 
 
@@ -158,6 +169,8 @@ final class ConfigurationClass {
 	}
 
 	/**
+	 * 通过ImportedBy属性判断是否是通过@Import注解被引入还是被嵌套在其他配置类中被自动注入的
+	 *
 	 * Return whether this configuration class was registered via @{@link Import} or
 	 * automatically registered due to being nested within another configuration class.
 	 * @since 3.1.1
@@ -209,13 +222,20 @@ final class ConfigurationClass {
 		return this.importedResources;
 	}
 
+	/**
+	 * 配置类的校验方法
+	 * @param problemReporter
+	 */
 	public void validate(ProblemReporter problemReporter) {
 		// A configuration class may not be final (CGLIB limitation) unless it declares proxyBeanMethods=false
+		// 获取@Configuration注解的属性值，除非配置类声明为proxyBeanMethods=false不适用CGLIB代理模式，否则的话不可能为final类
 		Map<String, Object> attributes = this.metadata.getAnnotationAttributes(Configuration.class.getName());
 		if (attributes != null && (Boolean) attributes.get("proxyBeanMethods")) {
+			// 如果配置类是final类型，则抛出异常
 			if (this.metadata.isFinal()) {
 				problemReporter.error(new FinalConfigurationProblem());
 			}
+			// 校验配置类中@Bean定义的方法
 			for (BeanMethod beanMethod : this.beanMethods) {
 				beanMethod.validate(problemReporter);
 			}

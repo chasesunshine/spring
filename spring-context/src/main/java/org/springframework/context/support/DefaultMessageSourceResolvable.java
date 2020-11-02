@@ -24,6 +24,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * spring中默认实现的解析消息要素的包装类
+ *
  * Spring's default implementation of the {@link MessageSourceResolvable} interface.
  * Offers an easy way to store all the necessary values needed to resolve
  * a message via a {@link org.springframework.context.MessageSource}.
@@ -103,6 +105,8 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 
 
 	/**
+	 * 返回此可解析的默认代码
+	 *
 	 * Return the default code of this resolvable, that is,
 	 * the last one in the codes array.
 	 */
@@ -146,6 +150,8 @@ public class DefaultMessageSourceResolvable implements MessageSourceResolvable, 
 
 
 	/**
+	 * 为此MessageSourceResolvable构建默认的String表示形式，包括代码，参数和默认消息
+	 *
 	 * Build a default String representation for this MessageSourceResolvable:
 	 * including codes, arguments, and default message.
 	 */

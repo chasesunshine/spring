@@ -33,7 +33,7 @@ import org.springframework.util.StringValueResolver;
 /**
  * Simple implementation of the {@link AliasRegistry} interface.
  * <p>Serves as base class for
- * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}
+ * {link org.springframework.beans.factory.support.BeanDefinitionRegistry}
  * implementations.
  * 定义map作为alias的缓存，并对接口aliasRegistry进行实现
  * @author Juergen Hoeller
@@ -214,6 +214,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		// Handle aliasing...
 		String resolvedName;
 		do {
+			// 将别名解析成真正的beanName
 			resolvedName = this.aliasMap.get(canonicalName);
 			if (resolvedName != null) {
 				canonicalName = resolvedName;

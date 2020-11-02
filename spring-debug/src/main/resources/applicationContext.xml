@@ -8,10 +8,10 @@
         http://www.mashibing.com/schema/user http://www.mashibing.com/schema/user.xsd">
 
 <!--    <msb:user id="msb" userName="lian" email="lian@msb.com" password="123456"></msb:user>-->
-    <context:component-scan base-package="com.mashibing" ></context:component-scan>
+    <context:component-scan base-package="com.mashibing.config,com.mashibing.shouldSkip" ></context:component-scan>
     <context:property-placeholder location="classpath:db.properties" ></context:property-placeholder>
     <bean class="com.mashibing.selfbdrpp.MyBeanDefinitionRegistryPostProcessor"></bean>
-    <bean id="person2" class="com.mashibing.Person"  >
+    <bean id="person2" class="com.mashibing.Person" >
         <constructor-arg index="0" value="2">
         </constructor-arg>
         <constructor-arg index="1" value="lisi"></constructor-arg>
