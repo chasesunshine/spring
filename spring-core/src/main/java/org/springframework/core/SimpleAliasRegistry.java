@@ -78,7 +78,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 								registeredName + "' with new target name '" + name + "'");
 					}
 				}
-				// 当A->B存在时，若再次出现A->C->B的时候回抛出异常
+				// 如果别名关系中存在环式结构，则会抛出异常，如A-B，同时出现B-A会报异常
 				checkForAliasCircle(name, alias);
 				this.aliasMap.put(alias, name);
 				if (logger.isTraceEnabled()) {

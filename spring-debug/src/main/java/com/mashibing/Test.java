@@ -1,7 +1,11 @@
 package com.mashibing;
 
 import com.mashibing.config.MyPropertySource;
+import com.mashibing.selfConverter.Student;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.convert.ConversionService;
 
 public class Test {
 
@@ -20,6 +24,8 @@ public class Test {
 //        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("selfEditor.xml");
 //        Customer bean = ac.getBean(Customer.class);
 //        System.out.println(bean);
-
+//        ConversionService bean = ac.getBean(ConversionService.class);
+//        Student convert = bean.convert("1_zhangsan", Student.class);
+//        System.out.println(convert);
     }
 }

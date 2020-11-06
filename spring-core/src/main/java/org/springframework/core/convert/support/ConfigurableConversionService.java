@@ -20,6 +20,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.ConverterRegistry;
 
 /**
+ * 此接口集成了ConversionService和ConverterRegistry两个接口，集成两个接口的功能
+ *
  * Configuration interface to be implemented by most if not all {@link ConversionService}
  * types. Consolidates the read-only operations exposed by {@link ConversionService} and
  * the mutating operations of {@link ConverterRegistry} to allow for convenient ad-hoc
@@ -32,7 +34,7 @@ import org.springframework.core.convert.converter.ConverterRegistry;
  * @since 3.1
  * @see org.springframework.core.env.ConfigurablePropertyResolver#getConversionService()
  * @see org.springframework.core.env.ConfigurableEnvironment
- * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment()
+ * see org.springframework.context.ConfigurableApplicationContext#getEnvironment()
  */
 public interface ConfigurableConversionService extends ConversionService, ConverterRegistry {
 

@@ -460,10 +460,10 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	private class ListenerRetriever {
 
-		// 存放应用程序事件监听器，有序，不可重复
+		// 存放应用程序事件监听器
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
-		// 存放应用程序事件监听器bean名称，有序，不可重复
+		// 存放应用程序事件监听器bean名称
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
 		// 是否预过滤监听器
