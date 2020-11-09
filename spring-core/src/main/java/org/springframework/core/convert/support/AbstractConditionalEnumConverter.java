@@ -22,6 +22,8 @@ import org.springframework.core.convert.converter.ConditionalConverter;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 枚举类型的转换
+ *
  * A {@link ConditionalConverter} base implementation for enum-based converters.
  *
  * @author Stephane Nicoll
@@ -29,6 +31,7 @@ import org.springframework.util.ClassUtils;
  */
 abstract class AbstractConditionalEnumConverter implements ConditionalConverter {
 
+	// 借助conversionService这个接口完成转换逻辑，
 	private final ConversionService conversionService;
 
 
@@ -39,7 +42,9 @@ abstract class AbstractConditionalEnumConverter implements ConditionalConverter 
 
 	@Override
 	public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
+		// 拿到source所有实现的接口，若没有实现任何接口，永远返回true
 		for (Class<?> interfaceType : ClassUtils.getAllInterfacesForClassAsSet(sourceType.getType())) {
+			// 委托给conversionService来判断是否能进行转换
 			if (this.conversionService.canConvert(TypeDescriptor.valueOf(interfaceType), targetType)) {
 				return false;
 			}

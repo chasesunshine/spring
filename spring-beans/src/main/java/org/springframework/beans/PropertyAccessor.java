@@ -22,6 +22,8 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.lang.Nullable;
 
 /**
+ * 对类中属性操作的接口
+ *
  * Common interface for classes that can access named properties
  * (such as bean properties of an object or fields in an object)
  * Serves as base interface for {@link BeanWrapper}.

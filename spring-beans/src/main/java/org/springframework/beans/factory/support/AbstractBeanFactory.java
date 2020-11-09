@@ -414,6 +414,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// 检查需要的类型是否符合bean的实际类型
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
+				// 获取类型转换器，并且进行类型转换
 				T convertedBean = getTypeConverter().convertIfNecessary(bean, requiredType);
 				if (convertedBean == null) {
 					throw new BeanNotOfRequiredTypeException(name, requiredType, bean.getClass());
@@ -1235,6 +1236,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	//---------------------------------------------------------------------
 
 	/**
+	 * 返回beanName，如果必要的话剔除前缀并且处理别名转换为规范的名字
+	 *
 	 * Return the bean name, stripping out the factory dereference prefix if necessary,
 	 * and resolving aliases to canonical names.
 	 * @param name the user-specified name
@@ -1325,7 +1328,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
-		// 检查beanName对应的mergedBeanDefinitions是否存在于缓存中
+		// 检查beanName对应的mergedBeanDefinitions是否存在于缓存中,此缓存是在beanFactoryPostProcessor中添加的
 		RootBeanDefinition mbd = this.mergedBeanDefinitions.get(beanName);
 		if (mbd != null && !mbd.stale) {
 			// 如果存在于缓存中直接返回
@@ -1475,6 +1478,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 检测当前BeanDefinition是否是抽象的，如果是抽象的，那么就抛出异常
+	 *
 	 * Check the given merged bean definition,
 	 * potentially throwing validation exceptions.
 	 * @param mbd the merged bean definition to check
@@ -1534,14 +1539,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			throws CannotLoadBeanClassException {
 
 		try {
+			// 判断mbd的定义信息中是否包含beanClass，并且是Class类型的，如果是直接返回，否则的话进行详细的解析
 			if (mbd.hasBeanClass()) {
 				return mbd.getBeanClass();
 			}
+			// 判断是否有安全管理器
 			if (System.getSecurityManager() != null) {
 				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
 						() -> doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
 			}
 			else {
+				// 进行详细的处理解析过程
 				return doResolveBeanClass(mbd, typesToMatch);
 			}
 		}
@@ -1561,10 +1569,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private Class<?> doResolveBeanClass(RootBeanDefinition mbd, Class<?>... typesToMatch)
 			throws ClassNotFoundException {
 
+		// 获取bean的类加载器
 		ClassLoader beanClassLoader = getBeanClassLoader();
 		ClassLoader dynamicLoader = beanClassLoader;
 		boolean freshResolve = false;
 
+		// 判断typesToMatch是否为空，如果不为空，那么使用临时加载器进行加载
 		if (!ObjectUtils.isEmpty(typesToMatch)) {
 			// When just doing type checks (i.e. not creating an actual instance yet),
 			// use the specified temporary class loader (e.g. in a weaving scenario).
@@ -1581,14 +1591,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 		}
 
+		// 获取bean的className
 		String className = mbd.getBeanClassName();
 		if (className != null) {
+			// 获取BeanDefinition中对应的className
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
+			// 判断className是否等于计算出的表达式的结果，如果不等于，那么判断evaluated的类型
 			if (!className.equals(evaluated)) {
 				// A dynamically resolved expression, supported as of 4.2...
+				// 如果是Class类型，直接返回
 				if (evaluated instanceof Class) {
 					return (Class<?>) evaluated;
 				}
+				// 如果是String类型，则设置freshResolve为true，并使用动态加载器进行加载
 				else if (evaluated instanceof String) {
 					className = (String) evaluated;
 					freshResolve = true;
@@ -1615,10 +1630,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 
 		// Resolve regularly, caching the result in the BeanDefinition...
+		// 定期检查，缓存beanDefinition的结果
 		return mbd.resolveBeanClass(beanClassLoader);
 	}
 
 	/**
+	 * 通过表达式处理器解析beanDefinition中给定的字符串
+	 *
 	 * Evaluate the given String as contained in a bean definition,
 	 * potentially resolving it as an expression.
 	 * @param value the value to check
@@ -1863,7 +1881,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
-		// 如果指定的name是工厂相关且beanInstance又不是FactoryBean类型则验证不通过
+		// 通过beanName判断是否有factoryBean的前缀
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;

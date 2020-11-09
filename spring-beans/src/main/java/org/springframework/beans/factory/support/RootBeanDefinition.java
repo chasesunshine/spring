@@ -60,7 +60,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private AnnotatedElement qualifiedElement;
 
-	/** Determines if the definition needs to be re-merged. */
+	/**
+	 * 判断beandefinition是否需要重新合并
+	 *
+	 * Determines if the definition needs to be re-merged. */
 	volatile boolean stale;
 
 	boolean allowCaching = true;
@@ -110,7 +113,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied. */
 	boolean postProcessed = false;
 
-	/** Package-visible field that indicates a before-instantiation post-processor having kicked in. */
+	/**
+	 *
+	 *
+	 * Package-visible field that indicates a before-instantiation post-processor having kicked in. */
 	@Nullable
 	volatile Boolean beforeInstantiationResolved;
 

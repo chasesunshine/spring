@@ -260,9 +260,11 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 		}
 
 		// New in Spring 2.5: resolve placeholders in alias target names and aliases as well.
+		// 处理别名中的占位符
 		beanFactoryToProcess.resolveAliases(valueResolver);
 
 		// New in Spring 3.0: resolve placeholders in embedded values such as annotation attributes.
+		// 设置占位符处理器为内置的值处理器
 		beanFactoryToProcess.addEmbeddedValueResolver(valueResolver);
 	}
 

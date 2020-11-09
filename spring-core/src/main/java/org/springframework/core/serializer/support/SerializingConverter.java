@@ -22,6 +22,8 @@ import org.springframework.core.serializer.Serializer;
 import org.springframework.util.Assert;
 
 /**
+ * 将任意一个对象，转换成byte[]
+ *
  * A {@link Converter} that delegates to a
  * {@link org.springframework.core.serializer.Serializer}
  * to convert an object to a byte array.
@@ -32,6 +34,7 @@ import org.springframework.util.Assert;
  */
 public class SerializingConverter implements Converter<Object, byte[]> {
 
+	// 序列化器，其本质是ObjectOutputStream
 	private final Serializer<Object> serializer;
 
 

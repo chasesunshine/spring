@@ -51,6 +51,8 @@ import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 支持类型转换，参数验证，数据绑定等功能
+ *
  * Binder that allows for setting property values onto a target object,
  * including support for validation and binding result analysis.
  * The binding process can be customized through specifying allowed fields,

@@ -78,6 +78,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * PropertyEditorRegistry接口的基本实现，对默认的编辑器或者自定义编辑器提供管理功能
+ *
  * Base implementation of the {@link PropertyEditorRegistry} interface.
  * Provides management of default editors and custom editors.
  * Mainly serves as base class for {@link BeanWrapperImpl}.
@@ -91,25 +93,33 @@ import org.springframework.util.ClassUtils;
  */
 public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
+	// 转换服务
 	@Nullable
 	private ConversionService conversionService;
 
+	// 是否启动默认编辑器
 	private boolean defaultEditorsActive = false;
 
+	// 是否启动String、int、long、short数组属性编辑器
 	private boolean configValueEditorsActive = false;
 
+	// 默认属性编辑器集合
 	@Nullable
 	private Map<Class<?>, PropertyEditor> defaultEditors;
 
+	// 重写默认属性编辑器集合
 	@Nullable
 	private Map<Class<?>, PropertyEditor> overriddenDefaultEditors;
 
+	// 自定义属性编辑器集合
 	@Nullable
 	private Map<Class<?>, PropertyEditor> customEditors;
 
+	// 自定义路径属性编辑器集合
 	@Nullable
 	private Map<String, CustomEditorHolder> customEditorsForPath;
 
+	// 自定义属性编辑器缓存集合
 	@Nullable
 	private Map<Class<?>, PropertyEditor> customEditorCache;
 
@@ -195,6 +205,8 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	}
 
 	/**
+	 * 注册默认的编辑器对于给定的注册器实例
+	 *
 	 * Actually register the default editors for this registry instance.
 	 */
 	private void createDefaultEditors() {

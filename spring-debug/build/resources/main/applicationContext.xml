@@ -10,12 +10,12 @@
 <!--    <msb:user id="msb" userName="lian" email="lian@msb.com" password="123456"></msb:user>-->
 <!--    <context:component-scan base-package="com.mashibing.config,com.mashibing.shouldSkip" ></context:component-scan>-->
     <context:property-placeholder location="classpath:db.properties" ></context:property-placeholder>
-    <bean class="com.mashibing.selfbdrpp.MyBeanDefinitionRegistryPostProcessor"></bean>
-    <bean id="person2" class="com.mashibing.Person" >
-        <constructor-arg index="0" value="2">
-        </constructor-arg>
-        <constructor-arg index="1" value="lisi"></constructor-arg>
-    </bean>
+<!--    <bean class="com.mashibing.selfbdrpp.MyBeanDefinitionRegistryPostProcessor"></bean>-->
+<!--    <bean id="person2" class="com.mashibing.Person" >-->
+<!--        <constructor-arg index="0" value="2">-->
+<!--        </constructor-arg>-->
+<!--        <constructor-arg index="1" value="lisi"></constructor-arg>-->
+<!--    </bean>-->
     <bean id="person"  class="com.mashibing.Person" >
 <!--        <lookup-method></lookup-method>-->
 <!--        <replaced-method></replaced-method>-->
@@ -26,14 +26,14 @@
 <!--            <property name="username" value="${jdbc.username}"></property>-->
 <!--    </bean>-->
 
-    <bean id="studentConverter" class="com.mashibing.selfConverter.StudentConverter"></bean>
-    <bean id ="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
-        <property name="converters">
-            <set>
-                <ref bean="studentConverter"></ref>
-            </set>
-        </property>
-    </bean>
+<!--    <bean id="studentConverter" class="com.mashibing.selfConverter.StudentConverter"></bean>-->
+<!--    <bean id ="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">-->
+<!--        <property name="converters">-->
+<!--            <set>-->
+<!--                <ref bean="studentConverter"></ref>-->
+<!--            </set>-->
+<!--        </property>-->
+<!--    </bean>-->
 <!--    <bean class="com.mashibing.MyBeanFactoryPostProcessor"></bean>-->
 <!--    <bean id="a" class="com.mashibing.A" scope="prototype">-->
 <!--        <property name="b" ref="b"></property>-->

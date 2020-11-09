@@ -19,11 +19,13 @@ package org.springframework.beans;
 import java.beans.PropertyDescriptor;
 
 /**
+ * spring中的核心接口，是spring中的一个包装类，具有单独或者批量获取和设置属性值，获取属性描述符一级查询属性可读可写的能力，还可以完成类型的转换
+ *
  * The central interface of Spring's low-level JavaBeans infrastructure.
  *
  * <p>Typically not used directly but rather implicitly via a
  * {@link org.springframework.beans.factory.BeanFactory} or a
- * {@link org.springframework.validation.DataBinder}.
+ * {link org.springframework.validation.DataBinder}.
  *
  * <p>Provides operations to analyze and manipulate standard JavaBeans:
  * the ability to get and set property values (individually or in bulk),
@@ -43,12 +45,14 @@ import java.beans.PropertyDescriptor;
  * @see PropertyEditorRegistry
  * @see PropertyAccessorFactory#forBeanPropertyAccess
  * @see org.springframework.beans.factory.BeanFactory
- * @see org.springframework.validation.BeanPropertyBindingResult
- * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
+ * see org.springframework.validation.BeanPropertyBindingResult
+ * see org.springframework.validation.DataBinder#initBeanPropertyAccess()
  */
 public interface BeanWrapper extends ConfigurablePropertyAccessor {
 
 	/**
+	 * 指定数组和集合自动增长的限制，在普通的beanWrapper上，默认值是无限的
+	 *
 	 * Specify a limit for array and collection auto-growing.
 	 * <p>Default is unlimited on a plain BeanWrapper.
 	 * @since 4.1

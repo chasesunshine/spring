@@ -17,6 +17,8 @@
 package org.springframework.beans;
 
 /**
+ * TypeConverterSupport的子类，使用PropertyEditorRegistrySupport中定义的默认属性编辑器
+ *
  * Simple implementation of the {@link TypeConverter} interface that does not operate on
  * a specific target object. This is an alternative to using a full-blown BeanWrapperImpl
  * instance for arbitrary type conversion needs, while using the very same conversion

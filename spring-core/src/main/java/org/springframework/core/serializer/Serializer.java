@@ -52,6 +52,7 @@ public interface Serializer<T> {
 	 * @since 5.2.7
 	 */
 	default byte[] serializeToByteArray(T object) throws IOException {
+		// 通过输出流转为byte数组
 		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
 		serialize(object, out);
 		return out.toByteArray();
