@@ -192,6 +192,8 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * 注册默认过滤器，主要是@component
+	 *
 	 * Register the default filter for {@link Component @Component}.
 	 * <p>This will implicitly register all annotations that have the
 	 * {@link Component @Component} meta-annotation including the
@@ -255,6 +257,8 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * 创建了ResourcePatternResolver,用来解析URL资源，
+	 *
 	 * Set the {@link ResourceLoader} to use for resource locations.
 	 * This will typically be a {@link ResourcePatternResolver} implementation.
 	 * <p>Default is a {@code PathMatchingResourcePatternResolver}, also capable of
@@ -265,7 +269,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	@Override
 	public void setResourceLoader(@Nullable ResourceLoader resourceLoader) {
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
+		// 创建CachingMetadataReaderFactory，用来做字节码文件元数据的缓存
 		this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
+		// 创建CandidateComponentsIndexLoader，spring内部定义的组件，读取META-INF/spring.components下的信息
 		this.componentsIndex = CandidateComponentsIndexLoader.loadIndex(this.resourcePatternResolver.getClassLoader());
 	}
 

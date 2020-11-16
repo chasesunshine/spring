@@ -51,6 +51,8 @@ public abstract class AdviceModeImportSelector<A extends Annotation> implements 
 	}
 
 	/**
+	 * 获取属性，然后传给TransactionManagementConfigurationSelector的selectImports
+	 *
 	 * This implementation resolves the type of annotation from generic metadata and
 	 * validates that (a) the annotation is in fact present on the importing
 	 * {@code @Configuration} class and (b) that the given annotation has an

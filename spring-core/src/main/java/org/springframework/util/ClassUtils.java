@@ -530,6 +530,9 @@ public abstract class ClassUtils {
 	}
 
 	/**
+	 * 比较两个class类，是不是相同或者是子类，即rhsType是不是lhstype的子类或者同类
+	 * a.isAssignableFrom(b),b是不是a的同类或者子类
+	 *
 	 * Check if the right-hand side type may be assigned to the left-hand side
 	 * type, assuming setting by reflection. Considers primitive wrapper
 	 * classes as assignable to the corresponding primitive types.
@@ -889,12 +892,15 @@ public abstract class ClassUtils {
 	}
 
 	/**
+	 * 找出用户定义的类型
+	 *
 	 * Return the user-defined class for the given class: usually simply the given
 	 * class, but the original class in case of a CGLIB-generated subclass.
 	 * @param clazz the class to check
 	 * @return the user-defined class
 	 */
 	public static Class<?> getUserClass(Class<?> clazz) {
+		// 如果包含CGLIB的名字符号，尝试获取父类
 		if (clazz.getName().contains(CGLIB_CLASS_SEPARATOR)) {
 			Class<?> superclass = clazz.getSuperclass();
 			if (superclass != null && superclass != Object.class) {
@@ -1284,6 +1290,8 @@ public abstract class ClassUtils {
 	}
 
 	/**
+	 * 尝试从自身或者父类获取接口方法
+	 *
 	 * Determine a corresponding interface method for the given method handle, if possible.
 	 * <p>This is particularly useful for arriving at a public exported type on Jigsaw
 	 * which can be reflectively invoked without an illegal access warning.

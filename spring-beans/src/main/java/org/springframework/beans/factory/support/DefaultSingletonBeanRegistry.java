@@ -111,7 +111,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
 	/**
-	 * 当前创建检查中排除的BeanName的集合
+	 * 在创建检查之外的beanName的集合
 	 *
 	 * Names of beans currently excluded from in creation checks. */
 	private final Set<String> inCreationCheckExclusions =
@@ -167,6 +167,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 此方法在创建实例后调用，将ObjectFactory保存到singletonFactories集合中，可以通过getObject调用
+	 *
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -178,8 +180,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
+				// 放到单例工厂里
 				this.singletonFactories.put(beanName, singletonFactory);
+				// 删除早期单例
 				this.earlySingletonObjects.remove(beanName);
+				// 添加到已注册
 				this.registeredSingletons.add(beanName);
 			}
 		}
@@ -192,6 +197,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 传入一个名字和是否允许早期引用，这个是为了解决循环依赖问题，其实就是从一级缓存，二级缓存，三级缓存中获取对应的bean对象
+	 *
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
@@ -252,6 +259,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			Object singletonObject = this.singletonObjects.get(beanName);
 			// 如果对象不存在，才需要进行bean的实例化
 			if (singletonObject == null) {
+				// 判断单例是否在销毁中，如果是，直接报异常
 				if (this.singletonsCurrentlyInDestruction) {
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
@@ -260,7 +268,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				// 记录当前对象的加载状态
+				// 记录当前对象的加载状态，做个正在创建的标记
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
@@ -270,6 +278,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				try {
 					// 开始进行bean对象的创建
 					singletonObject = singletonFactory.getObject();
+					// 只要获取了就是新的单例对象
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {
@@ -376,6 +385,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * singletonsCurrentlyInCreation的set集合中存放正在创建的单例的名字，此方法可以判断当前bean是否正在创建中
+	 *
 	 * Return whether the specified singleton bean is currently in creation
 	 * (within the entire factory).
 	 * @param beanName the name of the bean
@@ -385,12 +396,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 判断inCreationCheckExclusions和singletonsCurrentlyInCreation集合中是否包含当前beanName
+	 *
 	 * Callback before singleton creation.
 	 * <p>The default implementation register the singleton as currently in creation.
 	 * @param beanName the name of the singleton about to be created
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
+		//没有在排除范围里内且添加不成功，可能就是循环引用了
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}
@@ -410,6 +424,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 
 	/**
+	 * 把bean注册到集合中，在需要的时候进行回调
+	 *
 	 * Add the given bean to the list of disposable beans in this registry.
 	 * <p>Disposable beans usually correspond to registered singletons,
 	 * matching the bean name but potentially being a different instance

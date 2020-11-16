@@ -105,7 +105,9 @@ public class EventListenerMethodProcessor
 		// DefaultEventListenerFactory最低的优先级，如果其他EventListenerFactory都不支持的时候使用
 		Map<String, EventListenerFactory> beans = beanFactory.getBeansOfType(EventListenerFactory.class, false, false);
 		List<EventListenerFactory> factories = new ArrayList<>(beans.values());
+		// 排序
 		AnnotationAwareOrderComparator.sort(factories);
+		// 保存
 		this.eventListenerFactories = factories;
 	}
 

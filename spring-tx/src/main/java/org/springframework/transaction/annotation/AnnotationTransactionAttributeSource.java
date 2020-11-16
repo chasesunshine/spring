@@ -147,6 +147,11 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 		return false;
 	}
 
+	/**
+	 * 查找Transactional注解的属性，而且会对父类和接口也寻找，
+	 * @param clazz the class to retrieve the attribute for
+	 * @return
+	 */
 	@Override
 	@Nullable
 	protected TransactionAttribute findTransactionAttribute(Class<?> clazz) {

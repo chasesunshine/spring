@@ -20,6 +20,8 @@ import org.springframework.core.AttributeAccessorSupport;
 import org.springframework.lang.Nullable;
 
 /**
+ * 元数据属性访问器，既能获取源数据，也能提供属性访问
+ *
  * Extension of {@link org.springframework.core.AttributeAccessorSupport},
  * holding attributes as {@link BeanMetadataAttribute} objects in order
  * to keep track of the definition source.
@@ -30,6 +32,7 @@ import org.springframework.lang.Nullable;
 @SuppressWarnings("serial")
 public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport implements BeanMetadataElement {
 
+	// bean的源数据对象
 	@Nullable
 	private Object source;
 
@@ -50,6 +53,8 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 
 
 	/**
+	 * 添加BeanMetadataAttribute
+	 *
 	 * Add the given BeanMetadataAttribute to this accessor's set of attributes.
 	 * @param attribute the BeanMetadataAttribute object to register
 	 */
@@ -58,6 +63,8 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 	}
 
 	/**
+	 * 获取属性之后将属性转成BeanMetadataAttribute
+	 *
 	 * Look up the given BeanMetadataAttribute in this accessor's set of attributes.
 	 * @param name the name of the attribute
 	 * @return the corresponding BeanMetadataAttribute object,
@@ -68,6 +75,12 @@ public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport impl
 		return (BeanMetadataAttribute) super.getAttribute(name);
 	}
 
+	/**
+	 * 将名字和值封装成BeanMetadataAttribute
+	 *
+	 * @param name the unique attribute key
+	 * @param value the attribute value to be attached
+	 */
 	@Override
 	public void setAttribute(String name, @Nullable Object value) {
 		super.setAttribute(name, new BeanMetadataAttribute(name, value));

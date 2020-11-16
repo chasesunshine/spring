@@ -148,18 +148,20 @@ public abstract class AnnotationConfigUtils {
 	public static Set<BeanDefinitionHolder> registerAnnotationConfigProcessors(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 
+		// 获取beanFactory
 		DefaultListableBeanFactory beanFactory = unwrapDefaultListableBeanFactory(registry);
 		if (beanFactory != null) {
 			if (!(beanFactory.getDependencyComparator() instanceof AnnotationAwareOrderComparator)) {
-				// 设置dependencyComparator属性
+				// //设置依赖比较器
 				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
 			}
 			if (!(beanFactory.getAutowireCandidateResolver() instanceof ContextAnnotationAutowireCandidateResolver)) {
-				// 设置autowireCandidateResolver属性(设置自动注入候选对象的解析器，用于判断beanDefinition是否为候选对象)
+				// //设置自动装配解析器
 				beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 			}
 		}
 
+		// 创建BeanDefinitionHolder集合
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
 		// 注册内部管理的用于处理@configuration注解的后置处理器的bean
@@ -223,7 +225,7 @@ public abstract class AnnotationConfigUtils {
 
 		// 设置role
 		definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-		// 注册BeanDefinition
+		// 注册BeanDefinition到registry
 		registry.registerBeanDefinition(beanName, definition);
 		// 封装成BeanDefinitionHolder并返回
 		return new BeanDefinitionHolder(definition, beanName);

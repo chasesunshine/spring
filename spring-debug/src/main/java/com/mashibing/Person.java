@@ -1,7 +1,10 @@
 package com.mashibing;
 
-public class Person {
+import org.springframework.beans.factory.BeanClassLoaderAware;
 
+public class Person implements BeanClassLoaderAware {
+
+    private ClassLoader classLoader;
     private Integer id;
     private String name;
 
@@ -35,5 +38,14 @@ public class Person {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 }

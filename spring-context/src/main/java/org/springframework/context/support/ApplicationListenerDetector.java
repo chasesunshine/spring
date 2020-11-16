@@ -87,7 +87,7 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	}
 
 	/**
-	 * 整个bean创建过程中最后一个阶段执行，在对象初始化后执行
+	 * 将我们自定义的单例类作为监听器添加到applicationEventMulticaster里
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return

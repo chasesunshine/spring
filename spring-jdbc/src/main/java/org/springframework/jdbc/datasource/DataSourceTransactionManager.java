@@ -234,6 +234,12 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		return obtainDataSource();
 	}
 
+	/**
+	 * 创建一个DataSourceTransactionObject当作事务，设置是否允许保存点，然后获取连接持有器ConnectionHolder
+	 * 里面会存放JDBC的连接，设置给DataSourceTransactionObject,当然第一次是空的
+	 *
+	 * @return
+	 */
 	@Override
 	protected Object doGetTransaction() {
 		DataSourceTransactionObject txObject = new DataSourceTransactionObject();
@@ -246,6 +252,12 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		return txObject;
 	}
 
+	/**
+	 * 之前获取了事务，但是是创建的，如果要判断是否有事务存在就要看是否有JDBC连接，事务是否是激活的，当前第一次是没有连接持有器的
+	 * 所以当前事务不存在
+	 * @param transaction the transaction object returned by doGetTransaction
+	 * @return
+	 */
 	@Override
 	protected boolean isExistingTransaction(Object transaction) {
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;

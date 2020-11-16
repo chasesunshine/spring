@@ -94,6 +94,8 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 
 
 	/**
+	 * 判断接口是不是需要设置ProxyTargetClass=true，判断它的接口不是内部的回调接口和内部语言接口，就添加接口否则就设置ProxyTargetClass=true
+	 *
 	 * Check the interfaces on the given bean class and apply them to the {@link ProxyFactory},
 	 * if appropriate.
 	 * <p>Calls {@link #isConfigurationCallbackInterface} and {@link #isInternalLanguageInterface}
@@ -107,10 +109,12 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 		for (Class<?> ifc : targetInterfaces) {
 			if (!isConfigurationCallbackInterface(ifc) && !isInternalLanguageInterface(ifc) &&
 					ifc.getMethods().length > 0) {
+				// 用接口代理，也就是jdk
 				hasReasonableProxyInterface = true;
 				break;
 			}
 		}
+		// 有接口
 		if (hasReasonableProxyInterface) {
 			// Must allow for introductions; can't just set interfaces to the target's interfaces only.
 			for (Class<?> ifc : targetInterfaces) {
@@ -118,11 +122,14 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 			}
 		}
 		else {
+			// 没接口就设置true
 			proxyFactory.setProxyTargetClass(true);
 		}
 	}
 
 	/**
+	 * 是不是内部语言的一些接口
+	 *
 	 * Determine whether the given interface is just a container callback and
 	 * therefore not to be considered as a reasonable proxy interface.
 	 * <p>If no reasonable proxy interface is found for a given bean, it will get

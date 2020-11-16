@@ -29,16 +29,21 @@ import org.springframework.util.ObjectUtils;
  */
 public class BeanMetadataAttribute implements BeanMetadataElement {
 
+	// 属性名字
 	private final String name;
 
+	// 属性值
 	@Nullable
 	private final Object value;
 
+	// bean的来源
 	@Nullable
 	private Object source;
 
 
 	/**
+	 * 将名字和值封装起来
+	 *
 	 * Create a new AttributeValue instance.
 	 * @param name the name of the attribute (never {@code null})
 	 * @param value the value of the attribute (possibly before type conversion)

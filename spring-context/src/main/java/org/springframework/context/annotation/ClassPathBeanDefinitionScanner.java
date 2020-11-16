@@ -36,6 +36,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
 
 /**
+ * 此类被用来扫描注解，比如@Component，@Repository，@Service,@Controller，在创建对象的时候做一些基本的配置工作
+ *
  * A bean definition scanner that detects bean candidates on the classpath,
  * registering corresponding bean definitions with a given registry ({@code BeanFactory}
  * or {@code ApplicationContext}).
@@ -161,7 +163,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		this.registry = registry;
-
+		// 判断是否使用默认过滤器
 		if (useDefaultFilters) {
 			// 注册默认的filter
 			registerDefaultFilters();

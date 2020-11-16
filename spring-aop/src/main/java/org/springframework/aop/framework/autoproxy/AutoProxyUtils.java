@@ -24,6 +24,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
+ * 进行InfrastructureAdvisorAutoProxyCreator处理器的注册
+ *
  * Utilities for auto-proxy aware components.
  * Mainly for internal use within the framework.
  *
@@ -102,6 +104,8 @@ public abstract class AutoProxyUtils {
 	}
 
 	/**
+	 * 设置他的原来的类型
+	 *
 	 * Expose the given target class for the specified bean, if possible.
 	 * @param beanFactory the containing ConfigurableListableBeanFactory
 	 * @param beanName the name of the bean

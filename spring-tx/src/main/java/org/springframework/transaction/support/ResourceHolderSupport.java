@@ -30,8 +30,8 @@ import org.springframework.transaction.TransactionTimedOutException;
  *
  * @author Juergen Hoeller
  * @since 02.02.2004
- * @see org.springframework.jdbc.datasource.DataSourceTransactionManager#doBegin
- * @see org.springframework.jdbc.datasource.DataSourceUtils#applyTransactionTimeout
+ * see org.springframework.jdbc.datasource.DataSourceTransactionManager#doBegin
+ * see org.springframework.jdbc.datasource.DataSourceUtils#applyTransactionTimeout
  */
 public abstract class ResourceHolderSupport implements ResourceHolder {
 
@@ -69,6 +69,8 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	}
 
 	/**
+	 * 设置连接不回滚
+	 *
 	 * Reset the rollback-only status for this resource transaction.
 	 * <p>Only really intended to be called after custom rollback steps which
 	 * keep the original resource in action, e.g. in case of a savepoint.

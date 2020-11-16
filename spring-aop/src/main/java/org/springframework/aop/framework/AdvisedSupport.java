@@ -201,6 +201,8 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	}
 
 	/**
+	 * 添加一个代理接口
+	 *
 	 * Add a new proxied interface.
 	 * @param intf the additional interface to proxy
 	 */

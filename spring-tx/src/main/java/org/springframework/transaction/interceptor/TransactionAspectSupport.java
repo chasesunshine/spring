@@ -379,19 +379,20 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				throw ex;
 			}
 			finally {
-				// 清除消息
+				//清除事务信息，恢复线程私有的老的事务信息
 				cleanupTransactionInfo(txInfo);
 			}
 
 			if (retVal != null && vavrPresent && VavrDelegate.isVavrTry(retVal)) {
 				// Set rollback-only in case of Vavr failure matching our rollback rules...
 				TransactionStatus status = txInfo.getTransactionStatus();
+
 				if (status != null && txAttr != null) {
 					retVal = VavrDelegate.evaluateTryFailure(retVal, txAttr, status);
 				}
 			}
 
-			// 提交事务
+			//成功后提交，会进行资源储量，连接释放，恢复挂起事务等操作
 			commitTransactionAfterReturning(txInfo);
 			return retVal;
 		}

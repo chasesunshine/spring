@@ -170,6 +170,8 @@ public abstract class BeanUtils {
 	}
 
 	/**
+	 * 调用构造函数实例化
+	 *
 	 * Convenience method to instantiate a class using the given constructor.
 	 * <p>Note that this method tries to set the constructor accessible if given a
 	 * non-accessible (that is, non-public) constructor, and supports Kotlin classes
@@ -192,6 +194,7 @@ public abstract class BeanUtils {
 				Class<?>[] parameterTypes = ctor.getParameterTypes();
 				Assert.isTrue(args.length <= parameterTypes.length, "Can't specify more arguments than constructor parameters");
 				Object[] argsWithDefaultValues = new Object[args.length];
+				//获得参数
 				for (int i = 0 ; i < args.length; i++) {
 					if (args[i] == null) {
 						Class<?> parameterType = parameterTypes[i];
@@ -591,7 +594,7 @@ public abstract class BeanUtils {
 	 * @param type the type to check
 	 * @return whether the given type represents a "simple" property
 	 * @see org.springframework.beans.factory.support.RootBeanDefinition#DEPENDENCY_CHECK_SIMPLE
-	 * @see org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#checkDependencies
+	 * see org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#checkDependencies
 	 * @see #isSimpleValueType(Class)
 	 */
 	public static boolean isSimpleProperty(Class<?> type) {

@@ -37,8 +37,13 @@ final class BeanMethod extends ConfigurationMethod {
 		super(metadata, configurationClass);
 	}
 
+	/**
+	 * 验证@Bean注解的方法，如果是静态的，就立即返回，否则的话需要判断是否可以覆盖
+	 * @param problemReporter
+	 */
 	@Override
 	public void validate(ProblemReporter problemReporter) {
+		// 判断是否是静态的
 		if (getMetadata().isStatic()) {
 			// static @Bean methods have no constraints to validate -> return immediately
 			// 静态@Bean方法没有约束校验，立即返回约束验证

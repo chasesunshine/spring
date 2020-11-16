@@ -263,7 +263,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private boolean enforceDestroyMethod = true;
 
 	/**
-	 * 是否是用户定义的而不是应用程序本身定义的，创建AOP的时候为true
+	 * 是否是应用程序本身定义的而不是用户定义的,创建aop的是值是true
 	 */
 	private boolean synthetic = false;
 
@@ -469,6 +469,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * this.beanClasses是对象，可以是String也可以是Class
+	 *
 	 * Return the current bean class name of this bean definition.
 	 */
 	@Override
@@ -484,6 +486,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 设置BeanClass
+	 *
 	 * Specify the class for this bean.
 	 * @see #setBeanClassName(String)
 	 */
@@ -525,6 +529,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 判断beanClass是否是个Class对象
+	 *
 	 * Return whether this definition specifies a bean class.
 	 * @see #getBeanClass()
 	 * @see #setBeanClass(Class)
@@ -1253,6 +1259,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 定义了一个克隆的抽象方法
+	 *
 	 * Clone this bean definition.
 	 * To be implemented by concrete subclasses.
 	 * @return the cloned bean definition object

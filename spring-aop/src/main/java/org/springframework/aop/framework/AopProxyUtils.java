@@ -103,6 +103,8 @@ public abstract class AopProxyUtils {
 	}
 
 	/**
+	 * 增加一些其他的接口SpringProxy,DecoratingProxy,Advised
+	 *
 	 * Determine the complete set of interfaces to proxy for the given AOP configuration.
 	 * <p>This will always add the {@link Advised} interface unless the AdvisedSupport's
 	 * {@link AdvisedSupport#setOpaque "opaque"} flag is on. Always adds the
@@ -134,12 +136,15 @@ public abstract class AopProxyUtils {
 		boolean addAdvised = !advised.isOpaque() && !advised.isInterfaceProxied(Advised.class);
 		boolean addDecoratingProxy = (decoratingProxy && !advised.isInterfaceProxied(DecoratingProxy.class));
 		int nonUserIfcCount = 0;
+		// 需要添加SpringProxy接口
 		if (addSpringProxy) {
 			nonUserIfcCount++;
 		}
+		// 需要添加通知
 		if (addAdvised) {
 			nonUserIfcCount++;
 		}
+		// 需要添加DescoratingProxy接口
 		if (addDecoratingProxy) {
 			nonUserIfcCount++;
 		}

@@ -499,6 +499,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			this.beanFactory = beanFactory;
 		}
 
+		/**
+		 * 如果配置类有Configuration注解，会进行动态代理，会实现EnhancedConfiguration接口，里面有个setBeanFactory接口方法，会传入beanFactory
+		 * @param pvs
+		 * @param bean
+		 * @param beanName
+		 * @return
+		 */
 		@Override
 		public PropertyValues postProcessProperties(@Nullable PropertyValues pvs, Object bean, String beanName) {
 			// Inject the BeanFactory before AutowiredAnnotationBeanPostProcessor's
@@ -509,6 +516,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return pvs;
 		}
 
+		/**
+		 * 如果是ImportAware类型的，就会设置bean的注解信息
+		 * @param bean
+		 * @param beanName
+		 * @return
+		 */
 		@Override
 		public Object postProcessBeforeInitialization(Object bean, String beanName) {
 			if (bean instanceof ImportAware) {

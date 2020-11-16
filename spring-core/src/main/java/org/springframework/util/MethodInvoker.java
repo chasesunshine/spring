@@ -285,6 +285,10 @@ public class MethodInvoker {
 
 
 	/**
+	 * 此方法就是比较传入参数的类型和方法定义的参数类型，如果不是继承关系，直接就返回最大差异，如果是继承关系，获取传入参数的父类，如果父类类型
+	 * 就是参数类型，差异+2,否则判断父类类型是否是参数类型的子类，是的话差异+2，再继续查找父类的父类，知道没有父类为止，最后如果发现参数是接口
+	 * 类型，差异+1，然后返回差异
+	 *
 	 * Algorithm that judges the match between the declared parameter types of a candidate method
 	 * and a specific list of arguments that this method is supposed to be invoked with.
 	 * <p>Determines a weight that represents the class hierarchy difference between types and
@@ -308,16 +312,20 @@ public class MethodInvoker {
 		int result = 0;
 		for (int i = 0; i < paramTypes.length; i++) {
 			if (!ClassUtils.isAssignableValue(paramTypes[i], args[i])) {
+				// 有参数类型不匹配直接返回最大差异
 				return Integer.MAX_VALUE;
 			}
 			if (args[i] != null) {
 				Class<?> paramType = paramTypes[i];
+				// 获取传入参数的父类来比较
 				Class<?> superClass = args[i].getClass().getSuperclass();
 				while (superClass != null) {
+					// 参数类型等于父类型的，差异+2
 					if (paramType.equals(superClass)) {
 						result = result + 2;
 						superClass = null;
 					}
+					//superClass是paramType的子类类型，差异+2，可能还有paramType的子类类型，再尝试获取
 					else if (ClassUtils.isAssignable(paramType, superClass)) {
 						result = result + 2;
 						superClass = superClass.getSuperclass();
@@ -326,6 +334,7 @@ public class MethodInvoker {
 						superClass = null;
 					}
 				}
+				// 参数类型是接口类型，差异+1
 				if (paramType.isInterface()) {
 					result = result + 1;
 				}

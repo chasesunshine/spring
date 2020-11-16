@@ -86,6 +86,8 @@ public class ProxyFactory extends ProxyCreatorSupport {
 
 
 	/**
+	 * 创建AopProxy代理，然后获取代理
+	 *
 	 * Create a new proxy according to the settings in this factory.
 	 * <p>Can be called repeatedly. Effect will vary if we've added
 	 * or removed interfaces. Can add and remove interceptors.

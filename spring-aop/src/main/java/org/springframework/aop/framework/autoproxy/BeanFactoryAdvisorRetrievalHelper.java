@@ -59,6 +59,8 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 
 	/**
+	 * 寻找所有Advisor.class的bean名字，如果存在就放入缓存，并进行创建，然后返回
+	 *
 	 * Find all eligible Advisor beans in the current bean factory,
 	 * ignoring FactoryBeans and excluding beans that are currently in creation.
 	 * @return the list of {@link org.springframework.aop.Advisor} beans

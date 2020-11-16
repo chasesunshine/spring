@@ -23,8 +23,8 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 
     @Override
     protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-        super.setAllowBeanDefinitionOverriding(false);
-        super.setAllowCircularReferences(false);
+//        super.setAllowBeanDefinitionOverriding(false);
+//        super.setAllowCircularReferences(false);
         super.addBeanFactoryPostProcessor(new MyBeanFactoryPostProcessor());
         super.customizeBeanFactory(beanFactory);
     }

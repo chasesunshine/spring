@@ -25,6 +25,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 对AttributeAccessor接口的抽象实现，定义了一个map来存放名字和属性的映射关系
+ *
  * Support class for {@link AttributeAccessor AttributeAccessors}, providing
  * a base implementation of all methods. To be extended by subclasses.
  *
@@ -38,14 +40,14 @@ import org.springframework.util.StringUtils;
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 
 	/**
+	 * 名字和属性的对应属性
 	 *
-	 * 用于存放属性键值对
 	 * Map with String keys and Object values. */
 	private final Map<String, Object> attributes = new LinkedHashMap<>();
 
 
 	/**
-	 * 设置属性值
+	 * 设置null就会删除
 	 *
 	 * @param name the unique attribute key
 	 * @param value the attribute value to be attached

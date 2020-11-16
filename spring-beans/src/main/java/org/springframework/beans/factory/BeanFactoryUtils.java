@@ -82,7 +82,7 @@ public abstract class BeanFactoryUtils {
 	}
 
 	/**
-	 * 返回当前bean的实际的名称，其实本质是截取beanName前的&
+	 * 判断是不是有&前缀，没有就直接返回，说明不是FactoryBean的名字，否则就从缓存里获取，然后就把前缀&去掉返回
 	 *
 	 * Return the actual bean name, stripping out the factory dereference
 	 * prefix (if any, also stripping repeated factory prefixes if found).

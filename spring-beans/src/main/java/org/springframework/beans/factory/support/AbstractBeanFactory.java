@@ -288,7 +288,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			// Check if bean definition exists in this factory.
-			// 获取父类容器
+			// 如果bean定义不存在，就检查父工厂是否有
 			BeanFactory parentBeanFactory = getParentBeanFactory();
 			// 如果beanDefinitionMap中也就是在所有已经加载的类中不包含beanName，那么就尝试从父容器中获取
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
@@ -1141,6 +1141,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 返回特殊的bean是否正在被创建
+	 *
 	 * Return whether the specified prototype bean is currently in creation
 	 * (within the current thread).
 	 * @param beanName the name of the bean
@@ -1503,6 +1505,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected void clearMergedBeanDefinition(String beanName) {
 		RootBeanDefinition bd = this.mergedBeanDefinitions.get(beanName);
 		if (bd != null) {
+			// 需要合并
 			bd.stale = true;
 		}
 	}
@@ -1690,6 +1693,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 根据名字和bean定义信息判断是否是FactoryBean
+	 * 如果定义本身定义了isFactoryBean,那么直接返回结果，否则需要进行类型预测，会通过反射来判断名字对应的类是否是FactoryBean类型，如果是
+	 * 返回true，如果不是返回false
+	 *
 	 * Check whether the given bean is defined as a {@link FactoryBean}.
 	 * @param beanName the name of the bean
 	 * @param mbd the corresponding bean definition
@@ -1814,6 +1821,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (!this.alreadyCreated.contains(beanName)) {
 					// Let the bean definition get re-merged now that we're actually creating
 					// the bean... just in case some of its metadata changed in the meantime.
+					// 当我们需要实际创建bean的时候，需要对当前bean来进行重新合并，以防止一些元数据被修改
 					clearMergedBeanDefinition(beanName);
 					this.alreadyCreated.add(beanName);
 				}
@@ -1883,9 +1891,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
 		// 通过beanName判断是否有factoryBean的前缀
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
+			// 判断是否是NullBean类型
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
+			// //不是FactoryBean的话名字有&会报异常
 			if (!(beanInstance instanceof FactoryBean)) {
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
@@ -1904,6 +1914,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return beanInstance;
 		}
 
+		// 创建FactoryBean中的bean
 		Object object = null;
 		if (mbd != null) {
 			mbd.isFactoryBean = true;
@@ -1939,6 +1950,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 检查是否是有销毁的方法注册的，有方法名都是可以的或者有DestructionAwareBeanPostProcessor处理器来判断的
+	 *
 	 * Determine whether the given bean requires destruction on shutdown.
 	 * <p>The default implementation checks the DisposableBean interface as well as
 	 * a specified destroy method and registered DestructionAwareBeanPostProcessors.
@@ -1955,6 +1968,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 注册销毁回调方法
+	 *
 	 * Add the given bean to the list of disposable beans in this factory,
 	 * registering its DisposableBean interface and/or the given destroy method
 	 * to be called on factory shutdown (if applicable). Only applies to singletons.
@@ -1968,7 +1983,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
+		// 有销毁接口
 		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
+			// 单例的情况，注册销毁回调
 			if (mbd.isSingleton()) {
 				// Register a DisposableBean implementation that performs all destruction
 				// work for the given bean: DestructionAwareBeanPostProcessors,
@@ -1978,6 +1995,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			else {
 				// A bean with a custom scope...
+				// 自定义的，注册Scope
 				Scope scope = this.scopes.get(mbd.getScope());
 				if (scope == null) {
 					throw new IllegalStateException("No Scope registered for scope name '" + mbd.getScope() + "'");

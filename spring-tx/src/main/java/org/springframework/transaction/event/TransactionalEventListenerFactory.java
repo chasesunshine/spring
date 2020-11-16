@@ -24,6 +24,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 /**
+ * 事务事件监听工厂，可以为特定的方法创建事务事件监听器，实现了EventListenerFactory接口
+ *
  * {@link EventListenerFactory} implementation that handles {@link TransactionalEventListener}
  * annotated methods.
  *

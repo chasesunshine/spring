@@ -250,8 +250,11 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 
 	@Override
 	public PropertyDescriptor getPropertyDescriptor(String propertyName) throws InvalidPropertyException {
+		// 获取对应属性的BeanWrapperImpl
 		BeanWrapperImpl nestedBw = (BeanWrapperImpl) getPropertyAccessorForPropertyPath(propertyName);
+		// 根据beanWrapperImpl和属性名称获取finalPath
 		String finalPath = getFinalPath(nestedBw, propertyName);
+		// 从nestedBW中获取对应的属性描述
 		PropertyDescriptor pd = nestedBw.getCachedIntrospectionResults().getPropertyDescriptor(finalPath);
 		if (pd == null) {
 			throw new InvalidPropertyException(getRootClass(), getNestedPath() + propertyName,

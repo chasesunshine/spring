@@ -1,15 +1,16 @@
 package com.mashibing;
 
-import com.mashibing.config.MyPropertySource;
-import com.mashibing.selfConverter.Student;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.convert.ConversionService;
-
 public class Test {
 
     public static void main(String[] args) {
+//        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryBean.xml");
+//        MyFactoryBean bean1 = (MyFactoryBean) ac.getBean( "&myFactoryBean");
+//        System.out.println(bean1);
+//        User bean = (User) ac.getBean("myFactoryBean");
+//        System.out.println(bean.getUsername());
+//        User bean2 = (User) ac.getBean("myFactoryBean");
+//        System.out.println(bean2.getUsername());
+
         MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 //        System.out.println(ac.getBean(MyPropertySource.class).getName());
 //        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-${username}.xml");
@@ -27,5 +28,10 @@ public class Test {
 //        ConversionService bean = ac.getBean(ConversionService.class);
 //        Student convert = bean.convert("1_zhangsan", Student.class);
 //        System.out.println(convert);
+
+//        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryMethod.xml");
+
+//        ApplicationContext ac = new ClassPathXmlApplicationContext("test.xml");
+
     }
 }

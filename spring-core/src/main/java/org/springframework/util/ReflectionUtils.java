@@ -308,6 +308,8 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * 处理方法上的@Autowired和@value注解
+	 *
 	 * Perform the given callback operation on all matching methods of the given
 	 * class, as locally declared or equivalent thereof (such as default methods
 	 * on Java 8 based interfaces that the given class implements).
@@ -344,6 +346,8 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * 递归获取所有的方法以及父类的，获取后执行mc.doWith方法，
+	 *
 	 * Perform the given callback operation on all matching methods of the given
 	 * class and superclasses (or given interface and super-interfaces).
 	 * <p>The same named method occurring on subclass and superclass will appear
@@ -378,6 +382,8 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * 用反射获取方法
+	 *
 	 * Get all declared methods on the leaf class and all superclasses.
 	 * Leaf class methods are included first.
 	 * @param leafClass the class to introspect
@@ -655,6 +661,8 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * 处理所有属性
+	 *
 	 * Invoke the given callback on all locally declared fields in the given class.
 	 * @param clazz the target class to analyze
 	 * @param fc the callback to invoke for each field
