@@ -165,7 +165,7 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	}
 
 	/**
-	 * 回滚到保存点
+	 * 内部就是获取连接对象，然后调用rollback回滚到保存点，然后重置连接持有器的回滚标记为false
 	 *
 	 * This implementation rolls back to the given JDBC 3.0 Savepoint.
 	 * @see java.sql.Connection#rollback(java.sql.Savepoint)
@@ -185,6 +185,8 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	}
 
 	/**
+	 * JDBC连接释放保存点
+	 *
 	 * This implementation releases the given JDBC 3.0 Savepoint.
 	 * @see java.sql.Connection#releaseSavepoint
 	 */

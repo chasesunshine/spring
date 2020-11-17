@@ -53,6 +53,11 @@ public abstract class DelegatingTransactionAttribute extends DelegatingTransacti
 		return this.targetAttribute.getQualifier();
 	}
 
+	/**
+	 * 判断是否可以回滚
+	 * @param ex the exception to evaluate
+	 * @return
+	 */
 	@Override
 	public boolean rollbackOn(Throwable ex) {
 		return this.targetAttribute.rollbackOn(ex);

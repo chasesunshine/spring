@@ -1341,9 +1341,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
-		// Shortcut when re-creating the same bean...
 		// 一个类可能有多个构造器，所以Spring得根据参数个数、类型确定需要调用的构造器
 		// 在使用构造器创建实例后，Spring会将解析过后确定下来的构造器或工厂方法保存在缓存中，避免再次创建相同bean时再次解析
+
+		// Shortcut when re-creating the same bean...
 		// 标记下，防止重复创建同一个bean
 		boolean resolved = false;
 		// 是否需要自动装配，构造有参数的需要

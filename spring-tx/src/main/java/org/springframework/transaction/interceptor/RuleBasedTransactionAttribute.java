@@ -123,6 +123,9 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 
 
 	/**
+	 * 先处理回滚的规则，就是事务注解里的rollbackFor，rollbackForClassName，noRollbackFor，noRollbackForClassName属性
+	 * 如果没有设置就会调用父类的rollbackOn
+	 *
 	 * Winning rule is the shallowest rule (that is, the closest in the
 	 * inheritance hierarchy to the exception). If no rule applies (-1),
 	 * return false.
@@ -137,6 +140,7 @@ public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute i
 		RollbackRuleAttribute winner = null;
 		int deepest = Integer.MAX_VALUE;
 
+		// 处理设置的回滚规则
 		if (this.rollbackRules != null) {
 			for (RollbackRuleAttribute rule : this.rollbackRules) {
 				int depth = rule.getDepth(ex);

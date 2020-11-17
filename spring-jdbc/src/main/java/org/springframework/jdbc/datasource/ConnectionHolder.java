@@ -206,6 +206,9 @@ public class ConnectionHolder extends ResourceHolderSupport {
 	}
 
 
+	/**
+	 * 连接持有器的清除
+	 */
 	@Override
 	public void clear() {
 		super.clear();

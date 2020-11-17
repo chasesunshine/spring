@@ -598,6 +598,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	}
 
 	/**
+	 * 创建一个TransactionInfo,然后把事务管理器，事务注解属性，方法标识符，事务状态设置进入，然后绑定到当前线程私有变量里
+	 *
 	 * Prepare a TransactionInfo for the given attribute and status object.
 	 * @param txAttr the TransactionAttribute (may be {@code null})
 	 * @param joinpointIdentification the fully qualified method name
@@ -609,6 +611,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			@Nullable TransactionAttribute txAttr, String joinpointIdentification,
 			@Nullable TransactionStatus status) {
 
+		// 创建事务信息
 		TransactionInfo txInfo = new TransactionInfo(tm, txAttr, joinpointIdentification);
 		if (txAttr != null) {
 			// We need a transaction for this method...
@@ -616,6 +619,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				logger.trace("Getting transaction for [" + txInfo.getJoinpointIdentification() + "]");
 			}
 			// The transaction manager will flag an error if an incompatible tx already exists.
+			// 设置新事务状态
 			txInfo.newTransactionStatus(status);
 		}
 		else {
@@ -630,11 +634,14 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		// We always bind the TransactionInfo to the thread, even if we didn't create
 		// a new transaction here. This guarantees that the TransactionInfo stack
 		// will be managed correctly even if no transaction was created by this aspect.
+		// 事务信息绑定到当前线程
 		txInfo.bindToThread();
 		return txInfo;
 	}
 
 	/**
+	 * 调用事务管理器的提交方法
+	 *
 	 * Execute after successful completion of call, but not after an exception was handled.
 	 * Do nothing if we didn't create a transaction.
 	 * @param txInfo information about the current transaction
@@ -649,6 +656,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	}
 
 	/**
+	 * 如果支持回滚的话就进行回滚，否则就处理提交，提交里面如果TransactionStatus.isRollbackOnly()=true的话也会进行回滚处理
+	 *
 	 * Handle a throwable, completing the transaction.
 	 * We may commit or roll back, depending on the configuration.
 	 * @param txInfo information about the current transaction
@@ -662,6 +671,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			}
 			if (txInfo.transactionAttribute != null && txInfo.transactionAttribute.rollbackOn(ex)) {
 				try {
+					// 进行回滚
 					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
 				}
 				catch (TransactionSystemException ex2) {
@@ -694,6 +704,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	}
 
 	/**
+	 * 清除事务信息
+	 *
 	 * Reset the TransactionInfo ThreadLocal.
 	 * <p>Call this in all cases: exception or normal return!
 	 * @param txInfo information about the current transaction (may be {@code null})

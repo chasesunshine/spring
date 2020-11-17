@@ -182,6 +182,8 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	}
 
 	/**
+	 * 清除事务同步状态，回滚状态
+	 *
 	 * Clear the transactional state of this resource holder.
 	 */
 	public void clear() {
