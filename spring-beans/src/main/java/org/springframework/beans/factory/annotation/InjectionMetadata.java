@@ -36,6 +36,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 注入元数据
+ *
  * Internal class for managing injection metadata.
  * Not intended for direct use in applications.
  *
@@ -174,6 +176,8 @@ public class InjectionMetadata {
 	}
 
 	/**
+	 * 判断给定的注入元数据是否需要被刷新
+	 *
 	 * Check whether the given injection metadata needs to be refreshed.
 	 * @param metadata the existing metadata instance
 	 * @param clazz the current target class

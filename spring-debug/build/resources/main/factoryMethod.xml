@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="person" class="com.mashibing.factoryMethod.PersonStaticFactory" factory-method="getPerson">
         <!--constructor-arg：可以为方法指定参数-->
-        <constructor-arg value="lisi"></constructor-arg>
+        <constructor-arg value="123"></constructor-arg>
     </bean>
     <bean id="personInstanceFactory" class="com.mashibing.factoryMethod.PersonInstanceFactory"></bean>
     <bean id="person2" class="com.mashibing.factoryMethod.Person" factory-bean="personInstanceFactory" factory-method="getPerson">

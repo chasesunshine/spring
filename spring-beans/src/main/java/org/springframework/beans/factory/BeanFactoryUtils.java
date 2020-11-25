@@ -78,6 +78,8 @@ public abstract class BeanFactoryUtils {
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
 	public static boolean isFactoryDereference(@Nullable String name) {
+		//如果有传入bean名且bean名是以'&'开头，则返回true，表示是BeanFactory的解引用，否则
+		// 返回false，表示不是BeanFactory的解引用
 		return (name != null && name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
 	}
 

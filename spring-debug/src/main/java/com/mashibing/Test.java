@@ -1,5 +1,9 @@
 package com.mashibing;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 public class Test {
 
     public static void main(String[] args) {
@@ -11,7 +15,7 @@ public class Test {
 //        User bean2 = (User) ac.getBean("myFactoryBean");
 //        System.out.println(bean2.getUsername());
 
-        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
+//        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 //        System.out.println(ac.getBean(MyPropertySource.class).getName());
 //        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-${username}.xml");
 //        Person bean = ac.getBean(Person.class);
@@ -31,7 +35,15 @@ public class Test {
 
 //        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryMethod.xml");
 
-//        ApplicationContext ac = new ClassPathXmlApplicationContext("test.xml");
+//        ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("test.xml");
+//        Person person = ac.getBean("person", Person.class);
+//        ac.close();
+//        Person person2 = ac.getBean("person", Person.class);
+
+        ApplicationContext ac = new ClassPathXmlApplicationContext("person.xml");
+        Person bean = ac.getBean(Person.class);
+        Person bean2 = ac.getBean(Person.class);
+
 
     }
 }

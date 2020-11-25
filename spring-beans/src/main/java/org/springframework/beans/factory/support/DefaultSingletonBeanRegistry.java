@@ -81,6 +81,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 *
 	 * Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
+//	public final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	/**
 	 * 三级缓存
@@ -88,6 +89,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 *
 	 * Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
+//	public final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/**
 	 * 二级缓存
@@ -96,12 +98,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 *
 	 * Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
+//	public final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
 	/**
 	 * 用来保存当前所有已经注册的bean
 	 *
 	 * Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
+//	public final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
 	/**
 	 * 正在创建过程中的beanName集合
@@ -130,10 +134,14 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
-	/** Map between dependent bean names: bean name to Set of dependent bean names. */
+	/**
+	 * 存储 bean名到该bean名所要依赖的bean名 的Map
+	 * Map between dependent bean names: bean name to Set of dependent bean names. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
-	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
+	/**
+	 * 存储 bean名到依赖于该bean名的bean名 的Map
+	 * Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
 
@@ -242,6 +250,18 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		}
 		return singletonObject;
 	}
+
+	/*@Nullable
+	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+		Object singletonObject = this.singletonObjects.get(beanName);
+		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+				synchronized (this.singletonObjects) {
+					singletonObject = this.earlySingletonObjects.get(beanName);
+					return singletonObject;
+				}
+			}
+		return singletonObject != null ? singletonObject:null;
+	}*/
 
 	/**
 	 * Return the (raw) singleton object registered under the given name,
@@ -461,23 +481,31 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 注册beanName与dependentBeanNamed的依赖关系
+	 *
 	 * Register a dependent bean for the given bean,
 	 * to be destroyed before the given bean is destroyed.
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+		//获取name的最终别名或者是全类名
 		String canonicalName = canonicalName(beanName);
 
+		//使用 存储 bean名到该bean名所要依赖的bean名 的Map 作为锁，保证线程安全
 		synchronized (this.dependentBeanMap) {
+			//获取canonicalName对应的用于存储依赖Bean名的Set集合，如果没有就创建一个LinkeHashSet，并与canonicalName绑定到dependentBeans中
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
+			//如果dependendBeans已经添加过来了dependentBeanName，就结束该方法，不执行后面操作。
 			if (!dependentBeans.add(dependentBeanName)) {
 				return;
 			}
 		}
 
+		//使用Bean依赖关系Map作为锁，保证线程安全
 		synchronized (this.dependenciesForBeanMap) {
+			//添加dependendtBeanName依赖于cannoicalName的映射关系到 存储 bean名到依赖于该bean名的bean名 的Map中
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
 			dependenciesForBean.add(canonicalName);

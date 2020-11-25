@@ -1,7 +1,14 @@
 package com.mashibing;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+
+@Component
 public class Person implements BeanClassLoaderAware {
 
     private ClassLoader classLoader;
@@ -9,11 +16,33 @@ public class Person implements BeanClassLoaderAware {
     private String name;
 
     public Person() {
+        System.out.println("构造方法");
     }
 
+//    @Autowired(required = false)
     public Person(Integer id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    @PostConstruct
+    public void init(){
+        System.out.println("init ......");
+    }
+
+    @PreDestroy
+    public void destroy(){
+        System.out.println("destroy");
+    }
+
+    public Person(String name,Integer id) {
+        this.id = id;
+        this.name = name;
+    }
+
+//    @Autowired
+    public Person(Integer id) {
+        this.id = id;
     }
 
     public Integer getId() {

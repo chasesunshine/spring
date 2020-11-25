@@ -149,9 +149,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-		// 找到生命周期方法
+		// 调用方法获取生命周期元数据并保存
 		LifecycleMetadata metadata = findLifecycleMetadata(beanType);
-		// 注册初始化和销毁的回调方法
+		// 验证相关方法
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -211,18 +211,21 @@ public class InitDestroyAnnotationBeanPostProcessor
 	private LifecycleMetadata findLifecycleMetadata(Class<?> clazz) {
 		if (this.lifecycleMetadataCache == null) {
 			// Happens after deserialization, during destruction...
-			// 在反序列化之后，在销毁期间
+			// 在bean销毁过程中，反序列化后调用
 			return buildLifecycleMetadata(clazz);
 		}
 		// Quick check on the concurrent map first, with minimal locking.
-		// 首先对并发映射进行快速检查，只需最少的锁定
+		// 首先尝试从缓存中获取元数据
 		LifecycleMetadata metadata = this.lifecycleMetadataCache.get(clazz);
+		// 如果从缓存中获取失败则尝试加锁创建元数据
 		if (metadata == null) {
 			synchronized (this.lifecycleMetadataCache) {
+				// 加锁后再次尝试获取元数据，防止多线程重复执行
 				metadata = this.lifecycleMetadataCache.get(clazz);
 				if (metadata == null) {
+					// 构建生命周期元数据
 					metadata = buildLifecycleMetadata(clazz);
-					// 放入缓存
+					// 将构建好的元数据放入缓存中
 					this.lifecycleMetadataCache.put(clazz, metadata);
 				}
 				return metadata;
@@ -231,30 +234,42 @@ public class InitDestroyAnnotationBeanPostProcessor
 		return metadata;
 	}
 
+	/**
+	 * 构造生命周期元数据（解析带@PostConstruct和@PreDestroy注解的方法），当其构造完成后会将元数据缓存到lifecycleMetadataCache集合中并返回
+	 * 此时就完成了相关方法（初始化方法和销毁方法）的扫描解析和缓存工作
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	private LifecycleMetadata buildLifecycleMetadata(final Class<?> clazz) {
 		if (!AnnotationUtils.isCandidateClass(clazz, Arrays.asList(this.initAnnotationType, this.destroyAnnotationType))) {
 			return this.emptyLifecycleMetadata;
 		}
 
+		// 实例化后的回调方法（@PostConstruct）
 		List<LifecycleElement> initMethods = new ArrayList<>();
+		// 销毁前的回调方法（@PreDestroy）
 		List<LifecycleElement> destroyMethods = new ArrayList<>();
+		// 获取正在处理的目标类
 		Class<?> targetClass = clazz;
 
 		do {
+			// 保存每一轮循环搜索到的相关方法
 			final List<LifecycleElement> currInitMethods = new ArrayList<>();
 			final List<LifecycleElement> currDestroyMethods = new ArrayList<>();
-			//如果有PostConstruct和PreDestroy注解的方法就添加到currInitMethods和currDestroyMethods里，包括父类，因为可能CGLIB动态代理
+			// 反射获取当前类中的所有方法并依次对其调用第二个参数的lambda表达式
 			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
-				// 查看方法上是否有@PostConstruct注解存在
+				// 当前方法的注解中包含initAnnotationType注解时（@PostConstruct）
 				if (this.initAnnotationType != null && method.isAnnotationPresent(this.initAnnotationType)) {
 					// 如果有，把它封装成LifecycleElement对象，存储起来
 					LifecycleElement element = new LifecycleElement(method);
+					// 将创建好的元素添加到集合中
 					currInitMethods.add(element);
 					if (logger.isTraceEnabled()) {
 						logger.trace("Found init method on class [" + clazz.getName() + "]: " + method);
 					}
 				}
-				// 查看方法上是否有@PreDestory注解存在
+				// 当前方法的注解中包含destroyAnnotationType注解（PreDestroy）
 				if (this.destroyAnnotationType != null && method.isAnnotationPresent(this.destroyAnnotationType)) {
 					// 如果有，把它封装成LifecycleElement对象，存储起来
 					currDestroyMethods.add(new LifecycleElement(method));
@@ -264,12 +279,14 @@ public class InitDestroyAnnotationBeanPostProcessor
 				}
 			});
 
-			// 初始化方法父类早于子类
+			// 将本次循环中获取到的对应方法集合保存到总集合中
 			initMethods.addAll(0, currInitMethods);
 			// 销毁方法父类晚于子类
 			destroyMethods.addAll(currDestroyMethods);
+			// 获取当前类的父类
 			targetClass = targetClass.getSuperclass();
 		}
+		// 如果当前类存在父类且父类不为object基类则循环对父类进行处理
 		while (targetClass != null && targetClass != Object.class);
 
 		// 有一个不为空就封装一个LifecycleMetadata对象，否则就返回空的emptyLifecycleMetadata

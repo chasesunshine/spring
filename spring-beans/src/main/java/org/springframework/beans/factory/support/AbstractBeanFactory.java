@@ -161,7 +161,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
 	/**
-	 * 表明InstantiationAwareBeanPostProcessors是否被注册
+	 * 指示是否已经注册了任何 InstantiationAwareBeanPostProcessors 对象
 	 *
 	 * Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
@@ -432,14 +432,25 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return (T) bean;
 	}
 
+	/**
+	 * 该bean工厂是否包含具有给定名称的bean定义或外部注册的singleton实例
+	 * @param name the name of the bean to query
+	 * @return
+	 */
 	@Override
 	public boolean containsBean(String name) {
+		//获取name最终的规范名称【最终别名】
 		String beanName = transformedBeanName(name);
+		//如果beanName存在于singletonObjects【单例对象的高速缓存Map集合】中，
+		// 或者 从beanDefinitionMap【Beand定义对象映射】中存在该beanName的BeanDefinition对象
 		if (containsSingleton(beanName) || containsBeanDefinition(beanName)) {
 			return (!BeanFactoryUtils.isFactoryDereference(name) || isFactoryBean(name));
 		}
 		// Not found -> check parent.
+		//获取父工厂
 		BeanFactory parentBeanFactory = getParentBeanFactory();
+		//如果父工厂不为null 则递归形式查询该name是否存在于父工厂，并返回执行结果；为null时直接返回false
+		// 因为经过上面步骤，已经确定当前工厂不存在该bean的BeanDefinition对象以及singleton实例
 		return (parentBeanFactory != null && parentBeanFactory.containsBean(originalBeanName(name)));
 	}
 
@@ -989,6 +1000,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 返回此工厂是否拥有InstiationAwareBeanPostProcessor，它将在关闭时应用于单例bean
+	 *
 	 * Return whether this factory holds a InstantiationAwareBeanPostProcessor
 	 * that will get applied to singleton beans on creation.
 	 * @see #addBeanPostProcessor
@@ -1117,21 +1130,26 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public boolean isFactoryBean(String name) throws NoSuchBeanDefinitionException {
-		// 拿到真正的beanName
+		//去除name开头的'&'字符,获取name最终的规范名称【最终别名或者是全类名】：
 		String beanName = transformedBeanName(name);
-		// 尝试从缓存中获取bean实例对象
+		//获取beanName注册的（原始）单例对象，如果单例对象没有找到，并且beanName存在
+		// 	正在创建的Set集合中
 		Object beanInstance = getSingleton(beanName, false);
+		//如果beanInstance能获取到
 		if (beanInstance != null) {
-			// beanInstance存在，则直接判断类型是否为FactoryBean
+			// 如果 beanInstance是FactoryBean的实例 则返回true，否则返回false。
 			return (beanInstance instanceof FactoryBean);
 		}
 		// No singleton instance found -> check bean definition.
 		// 如果缓存中不存在此beanName && 父beanFactory是ConfigurableBeanFactory，则调用父BeanFactory判断是否为FactoryBean
 		if (!containsBeanDefinition(beanName) && getParentBeanFactory() instanceof ConfigurableBeanFactory) {
 			// No bean definition found in this factory -> delegate to parent.
+			// 在该工厂中找不到bean定义 -> 委托给父对象
+			// 尝试在父工厂中确定name是否为FactoryBean，如果不是返回false，否则返回true【递归】
 			return ((ConfigurableBeanFactory) getParentBeanFactory()).isFactoryBean(name);
 		}
-		// 通过MergedBeanDefinition来检查beanName对应的bean是否为FactoryBean
+		// 如果该bean对应于子bean定义，则遍历父bean定义。
+		// 判断(beanName和beanName对应的合并后BeanDefinition)所指的bean是否FactoryBean并将结果返回出去
 		return isFactoryBean(beanName, getMergedLocalBeanDefinition(beanName));
 	}
 
