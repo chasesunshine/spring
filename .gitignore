@@ -2,4 +2,4 @@
 */out
 .gradle
 .idea
-buildSrc/.gradle
+/buildSrc
