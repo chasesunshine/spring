@@ -31,11 +31,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * AliasRegistry接口的简单实现。
+ * 作为org.springframework.bean.factory.support.BeanDefinitionRegistry的基础实现
+ *
  * Simple implementation of the {@link AliasRegistry} interface.
  * <p>Serves as base class for
  * {link org.springframework.beans.factory.support.BeanDefinitionRegistry}
  * implementations.
- * 定义map作为alias的缓存，并对接口aliasRegistry进行实现
+ *
  * @author Juergen Hoeller
  * @author Qimiao Chen
  * @since 2.5.2
@@ -45,7 +48,9 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	/** Map from alias to canonical name. */
+	/**
+	 * 从别名映射到规范名称
+	 * Map from alias to canonical name. */
 	private final Map<String, String> aliasMap = new ConcurrentHashMap<>(16);
 
 
@@ -118,29 +123,49 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		}
 	}
 
+	/**
+	 * 确定此给定名称是否定义为别名：返回name是否存在于别名Map【aliasMap】中
+	 * @param name the name to check -- 要检查的名称
+	 */
 	@Override
 	public boolean isAlias(String name) {
+		// 返回name是否存在于别名Map中
 		return this.aliasMap.containsKey(name);
 	}
 
+	/**
+	 * 返回给定bean名称的别名(如果有)
+	 * @param name the bean name to check for aliases -- 用来检测别名的bena名称
+	 * @return 别名，如果没有则为空数组
+	 */
 	@Override
 	public String[] getAliases(String name) {
+		// 定义一个用于存放别名的集合
 		List<String> result = new ArrayList<>();
+		// 使用aliasMap加锁，以保证线程安全
 		synchronized (this.aliasMap) {
+			// 以递归的形式获取name的所有别名,将所有别名存放的result中
 			retrieveAliases(name, result);
 		}
+		// 将result转换成String数组
 		return StringUtils.toStringArray(result);
 	}
 
 	/**
+	 * 以递归的形式获取name的所有别名,将所有别名存放的result中
+	 *
 	 * Transitively retrieve all aliases for the given name.
 	 * @param name the target name to find aliases for
 	 * @param result the resulting aliases list
 	 */
 	private void retrieveAliases(String name, List<String> result) {
+		// 遍历aliasMap
 		this.aliasMap.forEach((alias, registeredName) -> {
+			// 如果已注册名称与要查找别名的目标名称相同
 			if (registeredName.equals(name)) {
+				// 将别名添加到result中
 				result.add(alias);
+				// 递归该方法，查找该别名的别名
 				retrieveAliases(alias, result);
 			}
 		});
@@ -207,23 +232,28 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	/**
-	 * 确定原始的名字，处理别名到原始的名字
+	 * 获取name的最终别名或者是全类名
 	 *
 	 * Determine the raw name, resolving aliases to canonical names.
 	 * @param name the user-specified name
 	 * @return the transformed name
 	 */
 	public String canonicalName(String name) {
+		// 规范名称初始化化传入的name
 		String canonicalName = name;
 		// Handle aliasing...
+		// 处理别名
 		String resolvedName;
 		do {
 			// 将别名解析成真正的beanName
 			resolvedName = this.aliasMap.get(canonicalName);
+			// 如果找到了解析后的名称
 			if (resolvedName != null) {
+				// 规范名称重新赋值为解析后名称
 				canonicalName = resolvedName;
 			}
 		}
+		// 只要找到了解析后的名称
 		while (resolvedName != null);
 		return canonicalName;
 	}

@@ -22,7 +22,12 @@ import java.lang.reflect.Method;
 import org.springframework.lang.Nullable;
 
 /**
+ * 用于发现方法和构造函数的参数名的接口
+ *
  * Interface to discover parameter names for methods and constructors.
+ *
+ *
+ * 参数名并非总是可以发现参数名称，但可以尝试各种策略，比如寻找在编译时可能发生调试信号，和寻找可选的附带AspectJ注解方法的argname注解值
  *
  * <p>Parameter name discovery is not always possible, but various strategies are
  * available to try, such as looking for debug information that may have been
@@ -36,6 +41,8 @@ import org.springframework.lang.Nullable;
 public interface ParameterNameDiscoverer {
 
 	/**
+	 *  返回方法的参数名，如果不能确定就返回{@code null}
+	 *
 	 * Return parameter names for a method, or {@code null} if they cannot be determined.
 	 * <p>Individual entries in the array may be {@code null} if parameter names are only
 	 * available for some parameters of the given method but not for others. However,
@@ -48,6 +55,8 @@ public interface ParameterNameDiscoverer {
 	String[] getParameterNames(Method method);
 
 	/**
+	 * 返回构造函数的参数名，如果不能确定就返回{@code null}
+	 *
 	 * Return parameter names for a constructor, or {@code null} if they cannot be determined.
 	 * <p>Individual entries in the array may be {@code null} if parameter names are only
 	 * available for some parameters of the given constructor but not for others. However,

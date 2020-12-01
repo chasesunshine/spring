@@ -24,6 +24,9 @@ import java.util.List;
 import org.springframework.lang.Nullable;
 
 /**
+ * 陆续尝试一些发现器委托类的{@link ParameterNameDiscoverer}实现。
+ * 在{@code addDiscoverer}方法中最先添加的那些有效级最高。如果一个返回{@code null},尝试下一个
+ *
  * {@link ParameterNameDiscoverer} implementation that tries several discoverer
  * delegates in succession. Those added first in the {@code addDiscoverer} method
  * have highest priority. If one returns {@code null}, the next will be tried.
@@ -36,10 +39,13 @@ import org.springframework.lang.Nullable;
  */
 public class PrioritizedParameterNameDiscoverer implements ParameterNameDiscoverer {
 
+	// 参数名发现器集合
 	private final List<ParameterNameDiscoverer> parameterNameDiscoverers = new LinkedList<>();
 
 
 	/**
+	 * 向此{@code PrioritizedParameterNameDiscoverer}检查的发现器列表添加一个{@link ParameterNameDiscoverer}委托对象
+	 *
 	 * Add a further {@link ParameterNameDiscoverer} delegate to the list of
 	 * discoverers that this {@code PrioritizedParameterNameDiscoverer} checks.
 	 */
@@ -51,24 +57,34 @@ public class PrioritizedParameterNameDiscoverer implements ParameterNameDiscover
 	@Override
 	@Nullable
 	public String[] getParameterNames(Method method) {
+		// 遍历参数名发现器集合
 		for (ParameterNameDiscoverer pnd : this.parameterNameDiscoverers) {
+			// 通过参数名发现器获取method中的参数名数组
 			String[] result = pnd.getParameterNames(method);
+			// 如果result不为null，表示该参数名发现器能拿到method的参数名
 			if (result != null) {
+				// 返回结果
 				return result;
 			}
 		}
+		// 如果所有的参数名发现器都没法拿到参数名，就返回null
 		return null;
 	}
 
 	@Override
 	@Nullable
 	public String[] getParameterNames(Constructor<?> ctor) {
+		// 遍历参数名发现器集合
 		for (ParameterNameDiscoverer pnd : this.parameterNameDiscoverers) {
+			// 通过参数名发现器获取ctor中的参数名数组
 			String[] result = pnd.getParameterNames(ctor);
+			// 如果result不为null，表示该参数名发现器能拿到ctor的参数名
 			if (result != null) {
+				// 返回结果
 				return result;
 			}
 		}
+		// 如果所有的参数名发现器都没法拿到参数名，就返回null
 		return null;
 	}
 

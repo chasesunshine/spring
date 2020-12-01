@@ -368,6 +368,11 @@ final class PostProcessorRegistrationDelegate {
         beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
     }
 
+    /**
+     * 对 postProcessors 进行排序，优先使用beanFactory的DependencyComparator，获取不到就使用OrderComparator.INSTANCE
+     * @param postProcessors
+     * @param beanFactory
+     */
     private static void sortPostProcessors(List<?> postProcessors, ConfigurableListableBeanFactory beanFactory) {
         // Nothing to sort?
         // 如果postProcessors的个数小于等于1，那么不做任何排序操作
@@ -381,7 +386,10 @@ final class PostProcessorRegistrationDelegate {
             comparatorToUse = ((DefaultListableBeanFactory) beanFactory).getDependencyComparator();
         }
         if (comparatorToUse == null) {
-            // 如果没有设置比较器，则使用默认的OrderComparator
+            //OrderComparator.INSTANCE:有序对象的比较实现，按顺序值升序或优先级降序排序,优先级由上往下：
+            // 	1.PriorityOrderd对象
+            // 	2.一些Order对象
+            // 	3.无顺序对象
             comparatorToUse = OrderComparator.INSTANCE;
         }
         // 使用比较器对postProcessors进行排序
@@ -389,42 +397,53 @@ final class PostProcessorRegistrationDelegate {
     }
 
     /**
+     * 调用给定 BeanDefinitionRegistryPostProcessor Bean对象
+     *
      * Invoke the given BeanDefinitionRegistryPostProcessor beans.
      */
     private static void invokeBeanDefinitionRegistryPostProcessors(
             Collection<? extends BeanDefinitionRegistryPostProcessor> postProcessors, BeanDefinitionRegistry registry) {
 
+        //遍历 postProcessors
         for (BeanDefinitionRegistryPostProcessor postProcessor : postProcessors) {
+            //调用 postProcessor 的 postProcessBeanDefinitionRegistry以使得postProcess往registry注册BeanDefinition对象
             postProcessor.postProcessBeanDefinitionRegistry(registry);
         }
     }
 
     /**
+     * 调用给定的 BeanFactoryPostProcessor类型Bean对象
+     *
      * Invoke the given BeanFactoryPostProcessor beans.
      */
     private static void invokeBeanFactoryPostProcessors(
             Collection<? extends BeanFactoryPostProcessor> postProcessors, ConfigurableListableBeanFactory beanFactory) {
 
+        //遍历postProcessors
         for (BeanFactoryPostProcessor postProcessor : postProcessors) {
+            //回调 BeanFactoryPostProcessor 的 postProcessBeanFactory 方法，使得每个postProcessor对象都可以对
+            // beanFactory进行调整
             postProcessor.postProcessBeanFactory(beanFactory);
         }
     }
 
     /**
+     * 注册给定的BeanPostProcessor类型Bean对象
+     *
      * Register the given BeanPostProcessor beans.
      */
     private static void registerBeanPostProcessors(
             ConfigurableListableBeanFactory beanFactory, List<BeanPostProcessor> postProcessors) {
         // 遍历postProcessors
         for (BeanPostProcessor postProcessor : postProcessors) {
-            // 将postProcessor添加到BeanFactory中的beanPostProcessors缓存
+            //将 postProcessor 添加到beanFactory,它将应用于该工厂创建的Bean。在工厂配置期间调用
             beanFactory.addBeanPostProcessor(postProcessor);
         }
     }
 
 
     /**
-     * bean后置处理器，用来记录后置处理器实例化时的输出信息
+     * 当前Bean在BeanPostProcessor实例化过程中被创建时，即当前一个Bean不适合被所有BeanPostProcessor处理时，记录一个信息消息
      *
      * BeanPostProcessor that logs an info message when a bean is created during
      * BeanPostProcessor instantiation, i.e. when a bean is not eligible for
@@ -434,10 +453,13 @@ final class PostProcessorRegistrationDelegate {
 
         private static final Log logger = LogFactory.getLog(BeanPostProcessorChecker.class);
 
+        //当前Bean工厂
         private final ConfigurableListableBeanFactory beanFactory;
 
+        //BeanPostProcessor目标数量
         private final int beanPostProcessorTargetCount;
 
+        //创建一个 BeanPostProcessorCheker 实例
         public BeanPostProcessorChecker(ConfigurableListableBeanFactory beanFactory, int beanPostProcessorTargetCount) {
             this.beanFactory = beanFactory;
             this.beanPostProcessorTargetCount = beanPostProcessorTargetCount;
@@ -462,8 +484,8 @@ final class PostProcessorRegistrationDelegate {
          */
         @Override
         public Object postProcessAfterInitialization(Object bean, String beanName) {
-            // 1、BeanPostProcessor类型不检测
-            // 2、ROLE_INFRASTRUCTURE这种类型的bean不检测（spring自己的bean）
+            // 如果bean不是BeanPostProcessor实例 && beanName 不是 完全内部使用 && beanFactory当前注册的BeanPostProcessor
+            // 数量小于 BeanPostProcessor目标数量
             if (!(bean instanceof BeanPostProcessor) && !isInfrastructureBean(beanName) &&
                     this.beanFactory.getBeanPostProcessorCount() < this.beanPostProcessorTargetCount) {
                 if (logger.isInfoEnabled()) {
@@ -472,19 +494,24 @@ final class PostProcessorRegistrationDelegate {
                             "(for example: not eligible for auto-proxying)");
                 }
             }
+            // 返回bean
             return bean;
         }
 
         /**
-         * 检测当前bean是否是spring自己的bean
+         * 判断 beanName 是否是 完全内部使用
          * @param beanName
          * @return
          */
         private boolean isInfrastructureBean(@Nullable String beanName) {
+            //如果 beanName不为null && beanFactory包含具有beanName的beanDefinition对象
             if (beanName != null && this.beanFactory.containsBeanDefinition(beanName)) {
+                //从beanFactory中获取beanName的BeanDefinition对象
                 BeanDefinition bd = this.beanFactory.getBeanDefinition(beanName);
+                //如果bd的角色是完全内部使用，返回true；否则返回false
                 return (bd.getRole() == RootBeanDefinition.ROLE_INFRASTRUCTURE);
             }
+            //默认返回false
             return false;
         }
     }

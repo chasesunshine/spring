@@ -1,7 +1,9 @@
 package com.mashibing;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -9,7 +11,7 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 @Component
-public class Person implements BeanClassLoaderAware {
+public class Person implements BeanClassLoaderAware, Ordered, InitializingBean {
 
     private ClassLoader classLoader;
     private Integer id;
@@ -76,5 +78,15 @@ public class Person implements BeanClassLoaderAware {
 
     public ClassLoader getClassLoader() {
         return classLoader;
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
     }
 }

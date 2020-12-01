@@ -361,6 +361,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 将给定事件发布到所有监听器
+	 *
 	 * Publish the given event to all listeners.
 	 * <p>Note: Listeners get initialized after the MessageSource, to be able
 	 * to access it within listener implementations. Thus, MessageSource
@@ -374,6 +376,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 将给定事件发布到所有监听器
+	 *
 	 * Publish the given event to all listeners.
 	 * <p>Note: Listeners get initialized after the MessageSource, to be able
 	 * to access it within listener implementations. Thus, MessageSource
@@ -387,6 +391,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 将给定事件发布到所有监听器
+	 *
 	 * Publish the given event to all listeners.
 	 * @param event the event to publish (may be an {@link ApplicationEvent}
 	 * or a payload object to be turned into a {@link PayloadApplicationEvent})
@@ -394,39 +400,53 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @since 4.2
 	 */
 	protected void publishEvent(Object event, @Nullable ResolvableType eventType) {
+		// 如果event为null，抛出异常
 		Assert.notNull(event, "Event must not be null");
 
 		// Decorate event as an ApplicationEvent if necessary
-		// 如果有必要，将事件装饰为applicationEvent
+		// 装饰事件作为一个应用事件，如果有必要
 		ApplicationEvent applicationEvent;
+		// 如果event是ApplicationEvent的实例
 		if (event instanceof ApplicationEvent) {
+			// 将event强转为ApplicationEvent对象
 			applicationEvent = (ApplicationEvent) event;
 		}
 		else {
-			// 不是事件就转为事件
+			// PayloadApplicationEvent：携带任意有效负载的ApplicationEvent。
+			// 创建一个新的PayloadApplicationEvent
 			applicationEvent = new PayloadApplicationEvent<>(this, event);
+			// 如果eventType为 null
 			if (eventType == null) {
+				// 将applicationEvent转换为PayloadApplicationEvent 象，引用其ResolvableType对象
 				eventType = ((PayloadApplicationEvent<?>) applicationEvent).getResolvableType();
 			}
 		}
 
 		// Multicast right now if possible - or lazily once the multicaster is initialized
-		// 如果可能，立即进行多播或者一旦初始化多播器就进入懒惰状态
+		// 如果可能的话，现在就进行组播——或者在组播初始化后延迟
+		// earlyApplicationEvents：在多播程序设置之前发布的ApplicationEvent
+		// 如果earlyApplicationEvents不为 null，这种情况只在上下文的多播器还没有初始化的情况下才会成立，会将applicationEvent
+		// 添加到earlyApplicationEvents保存起来，待多博器初始化后才继续进行多播到适当的监听器
 		if (this.earlyApplicationEvents != null) {
+			//将applicationEvent添加到 earlyApplicationEvents
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
 		else {
-			// 获取事件广播器，发布事件
+			// 多播applicationEvent到适当的监听器
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 
 		// Publish event via parent context as well...
-		// 如果存在父容器，那么父容器也发布事件
+		// 通过父上下文发布事件
+		// 如果parent不为null
 		if (this.parent != null) {
+			// 如果parent是AbstractApplicationContext的实例
 			if (this.parent instanceof AbstractApplicationContext) {
+				// 将event多播到所有适合的监听器。如果event不是ApplicationEvent实例，会将其封装成PayloadApplicationEvent对象再进行多播
 				((AbstractApplicationContext) this.parent).publishEvent(event, eventType);
 			}
 			else {
+				// 通知与event事件应用程序注册的所有匹配的监听器
 				this.parent.publishEvent(event);
 			}
 		}
@@ -864,28 +884,33 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 初始化 LifecycleProcessor.如果上下文中没有定义，则使用DefaultLifecycleProcessor
+	 *
 	 * Initialize the LifecycleProcessor.
 	 * Uses DefaultLifecycleProcessor if none defined in the context.
 	 * @see org.springframework.context.support.DefaultLifecycleProcessor
 	 */
 	protected void initLifecycleProcessor() {
-		// 获取beanFactory对象
+		//获取当前上下文的BeanFactory对象
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		// 判断beanFactory是否已经存在生命周期处理器
+		//如果beanFactory包含'lifecycleProcessor'的bean，忽略父工厂
 		if (beanFactory.containsLocalBean(LIFECYCLE_PROCESSOR_BEAN_NAME)) {
-			// 如果已经存在，则将该bean赋值给lifecycleProcessor
+			//让当前上下文引用从beanFactory中获取名为'lifecycleProcessor'的LifecycleProcessor类型的Bean对象
 			this.lifecycleProcessor =
 					beanFactory.getBean(LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.class);
+			//如果当前日志级级别是跟踪
 			if (logger.isTraceEnabled()) {
 				logger.trace("Using LifecycleProcessor [" + this.lifecycleProcessor + "]");
 			}
 		}
 		else {
-			// 如果不存在，则使用DefaultLifecycleProcessor
+			// 创建一个DefaultLifecycleProcessor实例
 			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();
+			// 为Bean实例提供所属工厂的回调函数
 			defaultProcessor.setBeanFactory(beanFactory);
+			// 让当前上下文引用defaultProcessor
 			this.lifecycleProcessor = defaultProcessor;
-			// 将DefaultLifecycleProcessor作为默认的生命周期处理器，注册到beanfactory中
+			//将lifecycleProcessor与lifecycleProcessor注册到beanFactory中
 			beanFactory.registerSingleton(LIFECYCLE_PROCESSOR_BEAN_NAME, this.lifecycleProcessor);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No '" + LIFECYCLE_PROCESSOR_BEAN_NAME + "' bean, using " +
@@ -983,28 +1008,37 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 完成刷新
 	 * Finish the refresh of this context, invoking the LifecycleProcessor's
 	 * onRefresh() method and publishing the
 	 * {@link org.springframework.context.event.ContextRefreshedEvent}.
 	 */
 	protected void finishRefresh() {
 		// Clear context-level resource caches (such as ASM metadata from scanning).
-		// 清除缓存
+		// 清除上下文级别的资源缓存(如扫描的ASM元数据)
+		// 清空在资源加载器中的所有资源缓存
 		clearResourceCaches();
 
 		// Initialize lifecycle processor for this context.
-		// 将刷新完毕时间传播到生命周期处理器
+		// 为这个上下文初始化生命周期处理器
+		// 初始化LifecycleProcessor.如果上下文中找到'lifecycleProcessor'的LifecycleProcessor Bean对象，
+		// 则使用DefaultLifecycleProcessor
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
-		// 传播刷新生命周期处理器
+		// 首先将刷新传播到生命周期处理器
+		// 上下文刷新的通知，例如自动启动的组件
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
-		// 发布事件
+		// 发布最终事件
+		// 新建ContextRefreshedEvent事件对象，将其发布到所有监听器。
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.
+		// 参与LiveBeansView MBean，如果是活动的
+		// LiveBeansView:Sping用于支持JMX 服务的类
+		// 注册当前上下文到LiveBeansView，以支持JMX服务
 		LiveBeansView.registerApplicationContext(this);
 	}
 

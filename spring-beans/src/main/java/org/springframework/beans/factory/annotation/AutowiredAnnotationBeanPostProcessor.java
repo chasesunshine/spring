@@ -565,7 +565,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 * @return
 	 */
 	private InjectionMetadata buildAutowiringMetadata(final Class<?> clazz) {
-		// 判断给定的类是否带有指定的注解
+		// 如果clazz是JDK中的类，直接忽略，因为不可能标注有这些标注
 		if (!AnnotationUtils.isCandidateClass(clazz, this.autowiredAnnotationTypes)) {
 			return InjectionMetadata.EMPTY;
 		}
@@ -593,6 +593,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			});
+
 
 			// 遍历类中的每个方法，判断属性是否包含指定的属性(通过 findAutowiredAnnotation 方法)
 			// 如果存在则保存，这里注意，方法保存的类型是 AutowiredMethodElement

@@ -91,21 +91,32 @@ public abstract class AbstractApplicationEventMulticaster
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
+		//如果 beanFactory 不是 ConfigurableBeanFactory 实例
 		if (!(beanFactory instanceof ConfigurableBeanFactory)) {
+			// 抛出非法状态异常：不在 ConfigurableBeanFactory：beanFactory
 			throw new IllegalStateException("Not running in a ConfigurableBeanFactory: " + beanFactory);
 		}
 		this.beanFactory = (ConfigurableBeanFactory) beanFactory;
+		//如果beanClassLoader为null
 		if (this.beanClassLoader == null) {
+			//获取beanFactory的类加载器以加载Bean类(即使无法使用系统ClassLoader,也只能为null)
 			this.beanClassLoader = this.beanFactory.getBeanClassLoader();
 		}
+		//获取beanFactory使用的单例互斥锁(用于外部协作者)
 		this.retrievalMutex = this.beanFactory.getSingletonMutex();
 	}
 
+	/**
+	 * 获取当前BeanFactory
+	 * @return
+	 */
 	private ConfigurableBeanFactory getBeanFactory() {
+		//如果beanFactory为null
 		if (this.beanFactory == null) {
 			throw new IllegalStateException("ApplicationEventMulticaster cannot retrieve listener beans " +
 					"because it is not associated with a BeanFactory");
 		}
+		//返回当前BeanFactory
 		return this.beanFactory;
 	}
 
@@ -116,73 +127,88 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
-		// 锁定监听器助手对象
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
 			// Explicitly remove target for a proxy, if registered already,
 			// in order to avoid double invocations of the same listener.
-			// 如果已经注册，则显式删除已经注册的监听器对象，为了避免调用重复的监听器对象
+			// 显示删除代理的目标(如果已经注册)，以避免对同一个监听器的两次调用获取listener背后的singleton目标对象
 			Object singletonTarget = AopProxyUtils.getSingletonTarget(listener);
+			//如果singletonTarget是ApplicationListener实例
 			if (singletonTarget instanceof ApplicationListener) {
-				// 删除监听器对象
+				//将singletonTarget从defaultRetriever.applicationListeners中移除
 				this.defaultRetriever.applicationListeners.remove(singletonTarget);
 			}
-			// 新增监听器对象
+			//将listener添加到defaultRetriever.applicationListeners中
 			this.defaultRetriever.applicationListeners.add(listener);
-			// 清空监听器助手缓存map
+			//清空缓存，因为listener可能支持缓存的某些事件类型和源类型，所以要刷新缓存
 			this.retrieverCache.clear();
 		}
 	}
 
 	@Override
 	public void addApplicationListenerBean(String listenerBeanName) {
-		// 锁定监听器助手对象
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
-			// 新增bean name为listenerBeanName的监听器对象到集合之中
+			// 将listenerBeanName添加到defaultRetriever的applicationListenerBeans
 			this.defaultRetriever.applicationListenerBeans.add(listenerBeanName);
-			// 清空监听器助手缓存map
+			// 清空缓存，因为listener可能支持缓存的某些事件类型和源类型，所以要刷新缓存
 			this.retrieverCache.clear();
 		}
 	}
 
 	@Override
 	public void removeApplicationListener(ApplicationListener<?> listener) {
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
+			//将listener从retriever的ApplicationListener对象集合中移除
 			this.defaultRetriever.applicationListeners.remove(listener);
+			//清空缓存，因为listener可能支持缓存的某些事件类型和源类型，所以要刷新缓存
 			this.retrieverCache.clear();
 		}
 	}
 
 	@Override
 	public void removeApplicationListenerBean(String listenerBeanName) {
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
+			//将listener从retriever的ApplicationListener对象集合中移除
 			this.defaultRetriever.applicationListenerBeans.remove(listenerBeanName);
+			//清空缓存，因为listener可能支持缓存的某些事件类型和源类型，所以要刷新缓存
 			this.retrieverCache.clear();
 		}
 	}
 
 	@Override
 	public void removeAllListeners() {
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
+			//清空defaultRetriever的ApplicationListener对象集合
 			this.defaultRetriever.applicationListeners.clear();
+			//清空defaultRetriever的BeanFactory中的applicationListener类型Bean名集合
 			this.defaultRetriever.applicationListenerBeans.clear();
+			//清空缓存，因为listener可能支持缓存的某些事件类型和源类型，所以要刷新缓存
 			this.retrieverCache.clear();
 		}
 	}
 
 
 	/**
+	 * 返回包含所有applicationListenere的集合
+	 *
 	 * Return a Collection containing all ApplicationListeners.
 	 * @return a Collection of ApplicationListeners
 	 * @see org.springframework.context.ApplicationListener
 	 */
 	protected Collection<ApplicationListener<?>> getApplicationListeners() {
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
+			//返回defaultRetriever的包含所有applicationListenere的集合
 			return this.defaultRetriever.getApplicationListeners();
 		}
 	}
 
 	/**
-	 * 获取监听器对象（匹配指定的事件类型，不匹配很早就被排除在外的监听器）
+	 * 返回给定事件类型匹配的 applicationListenere 集合。不匹配的监听器很早就排除在外
 	 *
 	 * Return a Collection of ApplicationListeners matching the given
 	 * event type. Non-matching listeners get excluded early.
@@ -195,50 +221,60 @@ public abstract class AbstractApplicationEventMulticaster
 	protected Collection<ApplicationListener<?>> getApplicationListeners(
 			ApplicationEvent event, ResolvableType eventType) {
 
-		// 事件源，事件最初发生在其上的对象
+		//event.getSource:事件最初在其上发生的对象。
+		//获取event最初在其上发生的对象
 		Object source = event.getSource();
-		// 事件源class对象
+		//如果source不为nul就获取source的Class对象；否则引用null
 		Class<?> sourceType = (source != null ? source.getClass() : null);
-		// 创建基于事件源和事件源类型的监听器助手cacheKey
+		//如果source不为nul就获取source的Class对象；否则引用null
 		ListenerCacheKey cacheKey = new ListenerCacheKey(eventType, sourceType);
 
 		// Quick check for existing entry on ConcurrentHashMap...
-		// 快速检测监听器助手缓存Concurrenthashmap中是否存在指定的cacheKey
+		// 在ConcurrentHashMap上快速检查现有条目,从retrieverCache中获取cacheKey对应的ListenerRetriever对象
 		ListenerRetriever retriever = this.retrieverCache.get(cacheKey);
+		//如果retriever不为null
 		if (retriever != null) {
-			// 如果存在指定的key，则返回应用程序的监听器对象
+			//获取ListenerRetriever存放的所有ApplicationListener对象
 			return retriever.getApplicationListeners();
 		}
 
-		// 如果类加载器为null，或者事件源在给定的类加载器上下文是安全的并且源类型为null或者源类型在指定上下文是安全的
+		// 判断是否由给定的类加载器或者给定的类加载的父级类加载器加载过
+		// 如果beanClassLoader为null||(event的Class对象已经被beanClassLoader加载过&&(sourceType为null||
+		// sourceType已经被beanClassLoader 加载过))
 		if (this.beanClassLoader == null ||
 				(ClassUtils.isCacheSafe(event.getClass(), this.beanClassLoader) &&
 						(sourceType == null || ClassUtils.isCacheSafe(sourceType, this.beanClassLoader)))) {
 			// Fully synchronized building and caching of a ListenerRetriever
-			// 同步从ListenerRetriever监听器助手中获取指定的监听器
+			// ListenerRetriever完全同步的构建和缓存,使用retrievalMutex加锁保证线程安全
 			synchronized (this.retrievalMutex) {
+				//从retrieverCache中获取cacheKey对应的ListenerRetriever对象
 				retriever = this.retrieverCache.get(cacheKey);
+				//如果retriever不为null
 				if (retriever != null) {
-					// 返回监听器助手中存储的监听器对象
+					//获取ListenerRetriever存放的所有ApplicationListener对象
 					return retriever.getApplicationListeners();
 				}
+				//新建一个ListenerRetriever对象
 				retriever = new ListenerRetriever(true);
-				// 实际检索给定事件和源类型的应用程序监听器
+				//过滤出所有支持eventType以及sourceType的ApplicationListener对象的列表
 				Collection<ApplicationListener<?>> listeners =
 						retrieveApplicationListeners(eventType, sourceType, retriever);
+				//将cacheKey,retriever绑定到retrieverCache中
 				this.retrieverCache.put(cacheKey, retriever);
+				//返回listeners
 				return listeners;
 			}
 		}
 		else {
 			// No ListenerRetriever caching -> no synchronization necessary
-			// 无ListenerRetriever监听器助手 -> 无需同步缓存
+			// 没有ListenerRetriever缓存 -> 不需要同步
+			//过滤出所有支持eventType以及sourceType的ApplicationListener对象的列表，不使用缓存
 			return retrieveApplicationListeners(eventType, sourceType, null);
 		}
 	}
 
 	/**
-	 * 检索应用程序给定事件监听器和源类型
+	 * 实际检索给定事件和原类型的应用程序监听器
 	 *
 	 * Actually retrieve the application listeners for the given event and source type.
 	 * @param eventType the event type
@@ -249,48 +285,66 @@ public abstract class AbstractApplicationEventMulticaster
 	private Collection<ApplicationListener<?>> retrieveApplicationListeners(
 			ResolvableType eventType, @Nullable Class<?> sourceType, @Nullable ListenerRetriever retriever) {
 
-		// 创建应用程序所有监听器的集合
+		//存放所有支持eventType以及sourceType的ApplicationListener对象的列表
 		List<ApplicationListener<?>> allListeners = new ArrayList<>();
 		// 创建应用程序监听器集合，去重
 		Set<ApplicationListener<?>> listeners;
 		Set<String> listenerBeans;
-		// 锁定监听器助手对象
+		//使用retrievalMutex加锁，保证线程安全
 		synchronized (this.retrievalMutex) {
-			// 初始化监听器集合对象
+			//初始化编程方式添加的静态ApplicationListener对象集合
 			listeners = new LinkedHashSet<>(this.defaultRetriever.applicationListeners);
+			// 初始化BeanFactory中的applicationListener类型Bean名集合
 			listenerBeans = new LinkedHashSet<>(this.defaultRetriever.applicationListenerBeans);
 		}
 
 		// Add programmatically registered listeners, including ones coming
 		// from ApplicationListenerDetector (singleton beans and inner beans).
-		// 遍历所有的监听器集合
+		// 添加以编程方式注册的监听器，包括来自ApplicationListenerDeteor(单例Bean和内部Bean)的监听器
+		// 遍历listeners
 		for (ApplicationListener<?> listener : listeners) {
+			//如果listener支持eventType事件类型以及sourceType源类型
 			if (supportsEvent(listener, eventType, sourceType)) {
+				//如果retriever不为null
 				if (retriever != null) {
+					//将listener添加到retriever的ApplicationListener对象集合中
 					retriever.applicationListeners.add(listener);
 				}
+				//将listener添加到allListeners中
 				allListeners.add(listener);
 			}
 		}
 
 		// Add listeners by bean name, potentially overlapping with programmatically
 		// registered listeners above - but here potentially with additional metadata.
+		// 按Bean名称添加监听器，可能与编程方式重叠————但这里可能有额外的元数据
+		// 如果listenerBean不是空集
 		if (!listenerBeans.isEmpty()) {
+			//获取当前BeanFactory
 			ConfigurableBeanFactory beanFactory = getBeanFactory();
+			//遍历 listenerBeans
 			for (String listenerBeanName : listenerBeans) {
 				try {
+					//如果通过在尝试实例化listenerBeanName的BeanDefinition的监听器之前检查到其泛型声明的事件类型支持eventType
 					if (supportsEvent(beanFactory, listenerBeanName, eventType)) {
+						//从beanFactory中获取名为listenerBeanName的ApplicationListener类型的Bean对象
 						ApplicationListener<?> listener =
 								beanFactory.getBean(listenerBeanName, ApplicationListener.class);
+						//如果allListeners不包含listener&&listener支持eventType事件类型以及sourceType源类型
 						if (!allListeners.contains(listener) && supportsEvent(listener, eventType, sourceType)) {
+							//如果retriever不为null
 							if (retriever != null) {
+								//如果listenerBeanName在beanFactory中的Bean对象是单例
 								if (beanFactory.isSingleton(listenerBeanName)) {
+									//将listener添加到retriever的ApplicationListener对象集合中
 									retriever.applicationListeners.add(listener);
 								}
 								else {
+									//将listener添加到allListeners中
 									retriever.applicationListenerBeans.add(listenerBeanName);
 								}
 							}
+							//将listener添加到allListeners中
 							allListeners.add(listener);
 						}
 					}
@@ -298,13 +352,20 @@ public abstract class AbstractApplicationEventMulticaster
 						// Remove non-matching listeners that originally came from
 						// ApplicationListenerDetector, possibly ruled out by additional
 						// BeanDefinition metadata (e.g. factory method generics) above.
+						// 删除最初来自ApplicationListenerDetector的不匹配监听器，可能被上面附加的BeanDefinition元数据
+						// (例如工厂方法泛型) 排除
+						// 获取在beanFactory中listenerBeanName的Bean对象
 						Object listener = beanFactory.getSingleton(listenerBeanName);
+						//retriever不为null
 						if (retriever != null) {
+							//将listener从retriever的ApplicationListener对象集合中移除
 							retriever.applicationListeners.remove(listener);
 						}
+						//将listener从allListeners移除
 						allListeners.remove(listener);
 					}
 				}
+				// 没有这样的BeanDefinition异常
 				catch (NoSuchBeanDefinitionException ex) {
 					// Singleton listener instance (without backing bean definition) disappeared -
 					// probably in the middle of the destruction phase
@@ -312,15 +373,24 @@ public abstract class AbstractApplicationEventMulticaster
 			}
 		}
 
+		//AnnotationAwareOrderComparator：OrderComparator的扩展,它支持Spring 的org.springframework.core.Ordered接口以及@Oreder和@Priority注解,
+		//其中Ordered实例提供的Order值将覆盖静态定义的注解值(如果有)
+		//使用AnnotationAwareOrderComparator对allListeners进行排序
 		AnnotationAwareOrderComparator.sort(allListeners);
+		//如果retriever不为null&&retriever的applicationListenerBeans是空集
 		if (retriever != null && retriever.applicationListenerBeans.isEmpty()) {
+			//将retriever的applicationListeners的元素情空
 			retriever.applicationListeners.clear();
+			//将allListeners添加到retriever的applicationListeners
 			retriever.applicationListeners.addAll(allListeners);
 		}
+		//返回allListeners
 		return allListeners;
 	}
 
 	/**
+	 * 通过在尝试实例化BeanDefinition的监听器之前检查其通用声明的事件类型，尽早筛选监听器
+	 *
 	 * Filter a bean-defined listener early through checking its generically declared
 	 * event type before trying to instantiate it.
 	 * <p>If this method returns {@code true} for a given listener as a first pass,
@@ -337,19 +407,29 @@ public abstract class AbstractApplicationEventMulticaster
 	private boolean supportsEvent(
 			ConfigurableBeanFactory beanFactory, String listenerBeanName, ResolvableType eventType) {
 
+		//获取listenerBeanName在beanFactory中的Class对象
 		Class<?> listenerType = beanFactory.getType(listenerBeanName);
+		//如果listenerType为null||listenerType是GenericApplicationListener的子类或本身||listenerType
+		//是SmartApplicationListener子类或本身
 		if (listenerType == null || GenericApplicationListener.class.isAssignableFrom(listenerType) ||
 				SmartApplicationListener.class.isAssignableFrom(listenerType)) {
+			//返回true
 			return true;
 		}
+		//如果listenerType不支持eventType的事件对象
 		if (!supportsEvent(listenerType, eventType)) {
+			//返回false
 			return false;
 		}
 		try {
+			//从beanFactory中获取listenerBeanName的合并BeanDefinition，如有必要，将子bean定义与其父级合并
 			BeanDefinition bd = beanFactory.getMergedBeanDefinition(listenerBeanName);
+			//获取bd指定的Bean类的ResolvableType对象，然后转换为ApplicationListener的ResolvableType，最后获取第一个泛型参数的ResolveableType
 			ResolvableType genericEventType = bd.getResolvableType().as(ApplicationListener.class).getGeneric();
+			//如果genericEventType是ResolvableType.NONE||eventType是genericEventType的子类或实现，就返回true；否则返回false
 			return (genericEventType == ResolvableType.NONE || genericEventType.isAssignableFrom(eventType));
 		}
+		//捕捉 没有这样BeanDefinition异常
 		catch (NoSuchBeanDefinitionException ex) {
 			// Ignore - no need to check resolvable type for manually registered singleton
 			return true;
@@ -357,6 +437,8 @@ public abstract class AbstractApplicationEventMulticaster
 	}
 
 	/**
+	 * 在尝试实例化监听器之前，通过检查其通用声明的事件类型，尽早筛选监听器
+	 *
 	 * Filter a listener early through checking its generically declared event
 	 * type before trying to instantiate it.
 	 * <p>If this method returns {@code true} for a given listener as a first pass,
@@ -368,12 +450,14 @@ public abstract class AbstractApplicationEventMulticaster
 	 * for the given event type
 	 */
 	protected boolean supportsEvent(Class<?> listenerType, ResolvableType eventType) {
+		//解析listenerType声明的事件类型
 		ResolvableType declaredEventType = GenericApplicationListenerAdapter.resolveDeclaredEventType(listenerType);
+		//如果declaredEventType为null||eventType是declaredEventType的子类或本身
 		return (declaredEventType == null || declaredEventType.isAssignableFrom(eventType));
 	}
 
 	/**
-	 * 判断给定的监听器是否支持给定的事件
+	 * 确定给定监听器是否支持给定事件
 	 *
 	 * Determine whether the given listener supports the given event.
 	 * <p>The default implementation detects the {@link SmartApplicationListener}
@@ -389,13 +473,18 @@ public abstract class AbstractApplicationEventMulticaster
 	protected boolean supportsEvent(
 			ApplicationListener<?> listener, ResolvableType eventType, @Nullable Class<?> sourceType) {
 
+		//如果listener是GenericApplicationListener实例，将将其强转为GenericApplicationListener对象，否则创建一个
+		//GenericApplicationListenerAdapter对象来封装listener作为GenericApplicationListener对象
 		GenericApplicationListener smartListener = (listener instanceof GenericApplicationListener ?
 				(GenericApplicationListener) listener : new GenericApplicationListenerAdapter(listener));
+		//如果smartListener支持eventType事件类型&& smartListener支持sourceType源类型【源类型是指产生eventType类型的对象的类】
 		return (smartListener.supportsEventType(eventType) && smartListener.supportsSourceType(sourceType));
 	}
 
 
 	/**
+	 * 根据事件类型和源类型为ListenerRetievers缓存键
+	 *
 	 * Cache key for ListenerRetrievers, based on event type and source type.
 	 */
 	private static final class ListenerCacheKey implements Comparable<ListenerCacheKey> {
@@ -405,6 +494,11 @@ public abstract class AbstractApplicationEventMulticaster
 		@Nullable
 		private final Class<?> sourceType;
 
+		/**
+		 * 根据eventType和sourceType新建一个ListenerRetievers缓存键
+		 * @param eventType
+		 * @param sourceType
+		 */
 		public ListenerCacheKey(ResolvableType eventType, @Nullable Class<?> sourceType) {
 			Assert.notNull(eventType, "Event type must not be null");
 			this.eventType = eventType;
@@ -413,13 +507,18 @@ public abstract class AbstractApplicationEventMulticaster
 
 		@Override
 		public boolean equals(@Nullable Object other) {
+			//如果other与this是同一个对象
 			if (this == other) {
 				return true;
 			}
+			//如果other不是ListenerCacheKey的实例
 			if (!(other instanceof ListenerCacheKey)) {
 				return false;
 			}
+			//将other强转为ListenerCacheKey对象
 			ListenerCacheKey otherKey = (ListenerCacheKey) other;
+			//ObjectUtils.nullSafeEquals:确定给定的对象是否相等，如果两个都为null返回true ,如果其中一个为null，返回false
+			//如果eventType与otherKey.eventType相同&&sourceType与otherKey.sourceType相同时，返回true；否则返回false
 			return (this.eventType.equals(otherKey.eventType) &&
 					ObjectUtils.nullSafeEquals(this.sourceType, otherKey.sourceType));
 		}
@@ -436,14 +535,20 @@ public abstract class AbstractApplicationEventMulticaster
 
 		@Override
 		public int compareTo(ListenerCacheKey other) {
+			// 获取比较eventype序列化成字符串与other.eventType序列化成字符串的结果
 			int result = this.eventType.toString().compareTo(other.eventType.toString());
+			// 如果result为0时
 			if (result == 0) {
+				// 如果sourceType为null
 				if (this.sourceType == null) {
+					// 如果other.sourceType为null，返回0；否则返回-1
 					return (other.sourceType == null ? 0 : -1);
 				}
+				// 如果other.sourceType为null
 				if (other.sourceType == null) {
 					return 1;
 				}
+				//获取比较sourceType类名与other.sourceType类名的结果
 				result = this.sourceType.getName().compareTo(other.sourceType.getName());
 			}
 			return result;
@@ -452,7 +557,7 @@ public abstract class AbstractApplicationEventMulticaster
 
 
 	/**
-	 * 监听器助手类，（封装一组特定目标监听器的帮助类，允许有效的检索预过滤的监听器，此帮助类的实例按照事件类型和源类型缓存）
+	 * 封装特定目标监听器的 Hellper 类，允许高效地检索预过滤的监听器
 	 *
 	 * Helper class that encapsulates a specific set of target listeners,
 	 * allowing for efficient retrieval of pre-filtered listeners.
@@ -460,35 +565,42 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	private class ListenerRetriever {
 
-		// 存放应用程序事件监听器
+		// ApplicationListener 对象集合
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
-		// 存放应用程序事件监听器bean名称
+		// BeanFactory中的applicationListener类型Bean名集合
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
 		// 是否预过滤监听器
 		private final boolean preFiltered;
 
+		/**
+		 * 新建一个ListenerRetriever实例
+		 * @param preFiltered
+		 */
 		public ListenerRetriever(boolean preFiltered) {
 			this.preFiltered = preFiltered;
 		}
 
-		// 获取应用程序的事件监听器
+		// 获取ListenerRetriever存放的所有ApplicationListener对象
 		public Collection<ApplicationListener<?>> getApplicationListeners() {
-			// 创建一个指定大小的ApplicationListener监听器list集合
+			// 定义存放所有监听器的集合
 			List<ApplicationListener<?>> allListeners = new ArrayList<>(
 					this.applicationListeners.size() + this.applicationListenerBeans.size());
+			// 将applicationListeners添加到allListeners中
 			allListeners.addAll(this.applicationListeners);
-			// 如果存放监听器bean name集合不为空
+			// 如果applicationListenerBeans不是空集合
 			if (!this.applicationListenerBeans.isEmpty()) {
-				// 获取ioc容器工厂类
+				// 获取当前上下文BeanFactory
 				BeanFactory beanFactory = getBeanFactory();
+				// 遍历applicationListenerBeans
 				for (String listenerBeanName : this.applicationListenerBeans) {
 					try {
-						// 获取指定bean name的监听器实例
+						// 从beanFactory中获取名为listenerBeanName的ApplicationListener类型的Bean对象
 						ApplicationListener<?> listener = beanFactory.getBean(listenerBeanName, ApplicationListener.class);
-						// 判定如果是预过滤的监听器或者集合中不包含监听器实例则添加到集合中
+						// 如果允许预过滤||allListeneres没有包含该listener
 						if (this.preFiltered || !allListeners.contains(listener)) {
+							// 将listener添加allListeners中
 							allListeners.add(listener);
 						}
 					}
@@ -498,7 +610,11 @@ public abstract class AbstractApplicationEventMulticaster
 					}
 				}
 			}
+			// 如果不允许预过滤||applicationListenerBeans不是空集合
 			if (!this.preFiltered || !this.applicationListenerBeans.isEmpty()) {
+				// AnnotationAwareOrderComparator：OrderComparator的扩展,它支持Spring 的org.springframework.core.Ordered接口以及@Oreder和@Priority注解,
+				// 其中Ordered实例提供的Order值将覆盖静态定义的注解值(如果有)
+				// 使用AnnotationAwareOrderComparator对allListeners进行排序
 				AnnotationAwareOrderComparator.sort(allListeners);
 			}
 			return allListeners;

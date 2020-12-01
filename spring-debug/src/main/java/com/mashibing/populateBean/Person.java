@@ -1,10 +1,12 @@
 package com.mashibing.populateBean;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.*;
 
 public class Person {
     private int id;
-    private String name="dahuang";
+    private String name;
     private int age;
     private String gender;
     private Address address;
@@ -119,6 +121,15 @@ public class Person {
         this.sets = sets;
     }
 
+    @PostConstruct
+    public void init(){
+        System.out.println("init---person");
+    }
+
+    @PreDestroy
+    public void destroy(){
+        System.out.println("destroy---person");
+    }
     @Override
     public String toString() {
         return "Person{" +

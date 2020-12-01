@@ -602,15 +602,20 @@ public abstract class ObjectUtils {
 	//---------------------------------------------------------------------
 
 	/**
+	 * 可得到(obj的全类名+'@'+obj的hashCode的十六进制字符串),如果obj为null，返回空字符串
+	 *
 	 * Return a String representation of an object's overall identity.
 	 * @param obj the object (may be {@code null})
 	 * @return the object's identity as String representation,
 	 * or an empty String if the object was {@code null}
 	 */
 	public static String identityToString(@Nullable Object obj) {
+		// 如果对象为null
 		if (obj == null) {
+			// 返回空字符串
 			return EMPTY_STRING;
 		}
+		// 拼接obj的全类名+'@'+obj的hashCode的十六进制字符串，然后返回出去
 		String className = obj.getClass().getName();
 		String identityHexString = getIdentityHexString(obj);
 		return className + '@' + identityHexString;

@@ -49,41 +49,66 @@ import org.springframework.util.StringUtils;
  * @author Stephane Nicoll
  * @since 3.2
  * @see #getSnapshotAsJson()
- * @see org.springframework.web.context.support.LiveBeansViewServlet
+ * see org.springframework.web.context.support.LiveBeansViewServlet
  */
 public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAware {
 
 	/**
+	 * 'MBean Domain'属性名
 	 * The "MBean Domain" property name.
 	 */
 	public static final String MBEAN_DOMAIN_PROPERTY_NAME = "spring.liveBeansView.mbeanDomain";
 
 	/**
+	 * MBean应用Key
 	 * The MBean application key.
 	 */
 	public static final String MBEAN_APPLICATION_KEY = "application";
 
+	/**
+	 * applicationContext集
+	 */
 	private static final Set<ConfigurableApplicationContext> applicationContexts = new LinkedHashSet<>();
 
+	/**
+	 * 此上下文所属的已部署应用程序的名称
+	 */
 	@Nullable
 	private static String applicationName;
 
 
+	/**
+	 * 注册 applicationContext
+	 * @param applicationContext
+	 */
 	static void registerApplicationContext(ConfigurableApplicationContext applicationContext) {
+		// 从applicationContext中环境对象中获取'spring.liveBeansView.mbeanDomain'的属性值
 		String mbeanDomain = applicationContext.getEnvironment().getProperty(MBEAN_DOMAIN_PROPERTY_NAME);
+		// 如果mbeanDomain不为null
 		if (mbeanDomain != null) {
+			// 使用applicationContexts进行同步加锁，保证线程安全
 			synchronized (applicationContexts) {
+				// 如果applicationContexts是空集合
 				if (applicationContexts.isEmpty()) {
 					try {
+						// ManagementFactory.getPlatformMBeanServer()返回对JVM中现有MBean服务器的引用
+						// MBean即managed beans【被管理的Beans】：一个MBean是一个被管理的Java对象，有点类似于JavaBean，
+						// 一个设备、一个应用或者任何资源都可以被表示为MBean，MBean会暴露一个接口对外，这个接口可以读取
+						// 或者写入一些对象中的属性，通常一个MBean需要定义一个接口，以MBean结尾，例如：EchoMBean,
+						// 格式为XXXMBean，这个是规范，必须得遵守。
 						MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+						// 获取此上下文所属的已部署应用程序的名称
 						applicationName = applicationContext.getApplicationName();
+						// 在MBeanServer里注册MBean, 标识为mbeanDomain:application=applicationName
 						server.registerMBean(new LiveBeansView(),
 								new ObjectName(mbeanDomain, MBEAN_APPLICATION_KEY, applicationName));
 					}
+					// 捕捉注册时抛出的异常
 					catch (Throwable ex) {
 						throw new ApplicationContextException("Failed to register LiveBeansView MBean", ex);
 					}
 				}
+				// 将applicationContext添加到applicationContexts中
 				applicationContexts.add(applicationContext);
 			}
 		}

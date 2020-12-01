@@ -17,6 +17,10 @@
 package org.springframework.core;
 
 /**
+ * 要由可重新加载的ClassLoader(例如，基于Groovy的ClassLoader)
+ * 实现的接口。例如，由Spring的CGLIB代理工厂检测到是否做出了缓存
+ * 决定
+ *
  * Interface to be implemented by a reloading-aware ClassLoader
  * (e.g. a Groovy-based ClassLoader). Detected for example by
  * Spring's CGLIB proxy factory for making a caching decision.
@@ -31,6 +35,8 @@ package org.springframework.core;
 public interface SmartClassLoader {
 
 	/**
+	 * 确定给定的类是否可重载（在此ClassLoader中）
+	 *
 	 * Determine whether the given class is reloadable (in this ClassLoader).
 	 * <p>Typically used to check whether the result may be cached (for this
 	 * ClassLoader) or whether it should be reobtained every time.

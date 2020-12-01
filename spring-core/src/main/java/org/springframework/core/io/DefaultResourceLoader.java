@@ -52,6 +52,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	private final Set<ProtocolResolver> protocolResolvers = new LinkedHashSet<>(4);
 
+	// 资源映射缓存
 	private final Map<Class<?>, Map<Resource, ?>> resourceCaches = new ConcurrentHashMap<>(4);
 
 
@@ -131,13 +132,14 @@ public class DefaultResourceLoader implements ResourceLoader {
 	}
 
 	/**
-	 * 清除资源加载器的所以资源
+	 * 清空在资源加载器中的所有资源缓存
 	 *
 	 * Clear all resource caches in this resource loader.
 	 * @since 5.0
 	 * @see #getResourceCache
 	 */
 	public void clearResourceCaches() {
+		// 清空resourceCaches
 		this.resourceCaches.clear();
 	}
 

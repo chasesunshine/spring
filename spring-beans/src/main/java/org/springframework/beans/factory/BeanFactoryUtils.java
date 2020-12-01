@@ -59,7 +59,7 @@ public abstract class BeanFactoryUtils {
 	public static final String GENERATED_BEAN_NAME_SEPARATOR = "#";
 
 	/**
-	 * 剔除factorybean前缀的beanName的缓存集合
+	 * 从具有FactoryBean前缀的名称缓存到剥离的名称，而无需取消引用
 	 *
 	 * Cache from name with factory bean prefix to stripped name without dereference.
 	 * @since 5.1
@@ -69,7 +69,7 @@ public abstract class BeanFactoryUtils {
 
 
 	/**
-	 * 判断当前给定的beanName是否是有factorybean的前缀
+	 * 返回给定名称是否为FactoryBean的解引用名.（从FactoryBean的解引用前缀开始）
 	 *
 	 * Return whether the given name is a factory dereference
 	 * (beginning with the factory dereference prefix).
@@ -78,7 +78,7 @@ public abstract class BeanFactoryUtils {
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
 	public static boolean isFactoryDereference(@Nullable String name) {
-		//如果有传入bean名且bean名是以'&'开头，则返回true，表示是BeanFactory的解引用，否则
+		// 如果有传入bean名且bean名是以'&'开头，则返回true，表示是BeanFactory的解引用，否则
 		// 返回false，表示不是BeanFactory的解引用
 		return (name != null && name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
 	}
@@ -98,9 +98,11 @@ public abstract class BeanFactoryUtils {
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
-		// 将beanName截取&之后返回
+		// 从transformedBeanNameCache中获取bean名对应的转换后的名称
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
+				// 从beanName的开头位置去掉'&',并重新赋值给beanName，再重新检查是还是以'&'开头，是的话就再截
+				// 知道开头不是以'&'开头后，加入到transformedBeanNameCache中
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 			}
 			while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
@@ -274,7 +276,7 @@ public abstract class BeanFactoryUtils {
 	}
 
 	/**
-	 * 返回给定类型的所有bean的名称集合，包括定义在祖先中的bean
+	 * 获取给定类型的所有bean名,包括父级工厂中定义的名称
 	 *
 	 * Get all bean names for the given type, including those defined in ancestor
 	 * factories. Will return unique names in case of overridden bean definitions.
@@ -300,12 +302,23 @@ public abstract class BeanFactoryUtils {
 			ListableBeanFactory lbf, Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
+		// 获取与type（包括子类）匹配的bean名称,根据includeNonSingletons来决定是否包含原型+单例还是只包含单例,根据allowEargerInit
+		// 决定是否初始化lazy-init单例和由FactoryBeans创建的对象以进行类型检查
 		String[] result = lbf.getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
+		// HierarchicalBeanFactory提供父容器的访问功能
+		// 如果lbf是HierarchicalBeanFactory
 		if (lbf instanceof HierarchicalBeanFactory) {
+			// 将lbf强转HierarchicalBeanFactory对象
 			HierarchicalBeanFactory hbf = (HierarchicalBeanFactory) lbf;
+			// ListableBeanFactory：扩展BeanFactory使其支持迭代Ioc容器持有的Bean对象。注意如果
+			// ListableBeanFactory同时也是HierarchicalBeanFactory，那么大多数情况下，
+			// 只迭代当前Ioc容器持有的Bean对象，不会在体系结构中想父级递归迭代
+			// 如果hbf的父工厂是ListableBeanFactory对象
 			if (hbf.getParentBeanFactory() instanceof ListableBeanFactory) {
+				// 递归该方法获取父工厂里type的所有bean名,包括父级工厂中定义的名称
 				String[] parentResult = beanNamesForTypeIncludingAncestors(
 						(ListableBeanFactory) hbf.getParentBeanFactory(), type, includeNonSingletons, allowEagerInit);
+				// 将result结果与parentResult合并
 				result = mergeNamesWithParent(result, parentResult, hbf);
 			}
 		}
@@ -568,7 +581,7 @@ public abstract class BeanFactoryUtils {
 
 
 	/**
-	 * 合并父子容器的beanName
+	 * 将给定的bean名结果与给定的父结果合并
 	 *
 	 * Merge the given bean names result with the given parent result.
 	 * @param result the local bean name result
@@ -578,16 +591,23 @@ public abstract class BeanFactoryUtils {
 	 * @since 4.3.15
 	 */
 	private static String[] mergeNamesWithParent(String[] result, String[] parentResult, HierarchicalBeanFactory hbf) {
+		// 如果parentResult是空数组，直接返回result
 		if (parentResult.length == 0) {
 			return result;
 		}
+		// 定义一个合并后的bean名结果集，初始化长度为result数组长度+parentResult数组长度
 		List<String> merged = new ArrayList<>(result.length + parentResult.length);
+		// 将result全部添加到merged中
 		merged.addAll(Arrays.asList(result));
+		// 遍历parentResult
 		for (String beanName : parentResult) {
+			// 如果merged没包含beanName且hbf没包含给定beanName
 			if (!merged.contains(beanName) && !hbf.containsLocalBean(beanName)) {
+				// 将beanName添加到merged中
 				merged.add(beanName);
 			}
 		}
+		// 将merged装换成数组返回出去
 		return StringUtils.toStringArray(merged);
 	}
 
