@@ -17,7 +17,7 @@
 <!--        </constructor-arg>-->
 <!--        <constructor-arg index="1" value="lisi"></constructor-arg>-->
 <!--    </bean>-->
-    <bean id="person"  class="com.mashibing.Person" scope="prototype" >
+    <bean id="person"  class="com.mashibing.Person" scope="prototype">
         <property name="id" value="1"></property>
         <property name="name" value="zhangsan"></property>
     </bean>

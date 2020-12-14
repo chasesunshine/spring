@@ -28,6 +28,10 @@ import org.springframework.aop.MethodMatcher;
  */
 public abstract class StaticMethodMatcher implements MethodMatcher {
 
+	/**
+	 * 永远返回false表示只会去静态匹配
+	 * @return
+	 */
 	@Override
 	public final boolean isRuntime() {
 		return false;

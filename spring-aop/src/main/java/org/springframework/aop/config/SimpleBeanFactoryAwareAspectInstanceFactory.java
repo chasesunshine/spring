@@ -26,6 +26,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * AspectInstanceFactory的实现类，通过一个配置的beanName来
+ *
  * Implementation of {@link AspectInstanceFactory} that locates the aspect from the
  * {@link org.springframework.beans.factory.BeanFactory} using a configured bean name.
  *

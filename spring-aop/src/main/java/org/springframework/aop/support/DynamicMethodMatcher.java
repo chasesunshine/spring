@@ -28,6 +28,7 @@ import org.springframework.aop.MethodMatcher;
  */
 public abstract class DynamicMethodMatcher implements MethodMatcher {
 
+	// 永远返回true
 	@Override
 	public final boolean isRuntime() {
 		return true;

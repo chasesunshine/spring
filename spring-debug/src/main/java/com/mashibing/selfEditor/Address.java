@@ -1,5 +1,6 @@
 package com.mashibing.selfEditor;
 
+
 public class Address {
     private String province;
     private String city;

@@ -53,6 +53,8 @@ import java.lang.reflect.Method;
 public interface MethodMatcher {
 
 	/**
+	 * 静态匹配，在匹配条件不是太严格时使用，可以满足大部分场景的使用
+	 *
 	 * Perform static checking whether the given method matches.
 	 * <p>If this returns {@code false} or if the {@link #isRuntime()}
 	 * method returns {@code false}, no runtime check (i.e. no
@@ -65,6 +67,8 @@ public interface MethodMatcher {
 	boolean matches(Method method, Class<?> targetClass);
 
 	/**
+	 * 是否需要执行动态匹配
+	 *
 	 * Is this MethodMatcher dynamic, that is, must a final call be made on the
 	 * {@link #matches(java.lang.reflect.Method, Class, Object[])} method at
 	 * runtime even if the 2-arg matches method returns {@code true}?
@@ -77,6 +81,8 @@ public interface MethodMatcher {
 	boolean isRuntime();
 
 	/**
+	 * 动态匹配，它是严格的匹配。在运行时动态的对参数的类型进行匹配
+	 *
 	 * Check whether there a runtime (dynamic) match for this method,
 	 * which must have matched statically.
 	 * <p>This method is invoked only if the 2-arg matches method returns

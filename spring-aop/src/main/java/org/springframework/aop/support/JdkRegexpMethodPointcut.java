@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
+ * 基于正则表达式来匹配方法名的pointcut
+ *
  * Regular expression pointcut based on the {@code java.util.regex} package.
  * Supports the following JavaBean properties:
  * <ul>
@@ -41,11 +43,15 @@ import java.util.regex.PatternSyntaxException;
 public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 
 	/**
+	 * 匹配的正则表达式对象
+	 *
 	 * Compiled form of the patterns.
 	 */
 	private Pattern[] compiledPatterns = new Pattern[0];
 
 	/**
+	 * 排除的正则表达式对象
+	 *
 	 * Compiled form of the exclusion patterns.
 	 */
 	private Pattern[] compiledExclusionPatterns = new Pattern[0];

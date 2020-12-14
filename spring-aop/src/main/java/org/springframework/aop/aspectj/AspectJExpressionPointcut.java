@@ -87,6 +87,8 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 	private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<>();
 
+	// 从此处可以看出，Spring支持的AspectJ的切点语言表达式一共有10中（加上后面的自己的Bean方式一共11种）
+	// AspectJ框架本省支持的非常非常多，详解枚举类：org.aspectj.weaver.tools.PointcutPrimitive
 	static {
 		SUPPORTED_PRIMITIVES.add(PointcutPrimitive.EXECUTION);
 		SUPPORTED_PRIMITIVES.add(PointcutPrimitive.ARGS);
@@ -116,6 +118,8 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 	@Nullable
 	private transient ClassLoader pointcutClassLoader;
 
+	// PointcutExpression是org.aspectj.weaver.tools.PointcutExpression是AspectJ的类
+	// 它最终通过一系列操作，由org.aspectj.weaver.tools.PointcutParser#parsePointcutExpression从字符串表达式解析出来
 	@Nullable
 	private transient PointcutExpression pointcutExpression;
 
@@ -247,6 +251,8 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 
 
 	/**
+	 * 我们不仅仅可议写&& ||  !这种。也支持 and or not这种
+	 *
 	 * If a pointcut expression has been specified in XML, the user cannot
 	 * write {@code and} as "&&" (though &amp;&amp; will work).
 	 * We also allow {@code and} between two pointcut sub-expressions.
