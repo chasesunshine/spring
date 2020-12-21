@@ -17,6 +17,9 @@
 package org.springframework.aop.framework;
 
 /**
+ * 创建AOP代理对象的工厂类。
+ * 选择使用JDK还是Cglib的方式来创建代理对象。
+ *
  * Interface to be implemented by factories that are able to create
  * AOP proxies based on {@link AdvisedSupport} configuration objects.
  *

@@ -44,6 +44,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.Nullable;
 
 /**
+ * AspectJAdvisorFactory的子类。使用AspectJ注解 生成Advisor的工厂类
+ *
  * Abstract base class for factories that can create Spring AOP Advisors
  * given AspectJ classes from classes honoring the AspectJ 5 annotation syntax.
  *
@@ -178,11 +180,13 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	 */
 	protected static class AspectJAnnotation<A extends Annotation> {
 
+		//切点表达式所在的属性,pointcut会覆盖value的值,通知类型注解中的属性
 		private static final String[] EXPRESSION_ATTRIBUTES = new String[] {"pointcut", "value"};
 
 		private static Map<Class<?>, AspectJAnnotationType> annotationTypeMap = new HashMap<>(8);
 
 		static {
+			// 初始化通知类型
 			annotationTypeMap.put(Pointcut.class, AspectJAnnotationType.AtPointcut);
 			annotationTypeMap.put(Around.class, AspectJAnnotationType.AtAround);
 			annotationTypeMap.put(Before.class, AspectJAnnotationType.AtBefore);
@@ -200,11 +204,15 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 		private final String argumentNames;
 
 		public AspectJAnnotation(A annotation) {
+			// 注解信息
 			this.annotation = annotation;
+			// 根据注解类型获取通知类型
 			this.annotationType = determineAnnotationType(annotation);
 			try {
+				// 从通知类型注解上面获取切点表达式
 				this.pointcutExpression = resolveExpression(annotation);
 				Object argNames = AnnotationUtils.getValue(annotation, "argNames");
+				// 获取参数的名字
 				this.argumentNames = (argNames instanceof String ? (String) argNames : "");
 			}
 			catch (Exception ex) {
@@ -220,7 +228,9 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 			throw new IllegalStateException("Unknown annotation type: " + annotation);
 		}
 
+		// 从这个获取切点表达式的代码中我们可以看到 pointcut的属性会覆盖value的属性值
 		private String resolveExpression(A annotation) {
+			// 循环上面的切点属性
 			for (String attributeName : EXPRESSION_ATTRIBUTES) {
 				Object val = AnnotationUtils.getValue(annotation, attributeName);
 				if (val instanceof String) {

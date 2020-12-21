@@ -18,6 +18,7 @@ public class B {
         return a;
     }
 
+
     public void setA(A a) {
         this.a = a;
     }

@@ -50,6 +50,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 使用AspectJ注解的通知类型顶级父类
+ *
  * Base class for AOP Alliance {@link org.aopalliance.aop.Advice} classes
  * wrapping an AspectJ aspect or an AspectJ-annotated advice method.
  *
@@ -77,11 +79,17 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 * Spring AOP invocation.
 	 */
 	public static JoinPoint currentJoinPoint() {
+		// 获取当前的MethodInvocation 即ReflectiveMethodInvocation的实例
 		MethodInvocation mi = ExposeInvocationInterceptor.currentInvocation();
 		if (!(mi instanceof ProxyMethodInvocation)) {
 			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 		}
 		ProxyMethodInvocation pmi = (ProxyMethodInvocation) mi;
+		// JOIN_POINT_KEY 的值 为 JoinPoint.class.getName()
+		// 从ReflectiveMethodInvocation中获取JoinPoint 的值
+		// 这里在第一次获取的时候 获取到的 JoinPoint是null
+		// 然后把下面创建的MethodInvocationProceedingJoinPoint放入到ReflectiveMethodInvocation的userAttributes中
+		// 这样在第二次获取的是 就会获取到这个 MethodInvocationProceedingJoinPoint
 		JoinPoint jp = (JoinPoint) pmi.getUserAttribute(JOIN_POINT_KEY);
 		if (jp == null) {
 			jp = new MethodInvocationProceedingJoinPoint(pmi);
@@ -379,19 +387,26 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 */
 	public final synchronized void calculateArgumentBindings() {
 		// The simple case... nothing to bind.
+		// 如果已经进行过参数绑定了或者通知方法中没有参数
 		if (this.argumentsIntrospected || this.parameterTypes.length == 0) {
 			return;
 		}
 
 		int numUnboundArgs = this.parameterTypes.length;
+		// 通知方法参数类型
 		Class<?>[] parameterTypes = this.aspectJAdviceMethod.getParameterTypes();
-		if (maybeBindJoinPoint(parameterTypes[0]) || maybeBindProceedingJoinPoint(parameterTypes[0]) ||
+		// 如果第一个参数是JoinPoint或者ProceedingJoinPoint
+		if (maybeBindJoinPoint(parameterTypes[0]) ||
+				//这个方法中还有一个校验 即只有在环绕通知中第一个参数类型才能是ProceedingJoinPoint
+				maybeBindProceedingJoinPoint(parameterTypes[0]) ||
+				//如果第一个参数是JoinPoint.StaticPart
 				maybeBindJoinPointStaticPart(parameterTypes[0])) {
 			numUnboundArgs--;
 		}
 
 		if (numUnboundArgs > 0) {
 			// need to bind arguments by name as returned from the pointcut match
+			// 进行参数绑定
 			bindArgumentsByName(numUnboundArgs);
 		}
 
@@ -550,6 +565,8 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	}
 
 	/**
+	 * 参数绑定
+	 *
 	 * Take the arguments at the method execution join point and output a set of arguments
 	 * to the advice method.
 	 * @param jp the current JoinPoint
@@ -567,6 +584,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		Object[] adviceInvocationArgs = new Object[this.parameterTypes.length];
 		int numBound = 0;
 
+		// 这个默认值是 -1 重新赋值是在calculateArgumentBindings中进行的
 		if (this.joinPointArgumentIndex != -1) {
 			adviceInvocationArgs[this.joinPointArgumentIndex] = jp;
 			numBound++;
@@ -576,6 +594,8 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 			numBound++;
 		}
 
+		// 这里主要是取通知方法中的参数类型 是除了 JoinPoint和ProceedingJoinPoint参数之外的参数
+		// 如异常通知参数 返回通知参数
 		if (!CollectionUtils.isEmpty(this.argumentBindings)) {
 			// binding from pointcut match
 			if (jpMatch != null) {
@@ -588,12 +608,14 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 				}
 			}
 			// binding from returning clause
+			// 后置返回通知参数
 			if (this.returningName != null) {
 				Integer index = this.argumentBindings.get(this.returningName);
 				adviceInvocationArgs[index] = returnValue;
 				numBound++;
 			}
 			// binding from thrown exception
+			// 异常通知参数
 			if (this.throwingName != null) {
 				Integer index = this.argumentBindings.get(this.throwingName);
 				adviceInvocationArgs[index] = ex;
@@ -612,6 +634,10 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 
 	/**
+	 * 这三个参数 JoinPointMatch 都是相同的
+	 * returnValue 当执行后置返回通知的时候 传值 其他为null
+	 * Throwable 当执行后置异常通知的时候 传值，其他为null
+	 *
 	 * Invoke the advice method.
 	 * @param jpMatch the JoinPointMatch that matched this execution join point
 	 * @param returnValue the return value from the method execution (may be null)
@@ -635,13 +661,15 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 	protected Object invokeAdviceMethodWithGivenArgs(Object[] args) throws Throwable {
 		Object[] actualArgs = args;
+		// 判断通知方法是否有参数
 		if (this.aspectJAdviceMethod.getParameterCount() == 0) {
 			actualArgs = null;
 		}
 		try {
 			ReflectionUtils.makeAccessible(this.aspectJAdviceMethod);
 			// TODO AopUtils.invokeJoinpointUsingReflection
-			// 激活增强方法
+			// 反射调用通知方法
+			// this.aspectInstanceFactory.getAspectInstance()获取的是切面的实例
 			return this.aspectJAdviceMethod.invoke(this.aspectInstanceFactory.getAspectInstance(), actualArgs);
 		}
 		catch (IllegalArgumentException ex) {
@@ -666,10 +694,37 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 */
 	@Nullable
 	protected JoinPointMatch getJoinPointMatch() {
+		// 这里从线程上下文中获取MethodInvocation 看到这里你也许会感到奇怪  跟着文章分析来看 我们没有在设置过上下文的值啊
+		// 这里是怎么获取到MethodInvocation 的对象的呢？
+		// 不知道你是否还记得 我们在获取Advisor的时候 调用过这样的一个方法org.springframework.aop.aspectj.AspectJProxyUtils#makeAdvisorChainAspectJCapableIfNecessary
+		// 在这个方法中会有这样的一段代码
+		// if (foundAspectJAdvice && //!advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
+		//     如果获取到了 Advisor  则向 Advisor集合中添加第一个元素 即 ExposeInvocationInterceptor.ADVISOR
+		// 也就是说 我们的 Advisor列表中的第一个元素为ExposeInvocationInterceptor.ADVISOR 它是一个DefaultPointcutAdvisor的实例
+		// 对于任何的目标方法都返回true  它的Advice是ExposeInvocationInterceptor
+		//      advisors.add(0, ExposeInvocationInterceptor.ADVISOR);
+		//      return true;
+		//  }
+		// 这样我们就不难理解了，在调用ReflectiveMethodInvocation#proceed的时候第一个调用的MethodInterceptor是ExposeInvocationInterceptor
+		// ExposeInvocationInterceptor的invoke方法的内容如下：
+		//  public Object invoke(MethodInvocation mi) throws Throwable {
+		//   先取出旧的MethodInvocation的值
+		//    MethodInvocation oldInvocation = invocation.get();
+		//    这里设置新的 MethodInvocation 就是这里了！！！
+		//    invocation.set(mi);
+		//    try {
+		//      递归调用
+		//      return mi.proceed();
+		///   }
+		//   finally {
+		//     invocation.set(oldInvocation);
+		//   }
+		//      }
 		MethodInvocation mi = ExposeInvocationInterceptor.currentInvocation();
 		if (!(mi instanceof ProxyMethodInvocation)) {
 			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 		}
+		// 这里主要是获取 JoinPointMatch
 		return getJoinPointMatch((ProxyMethodInvocation) mi);
 	}
 

@@ -242,15 +242,20 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	 */
 	@Override
 	protected Object doGetTransaction() {
-		// JDBC事务
+		// 创建一个数据源事务对象
 		DataSourceTransactionObject txObject = new DataSourceTransactionObject();
-		// 设置是否可有保存点
+		// 是否允许当前事务设置保持点
 		txObject.setSavepointAllowed(isNestedTransactionAllowed());
-		// 获取与当前线程绑定的连接持有器
+		/**
+		 * TransactionSynchronizationManager 事务同步管理器对象(该类中都是局部线程变量)
+		 * 用来保存当前事务的信息,我们第一次从这里去线程变量中获取 事务连接持有器对象 通过数据源为key去获取
+		 * 由于第一次进来开始事务 我们的事务同步管理器中没有被存放.所以此时获取出来的conHolder为null
+		 */
 		ConnectionHolder conHolder =
 				(ConnectionHolder) TransactionSynchronizationManager.getResource(obtainDataSource());
 		// 非新创建连接则写false
 		txObject.setConnectionHolder(conHolder, false);
+		// 返回事务对象
 		return txObject;
 	}
 
@@ -263,6 +268,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	@Override
 	protected boolean isExistingTransaction(Object transaction) {
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;
+		// 若第一次进来开始事务，txObject.hasConnectionHolder()返回的null那么表示不存在事务
 		return (txObject.hasConnectionHolder() && txObject.getConnectionHolder().isTransactionActive());
 	}
 
@@ -274,27 +280,28 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	 */
 	@Override
 	protected void doBegin(Object transaction, TransactionDefinition definition) {
+		// 强制转化事务对象
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) transaction;
 		Connection con = null;
 
 		try {
-			// 当前事务没有连接资源
+			// 判断事务对象没有数据库连接持有器
 			if (!txObject.hasConnectionHolder() ||
 					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
-				// 创建新连接
+				// 通过数据源获取一个数据库连接对象
 				Connection newCon = obtainDataSource().getConnection();
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
-				//设置连接持有器
+				// 把我们的数据库连接包装成一个ConnectionHolder对象 然后设置到我们的txObject对象中去
 				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
 			}
 
-			//标记事务同步状态
+			// 标记当前的连接是一个同步事务
 			txObject.getConnectionHolder().setSynchronizedWithTransaction(true);
 			con = txObject.getConnectionHolder().getConnection();
 
-			// 设置隔离级别，默认是用数据库默认的
+			// 为当前的事务设置隔离级别
 			Integer previousIsolationLevel = DataSourceUtils.prepareConnectionForTransaction(con, definition);
 			// 设置先前隔离级别
 			txObject.setPreviousIsolationLevel(previousIsolationLevel);
@@ -304,7 +311,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			// Switch to manual commit if necessary. This is very expensive in some JDBC drivers,
 			// so we don't want to do it unnecessarily (for example if we've explicitly
 			// configured the connection pool to set it already).
-			// 更改自动提交设置，由spring控制提交
+			// 关闭自动提交
 			if (con.getAutoCommit()) {
 				//设置需要回复自动提交
 				txObject.setMustRestoreAutoCommit(true);
@@ -315,18 +322,19 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				con.setAutoCommit(false);
 			}
 
-			// 是否需要设置只读命令
+			// 判断事务为只读事务
 			prepareTransactionalConnection(con, definition);
-			//标记激活事务
+			// 标记激活事务
 			txObject.getConnectionHolder().setTransactionActive(true);
 
+			// 设置事务超时时间
 			int timeout = determineTimeout(definition);
 			if (timeout != TransactionDefinition.TIMEOUT_DEFAULT) {
 				txObject.getConnectionHolder().setTimeoutInSeconds(timeout);
 			}
 
 			// Bind the connection holder to the thread.
-			//是新事务的话就绑定到线程私有
+			// 绑定我们的数据源和连接到我们的同步管理器上，把数据源作为key,数据库连接作为value 设置到线程变量中
 			if (txObject.isNewConnectionHolder()) {
 				// 将当前获取到的连接绑定到当前线程
 				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
@@ -335,6 +343,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 		catch (Throwable ex) {
 			if (txObject.isNewConnectionHolder()) {
+				// 释放数据库连接
 				DataSourceUtils.releaseConnection(con, obtainDataSource());
 				txObject.setConnectionHolder(null, false);
 			}

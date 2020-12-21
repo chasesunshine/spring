@@ -21,6 +21,9 @@ import java.io.Serializable;
 import org.springframework.util.Assert;
 
 /**
+ * SpringAOP中的一个核心类。在Advised中定义了一系列的配置接口，像：是否暴露对象、是否强制使用CGlib等。
+ * ProxyConfig是对这些接口的实现，但是ProxyConfig却不是Advised的实现类
+ *
  * Convenience superclass for configuration used in creating proxies,
  * to ensure that all proxy creators have consistent properties.
  *

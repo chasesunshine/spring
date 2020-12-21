@@ -19,6 +19,9 @@ package org.aopalliance.intercept;
 import java.lang.reflect.Constructor;
 
 /**
+ * Invocation的另一个重要实现类，执行构造方法的拦截。
+ * 主要方法：getConstructor()返回构造方法。
+ *
  * Description of an invocation to a constructor, given to an
  * interceptor upon constructor-call.
  *

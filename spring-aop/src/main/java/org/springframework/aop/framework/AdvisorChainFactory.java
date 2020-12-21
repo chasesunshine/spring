@@ -22,6 +22,8 @@ import java.util.List;
 import org.springframework.lang.Nullable;
 
 /**
+ * 获取Advisor链的接口
+ *
  * Factory interface for advisor chains.
  *
  * @author Rod Johnson

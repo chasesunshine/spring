@@ -19,6 +19,9 @@ package org.aopalliance.intercept;
 import java.lang.reflect.AccessibleObject;
 
 /**
+ * AOP中的连接点类。主要的方法是：proceed()执行下一个拦截器。
+ * getThis()获取目标对象。
+ *
  * This interface represents a generic runtime joinpoint (in the AOP
  * terminology).
  *

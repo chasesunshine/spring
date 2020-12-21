@@ -21,6 +21,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.OrderUtils;
 
 /**
+ * MetadataAwareAspectInstanceFactory的实例。在AspectJProxyFactory中有使用
+ *
  * Implementation of {@link MetadataAwareAspectInstanceFactory} that
  * creates a new instance of the specified aspect class for every
  * {@link #getAspectInstance()} call.
@@ -40,7 +42,9 @@ public class SimpleMetadataAwareAspectInstanceFactory extends SimpleAspectInstan
 	 * @param aspectName the aspect name
 	 */
 	public SimpleMetadataAwareAspectInstanceFactory(Class<?> aspectClass, String aspectName) {
+		// 将切面实例传入到父类构造函数中
 		super(aspectClass);
+		// 创建切面元数据
 		this.metadata = new AspectMetadata(aspectClass, aspectName);
 	}
 

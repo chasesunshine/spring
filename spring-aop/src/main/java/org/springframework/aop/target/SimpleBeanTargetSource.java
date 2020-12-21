@@ -17,6 +17,8 @@
 package org.springframework.aop.target;
 
 /**
+ * AbstractBeanFactoryBasedTargetSource的子类。从BeanFactory中获取单例Bean。
+ *
  * Simple {@link org.springframework.aop.TargetSource} implementation,
  * freshly obtaining the specified target bean from its containing
  * Spring {@link org.springframework.beans.factory.BeanFactory}.

@@ -32,6 +32,8 @@ import org.springframework.aop.framework.AopConfigException;
 import org.springframework.aop.support.ComposablePointcut;
 
 /**
+ * 使用AspectJ Aspect注解的切面元数据类
+ *
  * Metadata for an AspectJ aspect class, with an additional Spring AOP pointcut
  * for the per clause.
  *
@@ -47,6 +49,8 @@ import org.springframework.aop.support.ComposablePointcut;
 public class AspectMetadata implements Serializable {
 
 	/**
+	 * 切面的名字可能是类的全限定类名,也可能是Spring容器中bean的名字
+	 *
 	 * The name of this aspect as defined to Spring (the bean name) -
 	 * allows us to determine if two pieces of advice come from the
 	 * same aspect and hence their relative precedence.
@@ -54,18 +58,24 @@ public class AspectMetadata implements Serializable {
 	private final String aspectName;
 
 	/**
+	 * 切面类 指带有切面注解的类
+	 *
 	 * The aspect class, stored separately for re-resolution of the
 	 * corresponding AjType on deserialization.
 	 */
 	private final Class<?> aspectClass;
 
 	/**
+	 * 类的类型 这个是AspectJ中定义的类,存储了aspectClass类的类相关信息,实现类为 AjTypeImpl
+	 *
 	 * AspectJ reflection information (AspectJ 5 / Java 5 specific).
 	 * Re-resolved on deserialization since it isn't serializable itself.
 	 */
 	private transient AjType<?> ajType;
 
 	/**
+	 * Spring AOP 中的切点表达式
+	 *
 	 * Spring AOP pointcut corresponding to the per clause of the
 	 * aspect. Will be the Pointcut.TRUE canonical instance in the
 	 * case of a singleton, otherwise an AspectJExpressionPointcut.
@@ -79,27 +89,37 @@ public class AspectMetadata implements Serializable {
 	 * @param aspectName the name of the aspect
 	 */
 	public AspectMetadata(Class<?> aspectClass, String aspectName) {
+		// 传入的切面类名直接赋值
 		this.aspectName = aspectName;
 
 		Class<?> currClass = aspectClass;
 		AjType<?> ajType = null;
+		// 这里循环查找带有Aspect的类，一直找到父类为Object
 		while (currClass != Object.class) {
 			AjType<?> ajTypeToCheck = AjTypeSystem.getAjType(currClass);
 			if (ajTypeToCheck.isAspect()) {
+				// 这里的AjType所持有的aspectClass为带有@Aspect注解的类。
+				// 可能是我们传入的类，也可能是我们的传入类的父类 父父类
 				ajType = ajTypeToCheck;
 				break;
 			}
+			// 查找父类
 			currClass = currClass.getSuperclass();
 		}
+		// 如果传入的类,没有@Aspect注解,则抛出异常
 		if (ajType == null) {
 			throw new IllegalArgumentException("Class '" + aspectClass.getName() + "' is not an @AspectJ aspect");
 		}
+		// 这里是检查AspectJ的注解,
 		if (ajType.getDeclarePrecedence().length > 0) {
 			throw new IllegalArgumentException("DeclarePrecedence not presently supported in Spring AOP");
 		}
+		// 带有@Aspect注解的类
 		this.aspectClass = ajType.getJavaClass();
 		this.ajType = ajType;
 
+		// 正常我们的Aspect类 都是SINGLETON
+		// 其他的是AspectJ提供的一些高级的用法
 		switch (this.ajType.getPerClause().getKind()) {
 			case SINGLETON:
 				this.perClausePointcut = Pointcut.TRUE;

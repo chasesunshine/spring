@@ -49,6 +49,9 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * ProxyCreatorSupport的子类,用来创建代理对象。
+ * 它实现了BeanFactoryAware、FactoryBean接口
+ *
  * {@link org.springframework.beans.factory.FactoryBean} implementation that builds an
  * AOP proxy based on beans in Spring {@link org.springframework.beans.factory.BeanFactory}.
  *

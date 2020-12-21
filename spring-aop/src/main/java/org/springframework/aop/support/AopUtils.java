@@ -223,36 +223,52 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
-		// targetClass是否匹配切点表达式
+		// 进行切点表达式的匹配最重要的就是ClassFilter和MethodMatcher这两个方法的实现。
+		// MethodMatcher中有两个matches方法。一个参数是只有Method对象和targetClass，另一个参数有
+		// Method对象和targetClass对象还有一个Method的方法参数,他们两个的区别是：
+		// 两个参数的matches是用于静态的方法匹配 三个参数的matches是在运行期动态的进行方法匹配的
+		// 先进行ClassFilter的matches方法校验
+		// 首先这个类要在所匹配的规则下
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
 
+		// 再进行MethodMatcher方法级别的校验
 		MethodMatcher methodMatcher = pc.getMethodMatcher();
 		if (methodMatcher == MethodMatcher.TRUE) {
 			// No need to iterate the methods if we're matching any method anyway...
 			return true;
 		}
 
+		// 判断匹配器是不是IntroductionAwareMethodMatcher
 		IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
 		if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
 			introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
 		}
 
-		// 存放要代理的类以及他的接口
+		// 创建一个集合用于保存targetClass的class对象
 		Set<Class<?>> classes = new LinkedHashSet<>();
-		// 不是JDK的代理类
+		// 判断当前class是不是代理的class对象
 		if (!Proxy.isProxyClass(targetClass)) {
+			// 加入到集合中去
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
+		// 获取到targetClass所实现的接口的class对象，然后加入到集合中
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
-		// 查找方法是否是切点表达式匹配的
+		// 循环所有的class对象
 		for (Class<?> clazz : classes) {
+			// 通过class获取到所有的方法
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
+			// 循环我们的方法
 			for (Method method : methods) {
+				// 只要有一个方法能匹配到就返回true
+				// 这里就会有一个问题：因为在一个目标中可能会有多个方法存在，有的方法是满足这个切点的匹配规则的
+				// 但是也可能有一些方法是不匹配切点规则的，这里检测的是只有一个Method满足切点规则就返回true了
+				// 所以在运行时进行方法拦截的时候还会有一次运行时的方法切点规则匹配
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
+						// 通过方法匹配器进行匹配
 						methodMatcher.matches(method, targetClass)) {
 					return true;
 				}
@@ -285,13 +301,17 @@ public abstract class AopUtils {
 	 * @return whether the pointcut can apply on any method
 	 */
 	public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
+		// 如果是IntroductionAdvisor的话，则调用IntroductionAdvisor类型的实例进行类的过滤
+		// 这里是直接调用的ClassFilter的matches方法
 		if (advisor instanceof IntroductionAdvisor) {
 			return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
 		}
+		// 通常我们的Advisor都是PointcutAdvisor类型
 		else if (advisor instanceof PointcutAdvisor) {
+			// 转为PointcutAdvisor类型
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
-			// 是否匹配切点表达式信息
-			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
+			//这里从Advisor中获取Pointcut的实现类 这里是AspectJExpressionPointcut
+ 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
 		else {
 			// It doesn't have a pointcut so we assume it applies.
@@ -310,24 +330,30 @@ public abstract class AopUtils {
 	 * (may be the incoming List as-is)
 	 */
 	public static List<Advisor> findAdvisorsThatCanApply(List<Advisor> candidateAdvisors, Class<?> clazz) {
+		// 若候选的增强器集合为空 直接返回
 		if (candidateAdvisors.isEmpty()) {
 			return candidateAdvisors;
 		}
+		// 定义一个合适的增强器集合对象
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
-		// 处理增强器
+		// 循环我们候选的增强器对象
 		for (Advisor candidate : candidateAdvisors) {
+			// 判断我们的增强器对象是不是实现了IntroductionAdvisor (很明显我们事务的没有实现 所以不会走下面的逻辑)
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
 			}
 		}
+		// 是否有引介增强
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 		for (Advisor candidate : candidateAdvisors) {
-			// 增强器已经处理
+			// 判断我们的增强器对象是不是实现了IntroductionAdvisor
 			if (candidate instanceof IntroductionAdvisor) {
 				// already processed
+				// 在上面已经处理过,不需要处理
 				continue;
 			}
-			// 对于普通bean的处理
+
+			// 真正的判断增强器是否合适当前类型
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}
@@ -351,6 +377,7 @@ public abstract class AopUtils {
 		// Use reflection to invoke the method.
 		// 使用反射调用target对象方法的地方
 		try {
+			// 设置方法可见性
 			ReflectionUtils.makeAccessible(method);
 			return method.invoke(target, args);
 		}

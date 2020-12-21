@@ -17,6 +17,7 @@
 package org.springframework.aop;
 
 /**
+ * SpringAOP中切点的顶级抽象类
  * 主要负责对系统的相应的Joinpoint进行捕捉，对系统中所有的对象进行Joinpoint所定义的规则进行匹配
  *
  * Core Spring pointcut abstraction.

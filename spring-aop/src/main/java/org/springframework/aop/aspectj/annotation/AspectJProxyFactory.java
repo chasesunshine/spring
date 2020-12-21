@@ -32,6 +32,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * ProxyCreatorSupport的子类。用来创建代理对象。使用AspectJ语法。
+ *
  * AspectJ-based proxy factory, allowing for programmatic building
  * of proxies which include AspectJ aspects (code style as well
  * Java 5 annotation style).
@@ -105,25 +107,35 @@ public class AspectJProxyFactory extends ProxyCreatorSupport {
 	 * @param aspectClass the AspectJ aspect class
 	 */
 	public void addAspect(Class<?> aspectClass) {
+		// 全限定类名
 		String aspectName = aspectClass.getName();
+		// 根据切面对象创建切面元数据类
 		AspectMetadata am = createAspectMetadata(aspectClass, aspectName);
+		// 根据传入的切面类创建切面实例,将切面实例封装为切面实例工厂
 		MetadataAwareAspectInstanceFactory instanceFactory = createAspectInstanceFactory(am, aspectClass, aspectName);
+		// 从切面实例工厂中获取Advisor
 		addAdvisorsFromAspectInstanceFactory(instanceFactory);
 	}
 
 
 	/**
+	 * 获取advisor
+	 *
 	 * Add all {@link Advisor Advisors} from the supplied {@link MetadataAwareAspectInstanceFactory}
 	 * to the current chain. Exposes any special purpose {@link Advisor Advisors} if needed.
 	 * @see AspectJProxyUtils#makeAdvisorChainAspectJCapableIfNecessary(List)
 	 */
 	private void addAdvisorsFromAspectInstanceFactory(MetadataAwareAspectInstanceFactory instanceFactory) {
+		// 使用ReflectiveAspectJAdvisorFactory从MetadataAwareAspectInstanceFactory中获取Advisor
 		List<Advisor> advisors = this.aspectFactory.getAdvisors(instanceFactory);
 		Class<?> targetClass = getTargetClass();
 		Assert.state(targetClass != null, "Unresolvable target class");
+		// 从中挑出适用于目标对象的Advisor
 		advisors = AopUtils.findAdvisorsThatCanApply(advisors, targetClass);
 		AspectJProxyUtils.makeAdvisorChainAspectJCapableIfNecessary(advisors);
+		// 对获取到的Advisor进行排序
 		AnnotationAwareOrderComparator.sort(advisors);
+		// 将获取到Advisor添加到advisors集合中
 		addAdvisors(advisors);
 	}
 
@@ -131,7 +143,12 @@ public class AspectJProxyFactory extends ProxyCreatorSupport {
 	 * Create an {@link AspectMetadata} instance for the supplied aspect type.
 	 */
 	private AspectMetadata createAspectMetadata(Class<?> aspectClass, String aspectName) {
+		// 直接调用AspectMetadata的构造函数创建对象,入参为：切面类和切面类的全限定类名
 		AspectMetadata am = new AspectMetadata(aspectClass, aspectName);
+		// 如果切面类不是切面则抛出异常
+		// 这里判断我们传入的切面类是不是切面很简单，即判断切面类上是否存在@Aspect注解。
+		// 这里判断一个类是不是切面类是这样进行判断的：如果我们传入的切面类上没有@Aspect注解的话，则去查找它的父类上
+		// 是否存在@Aspect注解。一直查到父类为Object。如果一直没有找到带有@Aspect注解的类，则会抛出异常。
 		if (!am.getAjType().isAspect()) {
 			throw new IllegalArgumentException("Class [" + aspectClass.getName() + "] is not a valid aspect type");
 		}
@@ -149,11 +166,13 @@ public class AspectJProxyFactory extends ProxyCreatorSupport {
 		MetadataAwareAspectInstanceFactory instanceFactory;
 		if (am.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 			// Create a shared aspect instance.
+			// 根据传入的切面类创建切面对象,是一个单例,要求有无参构造函数
 			Object instance = getSingletonAspectInstance(aspectClass);
 			instanceFactory = new SingletonMetadataAwareAspectInstanceFactory(instance, aspectName);
 		}
 		else {
 			// Create a factory for independent aspect instances.
+			// 将上一步创建的切面对象封装到SingletonMetadataAwareAspectInstanceFactory中
 			instanceFactory = new SimpleMetadataAwareAspectInstanceFactory(aspectClass, aspectName);
 		}
 		return instanceFactory;

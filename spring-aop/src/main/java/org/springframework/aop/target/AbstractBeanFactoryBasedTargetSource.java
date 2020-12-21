@@ -27,6 +27,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * TargetSource的子类。实现了BeanFactoryAware接口。
+ *
  * Base class for {@link org.springframework.aop.TargetSource} implementations
  * that are based on a Spring {@link org.springframework.beans.factory.BeanFactory},
  * delegating to Spring-managed bean instances.

@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * AspectInstanceFactory的实现类，通过一个配置的beanName来
+ * AspectInstanceFactory的子类。实现了BeanFactoryAware接口。和<aop:config>配合使用的类
  *
  * Implementation of {@link AspectInstanceFactory} that locates the aspect from the
  * {@link org.springframework.beans.factory.BeanFactory} using a configured bean name.

@@ -51,6 +51,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * ProxyProcessorSupport的重要子类。SpringAOP中的核心类。
+ * 实现了SmartInstantiationAwareBeanPostProcessor、BeanFactoryAware接口。
+ * 自动创建代理对象的类。我们在使用AOP的时候基本上都是用的这个类来进程Bean的拦截，创建代理对象。
+ *
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
  * that wraps each eligible bean with an AOP proxy, delegating to specified interceptors
  * before invoking the bean itself.
@@ -482,9 +486,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// 创建代理工厂
 		ProxyFactory proxyFactory = new ProxyFactory();
 		// 获取当前类中相关属性
-		proxyFactory.copyFrom(this);
+ 		proxyFactory.copyFrom(this);
 		// 决定对于给定的bean是否应该使用targetClass而不是他的接口代理，检查proxyTargetClass设置以及preserverTargetClass属性
 		if (!proxyFactory.isProxyTargetClass()) {
+			// 判断是 使用jdk动态代理 还是cglib代理
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				proxyFactory.setProxyTargetClass(true);
 			}
@@ -507,7 +512,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (advisorsPreFiltered()) {
 			proxyFactory.setPreFiltered(true);
 		}
-
+		// 真正创建代理对象
 		return proxyFactory.getProxy(getProxyClassLoader());
 	}
 

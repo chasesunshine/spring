@@ -27,6 +27,9 @@ import org.aspectj.weaver.tools.JoinPointMatch;
 import org.springframework.aop.ProxyMethodInvocation;
 
 /**
+ * 使用AspectJ Around注解的后置通知类型。
+ * 实现了MethodInterceptor接口。继承了AbstractAspectJAdvice
+ *
  * Spring AOP around advice (MethodInterceptor) that wraps
  * an AspectJ advice method. Exposes ProceedingJoinPoint.
  *

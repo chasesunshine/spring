@@ -21,6 +21,8 @@ import java.io.Serializable;
 import org.springframework.beans.factory.BeanFactory;
 
 /**
+ * BeanFactoryAspectInstanceFactory的子类。获取Prototype类型的Aspect实例
+ *
  * {@link org.springframework.aop.aspectj.AspectInstanceFactory} backed by a
  * {@link BeanFactory}-provided prototype, enforcing prototype semantics.
  *

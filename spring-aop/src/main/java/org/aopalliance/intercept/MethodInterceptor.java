@@ -17,6 +17,8 @@
 package org.aopalliance.intercept;
 
 /**
+ * 方法拦截器是Interceptor的一个重要子类。主要方法：invoke。入参为：MethodInvocation
+ *
  * Intercepts calls on an interface on its way to the target. These
  * are nested "on top" of the target.
  *

@@ -28,6 +28,8 @@ import org.springframework.objenesis.SpringObjenesis;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * CglibAopProxy的子类。使用Cglib的方式创建代理对象。它持有Advised对象
+ *
  * Objenesis-based extension of {@link CglibAopProxy} to create proxy instances
  * without invoking the constructor of the class. Used by default as of Spring 4.
  *

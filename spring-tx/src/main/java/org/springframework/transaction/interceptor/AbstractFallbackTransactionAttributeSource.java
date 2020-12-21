@@ -92,19 +92,21 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	@Override
 	@Nullable
 	public TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
+		// 判断method所在的class是不是Object类型
 		if (method.getDeclaringClass() == Object.class) {
 			return null;
 		}
 
 		// First, see if we have a cached value.
-		// 先看缓存
+		// 构建缓存key
 		Object cacheKey = getCacheKey(method, targetClass);
+		// 从缓存中获取
 		TransactionAttribute cached = this.attributeCache.get(cacheKey);
 		// 有缓存，不会每次computeTransactionAttribute
 		if (cached != null) {
 			// Value will either be canonical value indicating there is no transaction attribute,
 			// or an actual transaction attribute.
-			// 如果没有事务属性就直接返回null
+			// 判断缓存中的对象是不是空事务属性的对象
 			if (cached == NULL_TRANSACTION_ATTRIBUTE) {
 				return null;
 			}
@@ -115,22 +117,25 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 		}
 		else {
 			// We need to work it out.
-			// 获取事务属性
+			// 查找我们的事务注解
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
+			// 若解析出来的事务注解属性为空
 			if (txAttr == null) {
+				// 往缓存中存放空事务注解属性
 				this.attributeCache.put(cacheKey, NULL_TRANSACTION_ATTRIBUTE);
 			}
 			else {
+				// 我们执行方法的描述符:包名+类名+方法名
 				String methodIdentification = ClassUtils.getQualifiedMethodName(method, targetClass);
-				// 设置方法全名
+				// 把方法描述设置到事务属性上去
 				if (txAttr instanceof DefaultTransactionAttribute) {
 					((DefaultTransactionAttribute) txAttr).setDescriptor(methodIdentification);
 				}
 				if (logger.isTraceEnabled()) {
 					logger.trace("Adding transactional method '" + methodIdentification + "' with attribute: " + txAttr);
 				}
-				// 缓存
+				// 加入缓存
 				this.attributeCache.put(cacheKey, txAttr);
 			}
 			return txAttr;

@@ -21,6 +21,9 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.lang.Nullable;
 
 /**
+ * AbstractAdvisorAutoProxyCreator的子类。SpringAOP中的核心类。
+ * 基础建设类。Spring事务默认的创建代理对象的类。
+ *
  * Auto-proxy creator that considers infrastructure Advisor beans only,
  * ignoring any application-defined Advisors.
  *

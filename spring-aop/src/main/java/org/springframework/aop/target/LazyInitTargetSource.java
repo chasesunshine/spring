@@ -20,13 +20,16 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
+ * AbstractBeanFactoryBasedTargetSource的子类。
+ * 从BeanFactory中获取单例Bean。支持延迟初始化。
+ *
  * {@link org.springframework.aop.TargetSource} that lazily accesses a
  * singleton bean from a {@link org.springframework.beans.factory.BeanFactory}.
  *
  * <p>Useful when a proxy reference is needed on initialization but
  * the actual target object should not be initialized until first use.
  * When the target bean is defined in an
- * {@link org.springframework.context.ApplicationContext} (or a
+ * {link org.springframework.context.ApplicationContext} (or a
  * {@code BeanFactory} that is eagerly pre-instantiating singleton beans)
  * it must be marked as "lazy-init" too, else it will be instantiated by said
  * {@code ApplicationContext} (or {@code BeanFactory}) on startup.

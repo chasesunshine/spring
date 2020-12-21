@@ -34,6 +34,8 @@ import org.springframework.aop.support.Pointcuts;
 import org.springframework.lang.Nullable;
 
 /**
+ * PointcutAdvisor的一个重要实现子类
+ *
  * Internal implementation of AspectJPointcutAdvisor.
  * Note that there will be one instance of this advisor for each target method.
  *
@@ -93,16 +95,28 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 			Method aspectJAdviceMethod, AspectJAdvisorFactory aspectJAdvisorFactory,
 			MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {
 
+		// 当前的切点表达式
 		this.declaredPointcut = declaredPointcut;
+		// 切面的class对象
 		this.declaringClass = aspectJAdviceMethod.getDeclaringClass();
+		// 切面方法的名称
 		this.methodName = aspectJAdviceMethod.getName();
+		// 切面方法的参数类型
 		this.parameterTypes = aspectJAdviceMethod.getParameterTypes();
+		// 切面方法对象
 		this.aspectJAdviceMethod = aspectJAdviceMethod;
+		// aspectj的通知工厂
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
+		// aspect的实例工厂
 		this.aspectInstanceFactory = aspectInstanceFactory;
+		// 切面的顺序
 		this.declarationOrder = declarationOrder;
+		// 切面的名称
 		this.aspectName = aspectName;
 
+		/**
+		 * 判断当前的切面对象是否需要延时加载
+		 */
 		if (aspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
 			// Static part of the pointcut is a lazy type.
 			Pointcut preInstantiationPointcut = Pointcuts.union(
@@ -119,7 +133,7 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 			// A singleton aspect.
 			this.pointcut = this.declaredPointcut;
 			this.lazy = false;
-			// 实例化Advice
+			// 将切面中的通知构造为advice通知对象
 			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
 		}
 	}
@@ -156,6 +170,12 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	private Advice instantiateAdvice(AspectJExpressionPointcut pointcut) {
+		// 入参为切点表达式类
+		// 这里是通过调用aspectJAdvisorFactory来获取Advice
+		// aspectJAdvisorFactory的实例是ReflectiveAspectJAdvisorFactory所以最终我们还是要到
+		// ReflectiveAspectJAdvisorFactory中去分析Advice的获取过程
+		// ReflectiveAspectJAdvisorFactory真是一个重要的类啊Advisor和Advice的获取都是在这个类中完成的
+		// 入参为：通知方法、切点表达式类、切面实例、切面的一个顺序、切面类名
 		Advice advice = this.aspectJAdvisorFactory.getAdvice(this.aspectJAdviceMethod, pointcut,
 				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
 		return (advice != null ? advice : EMPTY_ADVICE);

@@ -22,6 +22,9 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
+ * AdvisedSupport的子类。
+ * 引用了AopProxyFactory用来创建代理对象。
+ *
  * Base class for proxy factories.
  * Provides convenient access to a configurable AopProxyFactory.
  *
@@ -102,6 +105,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	 */
 	protected final synchronized AopProxy createAopProxy() {
 		if (!this.active) {
+			// 监听调用AdvisedSupportListener实现类的activated方法
 			activate();
 		}
 		// 通过AopProxyFactory获得AopProxy，这个AopProxyFactory是在初始化函数中定义的，使用的是DefaultAopProxyFactory
@@ -133,6 +137,8 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		super.adviceChanged();
 		synchronized (this) {
 			if (this.active) {
+				// 给Advised的监听器发送通知,通知Advised的变化
+				// 在Spring中没有默认的实现
 				for (AdvisedSupportListener listener : this.listeners) {
 					listener.adviceChanged(this);
 				}

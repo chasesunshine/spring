@@ -19,6 +19,9 @@ package org.springframework.aop.target;
 import org.springframework.beans.BeansException;
 
 /**
+ * AbstractPrototypeBasedTargetSource的子类。
+ * 从BeanFacory中获取Prototype类型的Beant
+ *
  * {@link org.springframework.aop.TargetSource} implementation that
  * creates a new instance of the target bean for each request,
  * destroying each instance on release (after each request).

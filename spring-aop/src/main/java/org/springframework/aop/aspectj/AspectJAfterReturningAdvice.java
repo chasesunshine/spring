@@ -27,6 +27,9 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.TypeUtils;
 
 /**
+ * 使用AspectJ AfterReturning注解的后置通知类型。
+ * 实现了AfterReturningAdvice、AfterAdvice接口。继承了AbstractAspectJAdvice
+ *
  * Spring AOP advice wrapping an AspectJ after-returning advice method.
  *
  * @author Rod Johnson

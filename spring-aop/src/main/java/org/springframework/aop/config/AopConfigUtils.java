@@ -30,6 +30,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * AOP配置工具类,主要是向Spring容器中注入可以生成Advisor和创建代理对象的bean
+ *
  * Utility class for handling registration of AOP auto-proxy creators.
  *
  * <p>Only a single auto-proxy creator should be registered yet multiple concrete

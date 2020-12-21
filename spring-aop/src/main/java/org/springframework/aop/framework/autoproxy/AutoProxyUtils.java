@@ -24,7 +24,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * 进行InfrastructureAdvisorAutoProxyCreator处理器的注册
+ * SpringAOP自动创建代理对象的工具类
  *
  * Utilities for auto-proxy aware components.
  * Mainly for internal use within the framework.

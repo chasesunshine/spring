@@ -23,6 +23,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * ProxyCreatorSupport的子类。
+ * 用来创建代理对象。在SpringAOP中用的最多
+ *
  * Factory for AOP proxies for programmatic use, rather than via declarative
  * setup in a bean factory. This class provides a simple way of obtaining
  * and configuring AOP proxy instances in custom user code.
@@ -109,6 +112,7 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	 * @return the proxy object
 	 */
 	public Object getProxy(@Nullable ClassLoader classLoader) {
+		// createAopProxy() 用来创建我们的代理工厂
 		return createAopProxy().getProxy(classLoader);
 	}
 

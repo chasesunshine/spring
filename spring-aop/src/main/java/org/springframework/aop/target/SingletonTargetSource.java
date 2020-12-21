@@ -23,6 +23,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * TargetSource的子类。适用于单例目标对象
+ *
  * Implementation of the {@link org.springframework.aop.TargetSource} interface
  * that holds a given object. This is the default implementation of the TargetSource
  * interface, as used by the Spring AOP framework. There is usually no need to
