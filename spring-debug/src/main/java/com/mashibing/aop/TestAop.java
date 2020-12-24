@@ -11,7 +11,7 @@ import java.util.Properties;
 public class TestAop {
 
     public static void main(String[] args) throws Exception {
-//        saveGeneratedCGlibProxyFiles(System.getProperty("user.dir")+"/proxy");
+        saveGeneratedCGlibProxyFiles(System.getProperty("user.dir")+"/proxy");
         ApplicationContext ac = new ClassPathXmlApplicationContext("aop.xml");
         MyCalculator bean = ac.getBean(MyCalculator.class);
         bean.add(1,1);

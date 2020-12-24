@@ -175,7 +175,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			Assert.state(rootClass != null, "Target class must be available for creating a CGLIB proxy");
 
 			Class<?> proxySuperClass = rootClass;
-			// 类名是否包含cglib分隔符
+			//如果目标对象已经是CGLIB 生成代理对象（就是比较类名称中有 $$ 字符串），那么就取目标对象的父类作为目标对象的类
 			if (rootClass.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
 				proxySuperClass = rootClass.getSuperclass();
 				// 获取原始父类的接口
@@ -186,7 +186,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			}
 
 			// Validate the class, writing log messages as necessary.
-			// 验证修饰符和方法修饰符
+			// 打印出不能代理的方法名，CGLIB 是使用继承实现的，所以final , static 的方法不能被增强
 			validateClassIfNecessary(proxySuperClass, classLoader);
 
 			// Configure CGLIB Enhancer...
@@ -199,13 +199,13 @@ class CglibAopProxy implements AopProxy, Serializable {
 					enhancer.setUseCache(false);
 				}
 			}
-			// 父类
+			// 配置超类，代理类实现的接口，回调方法等
 			enhancer.setSuperclass(proxySuperClass);
 			enhancer.setInterfaces(AopProxyUtils.completeProxiedInterfaces(this.advised));
 			enhancer.setNamingPolicy(SpringNamingPolicy.INSTANCE);
 			enhancer.setStrategy(new ClassLoaderAwareGeneratorStrategy(classLoader));
 
-			// 设置拦截器
+			// 获取callbacks
 			Callback[] callbacks = getCallbacks(rootClass);
 			Class<?>[] types = new Class<?>[callbacks.length];
 			for (int x = 0; x < types.length; x++) {
@@ -217,6 +217,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			enhancer.setCallbackTypes(types);
 
 			// Generate the proxy class and create a proxy instance.
+			// 通过 Enhancer 生成代理对象，并设置回调
 			return createProxyClassAndInstance(enhancer, callbacks);
 		}
 		catch (CodeGenerationException | IllegalArgumentException ex) {
@@ -298,7 +299,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 	private Callback[] getCallbacks(Class<?> rootClass) throws Exception {
 		// Parameters used for optimization choices...
-		// 对于expose-proxy属性的处理
+		// 对于expose-proxy属性的处理,是否暴露当前对象为ThreadLocal模式，在当前上下文中能够进行引用
 		boolean exposeProxy = this.advised.isExposeProxy();
 		boolean isFrozen = this.advised.isFrozen();
 		boolean isStatic = this.advised.getTargetSource().isStatic();
@@ -426,6 +427,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
+	 * 方法拦截器被用来没有通知链的静态目标
 	 * Method interceptor used for static targets with no advice chain. The call
 	 * is passed directly back to the target. Used when the proxy needs to be
 	 * exposed and it can't be determined that the method won't return
@@ -479,6 +481,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
+	 * 拦截器被用来执行动态目标不需要创建方法执行器或者计算通知链
 	 * Interceptor used to invoke a dynamic target without creating a method
 	 * invocation or evaluating an advice chain. (We know there was no advice
 	 * for this method.)
@@ -540,6 +543,8 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
+	 * 静态目标的分发器
+	 *
 	 * Dispatcher for a static target. Dispatcher is much faster than
 	 * interceptor. This will be used whenever it can be determined that a
 	 * method definitely does not return "this"
@@ -562,6 +567,8 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/**
+	 * 分发方法
+	 *
 	 * Dispatcher for any methods declared on the Advised class.
 	 */
 	private static class AdvisedDispatcher implements Dispatcher, Serializable {
