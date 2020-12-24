@@ -1,6 +1,6 @@
-package com.mashibing.aop;
+package com.mashibing.aop.xml;
 
-import com.mashibing.aop.service.MyCalculator;
+import com.mashibing.aop.xml.service.MyCalculator;
 import org.springframework.cglib.core.DebuggingClassWriter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

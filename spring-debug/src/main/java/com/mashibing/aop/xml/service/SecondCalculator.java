@@ -1,4 +1,4 @@
-package com.mashibing.aop.service;
+package com.mashibing.aop.xml.service;
 
 public class SecondCalculator implements Calculator {
     public Integer add(Integer i, Integer j) throws NoSuchMethodException {

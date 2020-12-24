@@ -1,6 +1,4 @@
-package com.mashibing.aop.service;
-
-import org.springframework.stereotype.Service;
+package com.mashibing.aop.xml.service;
 
 //@Service
 public class MyCalculator /*implements Calculator */{
