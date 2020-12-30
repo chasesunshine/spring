@@ -15,7 +15,7 @@ public class TestAop {
         ApplicationContext ac = new ClassPathXmlApplicationContext("aop.xml");
         MyCalculator bean = ac.getBean(MyCalculator.class);
         bean.add(1,1);
-
+        bean.sub(1,1);
     }
 
     public static void saveGeneratedCGlibProxyFiles(String dir) throws Exception {

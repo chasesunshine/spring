@@ -4,6 +4,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -18,36 +19,8 @@ public class LogUtil {
 //    @Pointcut("execution(* *(..))")
     public void myPointCut1(){}
 
-    @Before(value = "myPointCut()")
-    private int start(JoinPoint joinPoint){
-        //获取方法签名
-        Signature signature = joinPoint.getSignature();
-        //获取参数信息
-        Object[] args = joinPoint.getArgs();
-        System.out.println("log---"+signature.getName()+"方法开始执行：参数是"+Arrays.asList(args));
-        return 100;
-    }
-
-    @AfterReturning(value = "myPointCut()",returning = "result")
-    public static void stop(JoinPoint joinPoint,Object result){
-        Signature signature = joinPoint.getSignature();
-        System.out.println("log---"+signature.getName()+"方法执行结束，结果是："+result);
-    }
-
-    @AfterThrowing(value = "myPointCut()",throwing = "e")
-    public static void logException(JoinPoint joinPoint,Exception e){
-        Signature signature = joinPoint.getSignature();
-        System.out.println("log---"+signature.getName()+"方法抛出异常："+e.getMessage());
-    }
-
-    @After("myPointCut()")
-    public static void logFinally(JoinPoint joinPoint){
-        Signature signature = joinPoint.getSignature();
-        System.out.println("log---"+signature.getName()+"方法执行结束。。。。。over");
-
-    }
-
-     @Around("myPointCut()")
+    @Around("myPointCut()")
+    @Order(4)
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Signature signature = pjp.getSignature();
         Object[] args = pjp.getArgs();
@@ -65,5 +38,38 @@ public class LogUtil {
             System.out.println("log---环绕返回通知："+signature.getName()+"方法返回结果是："+result);
         }
         return result;
+    }
+
+    @Before(value = "myPointCut()")
+    @Order(5)
+    private int start(JoinPoint joinPoint){
+        //获取方法签名
+        Signature signature = joinPoint.getSignature();
+        //获取参数信息
+        Object[] args = joinPoint.getArgs();
+        System.out.println("log---"+signature.getName()+"方法开始执行：参数是"+Arrays.asList(args));
+        return 100;
+    }
+
+    @After("myPointCut()")
+    @Order(3)
+    public static void logFinally(JoinPoint joinPoint){
+        Signature signature = joinPoint.getSignature();
+        System.out.println("log---"+signature.getName()+"方法执行结束。。。。。over");
+    }
+
+
+    @AfterReturning(value = "myPointCut()",returning = "result")
+    @Order(2)
+    public static void stop(JoinPoint joinPoint,Object result){
+        Signature signature = joinPoint.getSignature();
+        System.out.println("log---"+signature.getName()+"方法执行结束，结果是："+result);
+    }
+
+    @AfterThrowing(value = "myPointCut()",throwing = "e")
+    @Order(1)
+    public static void logException(JoinPoint joinPoint,Exception e){
+        Signature signature = joinPoint.getSignature();
+        System.out.println("log---"+signature.getName()+"方法抛出异常："+e.getMessage());
     }
 }

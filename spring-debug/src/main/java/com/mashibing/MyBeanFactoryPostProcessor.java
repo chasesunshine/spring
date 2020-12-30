@@ -8,6 +8,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 public class MyBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        System.out.println("----------子定义扩展----------");
+        BeanDefinition dataSource = beanFactory.getBeanDefinition("dataSource");
+        Object username = dataSource.getPropertyValues().get("username");
+        if(username.equals("${jdbc.username}")){
+            username = "root";
+        }
+
     }
 }
