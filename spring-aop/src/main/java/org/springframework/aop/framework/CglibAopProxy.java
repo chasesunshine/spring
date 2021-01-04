@@ -735,6 +735,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		}
 
 		@Override
+
 		public boolean equals(@Nullable Object other) {
 			return (this == other ||
 					(other instanceof DynamicAdvisedInterceptor &&

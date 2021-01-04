@@ -313,7 +313,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			// configured the connection pool to set it already).
 			// 关闭自动提交
 			if (con.getAutoCommit()) {
-				//设置需要回复自动提交
+				//设置需要恢复自动提交
 				txObject.setMustRestoreAutoCommit(true);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");

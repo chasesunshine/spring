@@ -31,7 +31,7 @@
     <tx:advice id="myAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <tx:method name="*"/>
-            <tx:method name="checkout" propagation="REQUIRED"/>
+            <tx:method name="checkout" propagation="REQUIRED" />
             <tx:method name="get*" read-only="true"></tx:method>
         </tx:attributes>
     </tx:advice>

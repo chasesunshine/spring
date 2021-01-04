@@ -1168,7 +1168,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @return the object to expose as bean reference
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
-		// 默认最终公开的对象是bean
+		// 默认最终公开的对象是bean,通过createBeanInstance创建出来的普通对象
 		Object exposedObject = bean;
 		// mbd的systhetic属性：设置此bean定义是否是"synthetic"，一般是指只有AOP相关的pointCut配置或者Advice配置才会将 synthetic设置为true
 		// 如果mdb不是synthetic且此工厂拥有InstantiationAwareBeanPostProcessor
