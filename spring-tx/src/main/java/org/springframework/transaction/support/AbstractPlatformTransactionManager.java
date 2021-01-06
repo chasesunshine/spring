@@ -342,7 +342,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			throws TransactionException {
 
 		// Use defaults if no transaction definition given.
-		// 使用默认的事务管理器定义信息
+		// 如果没有事务定义信息则使用默认的事务管理器定义信息
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
 
 		// 获取事务
@@ -409,7 +409,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		// 创建新的事务
 		DefaultTransactionStatus status = newTransactionStatus(
 				definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
-		// 开启事务
+		// 开启事务和连接
 		doBegin(transaction, definition);
 		// 新同步事务的设置，针对于当前线程的设置
 		prepareSynchronization(status, definition);
@@ -543,7 +543,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	}
 
 	/**
-	 * 通过给定的参数创建事务状态
+	 * 通过给定的参数创建事务状态,有一个非常关键的参数是newTransaction,用于判断是否是新连接，如果事务不存在，那么肯定是true，如果存在，就需要根据传播特性来决定是否是false了
 	 * Create a TransactionStatus instance for the given arguments.
 	 */
 	protected DefaultTransactionStatus newTransactionStatus(
@@ -597,7 +597,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 
 	/**
-	 * 挂起当前的事务，首先会清除所有线程相关的同步状态，如果当前事务存在的话，就进行一些属性的清除，比如清空连接持有器，清空线程私有变量的同步状态，
+	 * 有些传播机制需要挂起当前的事务，比如NOT_SUPPORTED,REQUIRES_NEW首先会清除所有线程相关的同步状态，如果当前事务存在的话，就进行一些属性的清除，比如清空连接持有器，清空线程私有变量的同步状态，
 	 * 最后把当前事务清除的属性保存到一个SuspendedResourcesHolder里，以便于恢复的时候设置会去
 	 *
 	 * Suspend the given transaction. Suspends transaction synchronization first,

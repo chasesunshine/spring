@@ -322,7 +322,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				con.setAutoCommit(false);
 			}
 
-			// 判断事务为只读事务
+			// 判断事务是否需要设置为只读事务
 			prepareTransactionalConnection(con, definition);
 			// 标记激活事务
 			txObject.getConnectionHolder().setTransactionActive(true);
@@ -440,7 +440,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 		// Remove the connection holder from the thread, if exposed.
 		if (txObject.isNewConnectionHolder()) {
-			// 将数据库连接从当前线程中接触绑定
+			// 将数据库连接从当前线程中解除绑定
 			TransactionSynchronizationManager.unbindResource(obtainDataSource());
 		}
 
@@ -499,6 +499,8 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 
 	/**
+	 * 数据源事务对象，代表一个连接持有器，用作事务管理器的事务对象
+	 *
 	 * DataSource transaction object, representing a ConnectionHolder.
 	 * Used as transaction object by DataSourceTransactionManager.
 	 */

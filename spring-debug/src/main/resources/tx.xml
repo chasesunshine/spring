@@ -17,10 +17,10 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"></property>
     </bean>
-    <bean id="bookService" class="com.mashibing.tx.service.BookService">
+    <bean id="bookService" class="com.mashibing.tx.xml.service.BookService">
         <property name="bookDao" ref="bookDao"></property>
     </bean>
-    <bean id="bookDao" class="com.mashibing.tx.dao.BookDao">
+    <bean id="bookDao" class="com.mashibing.tx.xml.dao.BookDao">
         <property name="jdbcTemplate" ref="jdbcTemplate"></property>
     </bean>
 

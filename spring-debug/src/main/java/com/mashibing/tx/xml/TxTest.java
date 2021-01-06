@@ -1,11 +1,13 @@
-package com.mashibing.tx;
+package com.mashibing.tx.xml;
 
-import com.mashibing.tx.service.BookService;
+import com.mashibing.tx.xml.service.BookService;
+import com.mashibing.tx.xml.service.BookService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.sql.SQLException;
 
+// 把xml配置的方式准备对象的过程画一个流程图出来
 public class TxTest {
     public static void main(String[] args) throws SQLException {
         ApplicationContext context = new ClassPathXmlApplicationContext("tx.xml");

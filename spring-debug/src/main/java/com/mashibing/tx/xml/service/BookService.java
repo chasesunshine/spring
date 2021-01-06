@@ -1,8 +1,6 @@
-package com.mashibing.tx.service;
+package com.mashibing.tx.xml.service;
 
-import com.mashibing.tx.dao.BookDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.mashibing.tx.xml.dao.BookDao;
 
 public class BookService {
 
