@@ -15,6 +15,6 @@ public class AddressPropertyEditor extends PropertyEditorSupport {
         address.setProvince(s[0]);
         address.setCity(s[1]);
         address.setTown(s[2]);
-        setValue(text);
+        setValue(address);
     }
 }

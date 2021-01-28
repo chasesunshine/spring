@@ -5,7 +5,8 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="person" class="com.mashibing.populateBean.Person" init-method="init">
+    <!--给复杂类型的赋值都在property标签内进行-->
+    <bean id="person" class="com.mashibing.populateBean.Person">
         <property name="name">
             <!--赋空值-->
             <null></null>
@@ -59,11 +60,22 @@
             </set>
         </property>
     </bean>
+    <bean id="address" class="com.mashibing.populateBean.Address">
+        <property name="province" value="河北"></property>
+        <property name="city" value="邯郸"></property>
+        <property name="town" value="武安"></property>
+    </bean>
     <bean id="book2" class="com.mashibing.populateBean.Book">
         <property name="name" value="JVM"></property>
         <property name="author" value="马士兵"></property>
         <property name="price" value="1200"></property>
     </bean>
+    <!--级联属性-->
+    <bean id="person2" class="com.mashibing.populateBean.Person">
+        <property name="address" ref="address"></property>
+        <property name="address.province" value="北京"></property>
+    </bean>
+    <!--util名称空间创建集合类型的bean-->
     <util:map id="myMap">
         <entry key="key1" value="value1"></entry>
         <entry key="key2" value-ref="book2"></entry>
@@ -75,14 +87,4 @@
             </bean>
         </entry>
     </util:map>
-<!--    <bean id="person" class="com.mashibing.populateBean.Person" autowire="byName"></bean>-->
-<!--    <bean id="person2" class="com.mashibing.populateBean.Person" autowire="byType"></bean>-->
-<!--    <bean class="com.mashibing.populateBean.Person" init-method="init"></bean>-->
-    <bean id="address" class="com.mashibing.populateBean.Address">
-        <property name="province" value="河北"></property>
-        <property name="city" value="邯郸"></property>
-        <property name="town" value="武安"></property>
-    </bean>
-
-    <context:component-scan base-package="com.mashibing.populateBean"></context:component-scan>
 </beans>

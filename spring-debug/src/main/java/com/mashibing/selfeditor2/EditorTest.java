@@ -10,7 +10,10 @@ public class EditorTest {
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext applicationContext =
-                new AnnotationConfigApplicationContext(AddressPropertyConfiguration.class);
+                new AnnotationConfigApplicationContext();
+        applicationContext.register(AddressPropertyConfiguration.class);
+        applicationContext.register(Customer.class);
+        applicationContext.refresh();
         System.out.println(applicationContext.getBean(Customer.class));
     }
 }

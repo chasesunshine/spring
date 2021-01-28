@@ -21,8 +21,14 @@ public class BookService {
      */
     public void checkout(String username,int id){
 
-        bookDao.updateStock(id);
-        int price = bookDao.getPrice(id);
-        bookDao.updateBalance(username,price);
+        try {
+            bookDao.updateStock(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        for (int i = 1 ;i>=0 ;i--)
+//            System.out.println(10/i);
+//        int price = bookDao.getPrice(id);
+//        bookDao.updateBalance(username,price);
     }
 }

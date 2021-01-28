@@ -2,6 +2,7 @@ package com.mashibing.tx.annotation.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class BookDao {
@@ -22,7 +23,7 @@ public class BookDao {
      * @param userName
      * @param price
      */
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void updateBalance(String userName,int price){
         String sql = "update account set balance=balance-? where username=?";
         jdbcTemplate.update(sql,price,userName);
@@ -33,7 +34,7 @@ public class BookDao {
      * @param id
      * @return
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public int getPrice(int id){
         String sql = "select price from book where id=?";
         return jdbcTemplate.queryForObject(sql,Integer.class,id);
@@ -43,7 +44,7 @@ public class BookDao {
      * 减库存，减去某本书的库存
      * @param id
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateStock(int id){
         String sql = "update book_stock set stock=stock-1 where id=?";
         jdbcTemplate.update(sql,id);

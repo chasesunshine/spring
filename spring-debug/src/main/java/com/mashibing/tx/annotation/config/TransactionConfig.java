@@ -49,6 +49,7 @@ public class TransactionConfig {
 
     @Bean
     public BookService bookService() {
+        bookDao();
         return new BookService();
     }
 

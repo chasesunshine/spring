@@ -99,7 +99,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
-							// 获取默认的午餐构造器
+							// 获取默认的无参构造器
 							constructorToUse = clazz.getDeclaredConstructor();
 						}
 						// 获取到构造器之后将构造器赋值给bd中的属性

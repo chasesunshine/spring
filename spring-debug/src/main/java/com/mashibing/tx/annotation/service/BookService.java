@@ -2,6 +2,7 @@ package com.mashibing.tx.annotation.service;
 
 import com.mashibing.tx.annotation.dao.BookDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class BookService {
@@ -22,7 +23,7 @@ public class BookService {
      * @param username
      * @param id
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public void checkout(String username,int id){
 
         bookDao.updateStock(id);

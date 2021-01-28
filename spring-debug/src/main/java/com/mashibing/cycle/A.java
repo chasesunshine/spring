@@ -1,11 +1,14 @@
 package com.mashibing.cycle;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 
-public class A {
+public class A  {
 
-//    @Autowired
     private B b;
 
     public B getB() {

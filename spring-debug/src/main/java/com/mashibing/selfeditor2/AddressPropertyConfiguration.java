@@ -4,6 +4,7 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,10 +16,10 @@ import java.util.Collections;
 @Configuration
 public class AddressPropertyConfiguration {
 
-    @Bean
-    public Customer customer() {
-        return new Customer();
-    }
+//    @Bean
+//    public Customer customer() {
+//        return new Customer();
+//    }
 
     @Bean
     public static CustomEditorConfigurer editorConfigurer() {

@@ -20,7 +20,7 @@ public class LogUtil {
     public void myPointCut1(){}
 
     @Around("myPointCut()")
-    @Order(4)
+//    @Order(4)
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Signature signature = pjp.getSignature();
         Object[] args = pjp.getArgs();
@@ -41,7 +41,7 @@ public class LogUtil {
     }
 
     @Before(value = "myPointCut()")
-    @Order(5)
+//    @Order(5)
     private int start(JoinPoint joinPoint){
         //获取方法签名
         Signature signature = joinPoint.getSignature();
@@ -52,7 +52,7 @@ public class LogUtil {
     }
 
     @After("myPointCut()")
-    @Order(3)
+//    @Order(3)
     public static void logFinally(JoinPoint joinPoint){
         Signature signature = joinPoint.getSignature();
         System.out.println("log---"+signature.getName()+"方法执行结束。。。。。over");
@@ -60,14 +60,14 @@ public class LogUtil {
 
 
     @AfterReturning(value = "myPointCut()",returning = "result")
-    @Order(2)
+//    @Order(2)
     public static void stop(JoinPoint joinPoint,Object result){
         Signature signature = joinPoint.getSignature();
         System.out.println("log---"+signature.getName()+"方法执行结束，结果是："+result);
     }
 
     @AfterThrowing(value = "myPointCut()",throwing = "e")
-    @Order(1)
+//    @Order(1)
     public static void logException(JoinPoint joinPoint,Exception e){
         Signature signature = joinPoint.getSignature();
         System.out.println("log---"+signature.getName()+"方法抛出异常："+e.getMessage());

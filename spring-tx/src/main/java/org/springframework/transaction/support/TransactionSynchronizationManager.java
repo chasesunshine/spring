@@ -182,7 +182,7 @@ public abstract class TransactionSynchronizationManager {
 	 */
 	public static void bindResource(Object key, Object value) throws IllegalStateException {
 		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
-		Assert.notNull(value, "Value must not be null");
+		Assert.notNull(value, "Value must not be null");//每次在进行获取的时候都要根据obtainDataSource()返回的数据源来获取connectionHolder,现在经过设置会后，有了
 		Map<Object, Object> map = resources.get();
 		// set ThreadLocal Map if none found
 		if (map == null) {
