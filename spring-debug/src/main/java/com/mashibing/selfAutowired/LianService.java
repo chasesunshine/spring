@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 public class LianService {
 
     public void show(){
-        System.out.println("哈哈哈");
+        System.out.println("哈哈哈-----");
     }
 }

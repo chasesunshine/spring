@@ -31,10 +31,19 @@ import org.springframework.util.PathMatcher;
  */
 public class RequestMatchResult {
 
+	/**
+	 * 匹配到的路径
+	 */
 	private final String matchingPattern;
 
+	/**
+	 * 被匹配的路径
+	 */
 	private final String lookupPath;
 
+	/**
+	 * 路径匹配器
+	 */
 	private final PathMatcher pathMatcher;
 
 

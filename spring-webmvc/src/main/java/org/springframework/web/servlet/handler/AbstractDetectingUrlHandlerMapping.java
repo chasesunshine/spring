@@ -37,6 +37,8 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 
 
 	/**
+	 * 是否只扫描可访问的handler
+	 *
 	 * Set whether to detect handler beans in ancestor ApplicationContexts.
 	 * <p>Default is "false": Only handler beans in the current ApplicationContext
 	 * will be detected, i.e. only in the context that this HandlerMapping itself
@@ -56,6 +58,7 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	@Override
 	public void initApplicationContext() throws ApplicationContextException {
 		super.initApplicationContext();
+		// 自动探测处理器
 		detectHandlers();
 	}
 
@@ -68,16 +71,21 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	 * @see #determineUrlsForHandler(String)
 	 */
 	protected void detectHandlers() throws BeansException {
+		// 从spring上下文获取所有Object类型的bean名称
 		ApplicationContext applicationContext = obtainApplicationContext();
 		String[] beanNames = (this.detectHandlersInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(applicationContext, Object.class) :
 				applicationContext.getBeanNamesForType(Object.class));
 
 		// Take any bean name that we can determine URLs for.
+		// 遍历所有bean，逐个注册
 		for (String beanName : beanNames) {
+			// 获取bean对应的url
 			String[] urls = determineUrlsForHandler(beanName);
+			// 如果该bean存在对应的url，则添加该处理器
 			if (!ObjectUtils.isEmpty(urls)) {
 				// URL paths found: Let's consider it a handler.
+				// 调用父类的方法，往handlerMap中添加注册器
 				registerHandler(urls, beanName);
 			}
 		}

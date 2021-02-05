@@ -53,8 +53,14 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	/** Logger available to subclasses. */
 	protected final Log logger = HttpLogging.forLogName(getClass());
 
+	/**
+	 * 支持的 MediaType
+	 */
 	private List<MediaType> supportedMediaTypes = Collections.emptyList();
 
+	/**
+	 * 默认的字符集
+	 */
 	@Nullable
 	private Charset defaultCharset;
 
@@ -207,10 +213,14 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	public final void write(final T t, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException {
 
+		// 获取响应头
 		final HttpHeaders headers = outputMessage.getHeaders();
+		// 如果 Content-Type 为空则设置默认的
 		addDefaultHeaders(headers, t, contentType);
 
+		// <3> 往响应中写入数据
 		if (outputMessage instanceof StreamingHttpOutputMessage) {
+			// 如果是流，则再封装一层
 			StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) outputMessage;
 			streamingOutputMessage.setBody(outputStream -> writeInternal(t, new HttpOutputMessage() {
 				@Override
@@ -224,6 +234,7 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 			}));
 		}
 		else {
+			// 普通对象
 			writeInternal(t, outputMessage);
 			outputMessage.getBody().flush();
 		}

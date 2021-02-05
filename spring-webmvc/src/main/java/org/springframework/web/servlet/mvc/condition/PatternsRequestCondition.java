@@ -47,16 +47,28 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 	private final static Set<String> EMPTY_PATH_PATTERN = Collections.singleton("");
 
 
+	/**
+	 * 需要匹配的路径
+	 */
 	private final Set<String> patterns;
 
+	/**
+	 * 路径解析器 UrlPathHelper
+	 */
 	private final UrlPathHelper pathHelper;
 
+	/**
+	 * 路径匹配器 AntPathMatcher
+	 */
 	private final PathMatcher pathMatcher;
 
 	private final boolean useSuffixPatternMatch;
 
 	private final boolean useTrailingSlashMatch;
 
+	/**
+	 * 支持的文件后缀
+	 */
 	private final List<String> fileExtensions = new ArrayList<>();
 
 
@@ -120,8 +132,11 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 			@Nullable PathMatcher pathMatcher, boolean useSuffixPatternMatch,
 			boolean useTrailingSlashMatch, @Nullable List<String> fileExtensions) {
 
+		// 需要匹配的路径表达式集合，如果不以 `/` 开头，默认会加上
 		this.patterns = initPatterns(patterns);
+		// 路径解析器 UrlPathHelper
 		this.pathHelper = urlPathHelper != null ? urlPathHelper : UrlPathHelper.defaultInstance;
+		// 路径匹配器 AntPathMatcher
 		this.pathMatcher = pathMatcher != null ? pathMatcher : new AntPathMatcher();
 		this.useSuffixPatternMatch = useSuffixPatternMatch;
 		this.useTrailingSlashMatch = useTrailingSlashMatch;
@@ -143,6 +158,7 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 		Set<String> result = new LinkedHashSet<>(patterns.length);
 		for (String pattern : patterns) {
 			if (StringUtils.hasLength(pattern) && !pattern.startsWith("/")) {
+				// 没有以 `/` 开头则加上
 				pattern = "/" + pattern;
 			}
 			result.add(pattern);
@@ -209,6 +225,7 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 		else if (isEmptyPathPattern()) {
 			return other;
 		}
+		// 将另外一个 PatternsRequestCondition 合并到当前对象中
 		Set<String> result = new LinkedHashSet<>();
 		if (!this.patterns.isEmpty() && !other.patterns.isEmpty()) {
 			for (String pattern1 : this.patterns) {
@@ -243,8 +260,11 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 	@Override
 	@Nullable
 	public PatternsRequestCondition getMatchingCondition(HttpServletRequest request) {
+		// 通过路径解析器 UrlPathHelper 获取请求路径
 		String lookupPath = this.pathHelper.getLookupPathForRequest(request, HandlerMapping.LOOKUP_PATH);
+		// 获取该条件中匹配请求路径的路径
 		List<String> matches = getMatchingPatterns(lookupPath);
+		// 如果不为空表示匹配，符合条件，则返回 PatternsRequestCondition 对象
 		return !matches.isEmpty() ? new PatternsRequestCondition(new LinkedHashSet<>(matches), this) : null;
 	}
 
@@ -277,6 +297,7 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 	@Nullable
 	private String getMatchingPattern(String pattern, String lookupPath) {
 		if (pattern.equals(lookupPath)) {
+			// 直接相等，匹配，则直接返回
 			return pattern;
 		}
 		if (this.useSuffixPatternMatch) {
@@ -294,6 +315,7 @@ public class PatternsRequestCondition extends AbstractRequestCondition<PatternsR
 				}
 			}
 		}
+		// 通过路径匹配器 AntPathMatcher 判断是否匹配
 		if (this.pathMatcher.match(pattern, lookupPath)) {
 			return pattern;
 		}

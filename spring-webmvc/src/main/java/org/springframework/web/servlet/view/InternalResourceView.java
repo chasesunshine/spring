@@ -142,12 +142,15 @@ public class InternalResourceView extends AbstractUrlBasedView {
 		exposeModelAsRequestAttributes(model, request);
 
 		// Expose helpers as request attributes, if any.
+		// 往请求中设置一些属性，Locale、TimeZone、LocalizationContext
 		exposeHelpers(request);
 
 		// Determine the path for the request dispatcher.
+		// 获取需要转发的路径
 		String dispatcherPath = prepareForRendering(request, response);
 
 		// Obtain a RequestDispatcher for the target resource (typically a JSP).
+		// 获取请求转发器
 		RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
 		if (rd == null) {
 			throw new ServletException("Could not get RequestDispatcher for [" + getUrl() +
@@ -168,6 +171,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Forwarding to [" + getUrl() + "]");
 			}
+			// 最后进行转发
 			rd.forward(request, response);
 		}
 	}
