@@ -2,6 +2,7 @@ package com.mashibing;
 
 import com.mashibing.cycle.A;
 import com.mashibing.cycle.B;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -56,6 +57,13 @@ public class Test {
         // 所有的对象必须只有一个，单例对象
 //        A a = new A();
 //        B b = new B();
+
+        ApplicationContext context = new ClassPathXmlApplicationContext("test.xml");
+        Teacher bean = context.getBean(Teacher.class);
+        System.out.println(bean.getId());
+        System.out.println(bean.getName());
+        System.out.println(bean.getApplicationContext());
+        System.out.println(bean.getBeanFactory());
 
     }
 }

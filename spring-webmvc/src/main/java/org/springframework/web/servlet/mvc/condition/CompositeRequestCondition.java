@@ -28,6 +28,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 此类本身并不实际做匹配，而是将多个别的RequestCondition封装到自己的一个变量中，在用的时候遍历所有RequestCondition进行匹配
+ *
  * Implements the {@link RequestCondition} contract by delegating to multiple
  * {@code RequestCondition} types and using a logical conjunction (' && ') to
  * ensure all conditions match a given request.

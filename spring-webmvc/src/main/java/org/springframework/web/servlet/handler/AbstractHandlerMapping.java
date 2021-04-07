@@ -51,6 +51,13 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
+ * AbstractHandlerMapping是HandlerMapping接口的抽象实现，所有的handlerMapping都要继承此抽象类
+ * abstractHandlerMapping采用模板模式设计了HandlerMapping实现子类的整体结构，子类只需要通过模板方法提供一些初始值或者业务逻辑即可
+ *
+ * handlerMapping是根据request找到Handler和interceptors,获取Handler的过程通过模板方法getHandlerInternal交给了子类，
+ * abstractHandlerMapping保存了所用配置的interceptor，在获取到handler之后，根据从request中提取的lookupPath将相应的interceptors装配进去
+ * 当然子类也可以通过getHandlerInternal方法设置自己的interceptor。
+ *
  * Abstract base class for {@link org.springframework.web.servlet.HandlerMapping}
  * implementations. Supports ordering, a default handler, handler interceptors,
  * including handler interceptors mapped by path patterns.
@@ -84,11 +91,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
 	/**
-	 * 配置的拦截器数组
-	 * 在  initInterceptors() 方法中，初始化到adaptedInterceptors中
-	 * 添加方式有两种：
-	 * setInterceptors
-	 * extendInterceptors
+	 * 用于配置springmvc的拦截器，有两种设置方式，
+	 * 1、注册handlerMapping时通过属性设置
+	 * 2、通过子类的extendInterceptors钩子方法进行设置
+	 *
+	 * 此集合并不会直接使用，而是通过initInterceptors方法按照类型分配到mappedInterceptors和adaptedInterceptors中进行使用
 	 */
 	private final List<Object> interceptors = new ArrayList<>();
 
@@ -295,11 +302,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	@Override
 	protected void initApplicationContext() throws BeansException {
-		// 空实现，交给子类实现，用于注册自定义的拦截器到 interceptors 中，目前暂无子类实现
+		// 空实现，交给子类实现，用于注册自定义的拦截器到interceptors中，目前暂无子类实现
 		extendInterceptors(this.interceptors);
-		// 扫描已注册的 MappedInterceptor 的 Bean 们，添加到 mappedInterceptors 中
+		// 扫描已注册的MappedInterceptor的Bean们，添加到adaptedInterceptors中
 		detectMappedInterceptors(this.adaptedInterceptors);
-		// 将 interceptors 初始化成 HandlerInterceptor 类型，添加到 mappedInterceptors 中
+		// 将interceptors初始化成 HandlerInterceptor类型，添加到mappedInterceptors中
 		initInterceptors();
 	}
 
@@ -325,8 +332,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @param mappedInterceptors an empty list to add to
 	 */
 	protected void detectMappedInterceptors(List<HandlerInterceptor> mappedInterceptors) {
-		// 扫描已注册的 MappedInterceptor 的 Bean 们，添加到 mappedInterceptors 中
-		// MappedInterceptor 会根据请求路径做匹配，是否进行拦截
+		// 扫描已注册的MappedInterceptor的Bean，添加到mappedInterceptors中
+		// MappedInterceptor会根据请求路径做匹配，是否进行拦截
 		mappedInterceptors.addAll(BeanFactoryUtils.beansOfTypeIncludingAncestors(
 				obtainApplicationContext(), MappedInterceptor.class, true, false).values());
 	}
@@ -344,8 +351,8 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				if (interceptor == null) {
 					throw new IllegalArgumentException("Entry number " + i + " in interceptors array is null");
 				}
-				// 将 interceptors 初始化成 HandlerInterceptor 类型，添加到 mappedInterceptors 中
-				// 注意，HandlerInterceptor 无需进行路径匹配，直接拦截全部
+				// 将interceptors初始化成HandlerInterceptor类型，添加到adaptedInterceptors中
+				// 注意，HandlerInterceptor无需进行路径匹配，直接拦截全部
 				this.adaptedInterceptors.add(adaptInterceptor(interceptor));
 			}
 		}
@@ -412,7 +419,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-		// 获得处理器（HandlerMethod 或者 HandlerExecutionChain），该方法是抽象方法，由子类实现
+		// 获得处理器（HandlerMethod或者HandlerExecutionChain），该方法是抽象方法，由子类实现
 		Object handler = getHandlerInternal(request);
 		// 获得不到，则使用默认处理器
 		if (handler == null) {
@@ -423,13 +430,13 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			return null;
 		}
 		// Bean name or resolved handler?
-		// 如果找到的处理器是 String 类型，则从 Spring 容器中找到对应的 Bean 作为处理器
+		// 如果找到的处理器是String类型，则从Spring容器中找到对应的Bean作为处理器
 		if (handler instanceof String) {
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
-		// 创建 HandlerExecutionChain 对象（包含处理器和拦截器）
+		// 创建HandlerExecutionChain对象（包含处理器和拦截器）
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (logger.isTraceEnabled()) {

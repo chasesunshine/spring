@@ -29,5 +29,13 @@ public class BookService {
         bookDao.updateStock(id);
         int price = bookDao.getPrice(id);
         bookDao.updateBalance(username,price);
+//        try{
+
+        for (int i = 1 ;i>=0 ;i--)
+            System.out.println(10/i);
+//        }catch (Exception e){
+//            System.out.println("...............");
+//        }
     }
+
 }

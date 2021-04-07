@@ -3,8 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <bean class="com.mashibing.MyBeanFactoryPostProcessorBySelf"></bean>
+<!--    <bean class="com.mashibing.MyBeanFactoryPostProcessorBySelf"></bean>-->
     <bean id="a" class="com.mashibing.cycle.A">
+        <property name="name" value="zhangsan"></property>
         <property name="b" ref="b"></property>
     </bean>
     <bean id="b" class="com.mashibing.cycle.B">

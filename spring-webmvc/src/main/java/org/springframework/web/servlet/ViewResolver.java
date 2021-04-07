@@ -21,6 +21,13 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
+ * 将String类型的视图名和locale解析为view类型的视图
+ * viewResolver需要找到渲染所用的模板和视图的类型进行渲染，具体的渲染过程则交给不同的视图来完成
+ * 最常使用的有
+ * 	UrlBasedViewResolver:针对单一视图
+ *	InternalResourceViewResolver:针对jsp类型的视图
+ *	FreeMarkerViewResolver:针对freeMaker
+ *
  * Interface to be implemented by objects that can resolve views by name.
  *
  * <p>View state doesn't change during the running of the application,

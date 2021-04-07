@@ -19,7 +19,7 @@ package org.springframework.beans;
 import java.beans.PropertyDescriptor;
 
 /**
- * spring中的核心接口，是spring中的一个包装类，具有单独或者批量获取和设置属性值，获取属性描述符一级查询属性可读可写的能力，还可以完成类型的转换
+ * spring中的核心接口，是spring中的一个包装类，具有单独或者批量获取和设置属性值，获取属性描述符以及查询属性可读可写的能力，还可以完成类型的转换
  *
  * The central interface of Spring's low-level JavaBeans infrastructure.
  *

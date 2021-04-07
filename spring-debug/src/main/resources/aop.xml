@@ -7,7 +7,8 @@
        http://www.springframework.org/schema/aop
        http://www.springframework.org/schema/aop/spring-aop.xsd
 ">
-    <bean id="logUtil" class="com.mashibing.aop.xml.util.LogUtil"></bean>
+    <bean class="com.mashibing.MyBeanFactoryPostProcessorBySelf"></bean>
+    <bean id="logUtil" class="com.mashibing.aop.xml.util.LogUtil" ></bean>
     <bean id="myCalculator" class="com.mashibing.aop.xml.service.MyCalculator" ></bean>
     <aop:config>
         <aop:aspect ref="logUtil">

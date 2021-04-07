@@ -35,4 +35,8 @@
 <!--            </aop:aspect>-->
 <!--        </aop:config>-->
 
+    <bean class="com.mashibing.Student" id="student">
+        <property name="id" value="1"></property>
+        <property name="name" value="zhangsan"></property>
+    </bean>
 </beans>

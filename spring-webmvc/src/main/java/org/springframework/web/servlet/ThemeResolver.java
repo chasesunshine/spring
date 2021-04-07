@@ -22,6 +22,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;
 
 /**
+ * themeResolver是用来做主题解析使用的，不同的主题其实就是换一套图片、显示效果以及样式等，在springmvc中一套主题对应着一个properties文件，
+ * 存储着跟主题相关的所有资源，例如：theme.properties
+ * 	companyName=mashibing
+ * 	在使用的时候可以用<spring:theme code="companyName"></>那么在显示的时候就会出现mashibing的字符串了
+ * 	默认实现的子类是FixedThemeResolver,获取资源的名称是ThemeResolver的工作，而根据资源名称找到主题就是ThemeSource的作用了
+ *
+ * 	我们可以自己配置ThemeResolver和ThemeSource对象
+ * 	<bean id="themeSource" class="org.springframework.ui.context.support.ResourceBundleThemeSource" p:basenamePrefix="com.mashibing.theme."></bean>
+ *	<bean id="themeResolver" class="org.springframework.web.servlet.theme.CookieThemeResolver" p:defaultThemeName="default"></bean>
+ *
+ *	在进行主题切换的时候，同样也是通过拦截器来实现的
+ *	<mvc:interceptors>
+ *	   <mvc:interceptor>
+ *	       <mvc:mapping path="/*“></mvc:mapping>
+ *	       <bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor" p:paramName="theme"></bean>
+ *	   </mvc:interceptor>
+ *	</mvc:interceptors>
+ *	http://localhost:8080?theme=default
+ *
  * Interface for web-based theme resolution strategies that allows for
  * both theme resolution via the request and theme modification via
  * request and response.

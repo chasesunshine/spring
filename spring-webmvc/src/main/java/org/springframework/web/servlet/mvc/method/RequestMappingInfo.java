@@ -40,6 +40,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.util.UrlPathHelper;
 
 /**
+ *	此类使用7个变量来保存7种类型的RequestCondition对象
+ *
  * Request mapping information. Encapsulates the following request mapping conditions:
  * <ol>
  * <li>{@link PatternsRequestCondition}

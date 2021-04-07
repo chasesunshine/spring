@@ -79,7 +79,7 @@ public class HandlerMappingIntrospector
 	/**
 	 * Constructor that detects the configured {@code HandlerMapping}s in the
 	 * given {@code ApplicationContext} or falls back on
-	 * "DispatcherServlet.properties" like the {@code DispatcherServlet}.
+	 * "DispatcherServlet_test.properties" like the {@code DispatcherServlet}.
 	 * @deprecated as of 4.3.12, in favor of {@link #setApplicationContext}
 	 */
 	@Deprecated
@@ -181,7 +181,7 @@ public class HandlerMappingIntrospector
 
 	private static List<HandlerMapping> initFallback(ApplicationContext applicationContext) {
 		Properties props;
-		String path = "DispatcherServlet.properties";
+		String path = "DispatcherServlet_test.properties";
 		try {
 			Resource resource = new ClassPathResource(path, DispatcherServlet.class);
 			props = PropertiesLoaderUtils.loadProperties(resource);

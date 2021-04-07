@@ -23,6 +23,8 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 将容器所有的bean都拿出来，按一定规则注册到父类的map中
+ * 此实现类也是通过重写initApplicationContext方法来注册handler，内部调用了detectHandlers方法
  * Abstract implementation of the {@link org.springframework.web.servlet.HandlerMapping}
  * interface, detecting URL mappings for handler beans through introspection of all
  * defined beans in the application context.
@@ -63,6 +65,9 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	}
 
 	/**
+	 * 根据配置的detectHandlersInAncestorContexts参数从springmvc容器或者父容器中找到所有bean的beanName，然后使用determineUrlsForHandler方法
+	 * 对每个beanName解析出对应的urls，如果解析结果不为空，则解析出urls和beanName注册到父类的map中，
+	 *
 	 * Register all handlers found in the current ApplicationContext.
 	 * <p>The actual URL determination for a handler is up to the concrete
 	 * {@link #determineUrlsForHandler(String)} implementation. A bean for
@@ -73,14 +78,15 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	protected void detectHandlers() throws BeansException {
 		// 从spring上下文获取所有Object类型的bean名称
 		ApplicationContext applicationContext = obtainApplicationContext();
+		// 获取容器中所有bean的名字
 		String[] beanNames = (this.detectHandlersInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(applicationContext, Object.class) :
 				applicationContext.getBeanNamesForType(Object.class));
 
 		// Take any bean name that we can determine URLs for.
-		// 遍历所有bean，逐个注册
+		// 对每一个beanName解析url，如果能解析到就注册到父类的map中
 		for (String beanName : beanNames) {
-			// 获取bean对应的url
+			// 使用beanName解析url，模板方法，有子类实现
 			String[] urls = determineUrlsForHandler(beanName);
 			// 如果该bean存在对应的url，则添加该处理器
 			if (!ObjectUtils.isEmpty(urls)) {

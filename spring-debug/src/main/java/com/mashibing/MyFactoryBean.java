@@ -7,6 +7,7 @@ public class MyFactoryBean implements FactoryBean<User> {
 
     @Override
     public User getObject() throws Exception {
+        //任何创建对象的操作
         return new User("zhangsan");
     }
 

@@ -26,6 +26,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * SimpleUrlHandlerMapping在内部定义了一个map变量，有两个作用，一个是方便进行配置，第二个是在注册钱可以做预处理工作，确保所有的url都是以/开头
+ * 然后将所有的url和handler的对应关系存储起来，最后注册到父类的map中
+ *
+ * 此对象在进行创建的时候会通过重写的父类的initApplicationContext方法调用registerHandler来完成handler的注册，
+ *
  * Implementation of the {@link org.springframework.web.servlet.HandlerMapping}
  * interface that maps from URLs to request handler beans. Supports both mapping to bean
  * instances and mapping to bean names; the latter is required for non-singleton handlers.
@@ -59,9 +64,9 @@ import org.springframework.util.CollectionUtils;
 public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
 	/**
-	 * 配置的 URL 与处理器的映射
+	 * 配置的URL与处理器的映射
 	 *
-	 * 最终，会调用 registerHandlers(Map) 进行注册到 AbstractUrlHandlerMapping#handlerMap 中
+	 * 最终，会调用registerHandlers(Map)进行注册到AbstractUrlHandlerMapping#handlerMap中
 	 */
 	private final Map<String, Object> urlMap = new LinkedHashMap<>();
 

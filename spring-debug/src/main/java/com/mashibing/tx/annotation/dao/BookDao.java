@@ -23,9 +23,12 @@ public class BookDao {
      * @param userName
      * @param price
      */
-    @Transactional(propagation = Propagation.SUPPORTS)
+//    @Transactional(propagation = Propagation.SUPPORTS)
     public void updateBalance(String userName,int price){
         String sql = "update account set balance=balance-? where username=?";
+//        for (int i = 0; i <2 ; i++) {
+//            int a = 1/i;
+//        }
         jdbcTemplate.update(sql,price,userName);
     }
 
@@ -44,11 +47,12 @@ public class BookDao {
      * 减库存，减去某本书的库存
      * @param id
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.NESTED)
     public void updateStock(int id){
         String sql = "update book_stock set stock=stock-1 where id=?";
         jdbcTemplate.update(sql,id);
 //        for (int i = 1 ;i>=0 ;i--)
 //            System.out.println(10/i);
     }
+
 }

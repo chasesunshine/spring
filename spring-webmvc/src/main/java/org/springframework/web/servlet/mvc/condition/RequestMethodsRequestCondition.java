@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.cors.CorsUtils;
 
 /**
+ * 使用requestMethod做匹配
  * A logical disjunction (' || ') request condition that matches a request
  * against a set of {@link RequestMethod RequestMethods}.
  *

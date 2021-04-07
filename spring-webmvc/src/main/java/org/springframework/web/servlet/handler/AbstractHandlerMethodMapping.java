@@ -54,6 +54,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
+ * 抽象的基础类通过map的映射关系来存储request和handlerMethod之间的关系
  * Abstract base class for {@link HandlerMapping} implementations that define
  * a mapping between a request and a {@link HandlerMethod}.
  *
@@ -67,6 +68,8 @@ import org.springframework.web.servlet.HandlerMapping;
  * @since 3.1
  * @param <T> the mapping for a {@link HandlerMethod} containing the conditions
  * needed to match the handler method to an incoming request.
+ * 此泛型类型用来代表匹配handler的条件专门使用的一种类，这里的条件不只是url，还可以是其他条件，如请求方式，请求参数等都可以作为条件，默认使用的RequestMappingInfo
+ *
  */
 public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMapping implements InitializingBean {
 
@@ -282,14 +285,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #getMappingForMethod
 	 */
 	protected void detectHandlerMethods(Object handler) {
-		// 获得 Bean 对应的 Class 对象
+		// 获取handler的类型
 		Class<?> handlerType = (handler instanceof String ?
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
 		if (handlerType != null) {
-			// 获得真实的 Class 对象，因为 `handlerType` 可能是代理类
+			// 如果是cglib代理的子对象类型，则返回父类型，否则直接返回传入的类型
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
-			// 获得匹配的方法和对应的 Mapping 对象
+			// 保存handler与匹配条件的对应关系，用于给registerHandlerMethod传入匹配条件
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
@@ -304,7 +307,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			if (logger.isTraceEnabled()) {
 				logger.trace(formatMappings(userType, methods));
 			}
-			// 遍历方法，逐个注册 HandlerMethod
+			// 将符合要求的method注册起来，也就是保存到三个map中
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
 				registerHandlerMethod(handler, invocableMethod, mapping);
@@ -385,7 +388,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
-		// 获得请求的路径
+		// 截取用于匹配的url有效路径
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		request.setAttribute(LOOKUP_PATH, lookupPath);
 		// 获得读锁
@@ -583,7 +586,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		private final Map<T, MappingRegistration<T>> registry = new HashMap<>();
 
 		/**
-		 * 注册表2
+		 * 保存RequestCondition和handlerMethod的对应关系
 		 *
 		 * Key：Mapping
 		 * Value：{@link HandlerMethod}
@@ -591,7 +594,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		private final Map<T, HandlerMethod> mappingLookup = new LinkedHashMap<>();
 
 		/**
-		 * 直接 URL 的映射
+		 * 保存url与RequestCondition的对应关系
 		 *
 		 * Key：直接 URL（就是固定死的路径，而非多个）
 		 * Value：Mapping 数组
