@@ -388,15 +388,16 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
-		// 截取用于匹配的url有效路径
+		// 获取访问的路径，一般类似于request.getServletPath()，返回不含contextPath的访问路径
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		request.setAttribute(LOOKUP_PATH, lookupPath);
 		// 获得读锁
 		this.mappingRegistry.acquireReadLock();
 		try {
-			// 获得 HandlerMethod 对象
+			// 获取HandlerMethod作为handler对象，这里涉及到路径匹配的优先级
+			// 优先级: 精确匹配>最长路径匹配>扩展名匹配
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
-			// 进一步，获得一个新的 HandlerMethod 对象
+			// handlerMethod内部包含有bean对象，其实指的是对应的controller
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {
@@ -416,27 +417,28 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Nullable
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
-		//  Match 数组，存储匹配上当前请求的结果（Mapping + HandlerMethod）
+		//  Match数组，存储匹配上当前请求的结果（Mapping + HandlerMethod）
 		List<Match> matches = new ArrayList<>();
-		// 优先，基于直接 URL （就是固定死的路径，而非多个）的 Mapping 们，进行匹配
-		List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
+		// 首先根据lookupPath获取到匹配条件
+  		List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
 		if (directPathMatches != null) {
+			// 将找到的匹配条件添加到matches
 			addMatchingMappings(directPathMatches, matches, request);
 		}
-		// 其次，扫描注册表的 Mapping 们，进行匹配
+		// 如果不能直接使用lookupPath得到匹配条件，则将所有匹配条件加入matches
 		if (matches.isEmpty()) {
 			// No choice but to go through all mappings...
 			addMatchingMappings(this.mappingRegistry.getMappings().keySet(), matches, request);
 		}
 
-		// 如果匹配到，则获取最佳匹配的 Match 结果的 `HandlerMethod`属性
+		// 将包含匹配条件和handler的matches排序，并取第一个作为bestMatch，如果前面两个排序相同则抛出异常
 		if (!matches.isEmpty()) {
 			Match bestMatch = matches.get(0);
 			if (matches.size() > 1) {
-				// 创建 MatchComparator 对象，排序 matches 结果，排序器
+				// 创建MatchComparator对象，排序matches结果，排序器
 				Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
 				matches.sort(comparator);
-				// 获得首个 Match 对象，也就是最匹配的
+				// 获得首个Match对象，也就是最匹配的
 				bestMatch = matches.get(0);
 				if (logger.isTraceEnabled()) {
 					logger.trace(matches.size() + " matching mappings: " + matches);
@@ -444,7 +446,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				if (CorsUtils.isPreFlightRequest(request)) {
 					return PREFLIGHT_AMBIGUOUS_MATCH;
 				}
-				// 比较 bestMatch 和 secondBestMatch ，如果相等，说明有问题，抛出 IllegalStateException 异常
+				// 比较bestMatch和secondBestMatch，如果相等，说明有问题，抛出IllegalStateException异常
 				// 因为，两个优先级一样高，说明无法判断谁更优先
 				Match secondBestMatch = matches.get(1);
 				if (comparator.compare(bestMatch, secondBestMatch) == 0) {
@@ -456,9 +458,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				}
 			}
 			request.setAttribute(BEST_MATCHING_HANDLER_ATTRIBUTE, bestMatch.handlerMethod);
-			// 处理首个 Match 对象
+			// 处理首个Match对象
 			handleMatch(bestMatch.mapping, lookupPath, request);
-			// 返回首个 Match 对象的 handlerMethod 属性
+			// 返回首个Match对象的handlerMethod属性
 			return bestMatch.handlerMethod;
 		}
 		// 如果匹配不到，则处理不匹配的情况
@@ -678,37 +680,37 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			// 获得写锁
 			this.readWriteLock.writeLock().lock();
 			try {
-				// 创建 HandlerMethod 对象
+				// 创建HandlerMethod对象
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
-				// 校验当前 mapping 是否存在对应的 HandlerMethod 对象，如果已存在但不是当前的 handlerMethod 对象则抛出异常
+				// 校验当前mapping是否存在对应的HandlerMethod对象，如果已存在但不是当前的handlerMethod对象则抛出异常
 				validateMethodMapping(handlerMethod, mapping);
-				// 将 mapping 与 handlerMethod 的映射关系保存至 this.mappingLookup
+				// 将mapping与handlerMethod的映射关系保存至this.mappingLookup
 				this.mappingLookup.put(mapping, handlerMethod);
 
-				// 获得 mapping 对应的普通 URL 数组
+				// 获得mapping对应的普通URL数组
 				List<String> directUrls = getDirectUrls(mapping);
-				// 将 url 和 mapping 的映射关系保存至 this.urlLookup
+				// 将url和mapping的映射关系保存至this.urlLookup
 				for (String url : directUrls) {
 					this.urlLookup.add(url, mapping);
 				}
 
-				// 初始化 nameLookup
+				// 初始化nameLookup
 				String name = null;
 				if (getNamingStrategy() != null) {
-					// 获得 Mapping 的名字
+					// 获得Mapping的名字
 					name = getNamingStrategy().getName(handlerMethod, mapping);
-					// 将 mapping 的名字与 HandlerMethod 的映射关系保存至 this.nameLookup
+					// 将mapping的名字与HandlerMethod的映射关系保存至this.nameLookup
 					addMappingName(name, handlerMethod);
 				}
 
-				// 初始化 CorsConfiguration 配置对象
+				// 初始化CorsConfiguration配置对象
 				CorsConfiguration corsConfig = initCorsConfiguration(handler, method, mapping);
 				if (corsConfig != null) {
 					this.corsLookup.put(handlerMethod, corsConfig);
 				}
 
-				// 创建 MappingRegistration 对象
-				// 并与 mapping 映射添加到 registry 注册表中
+				// 创建MappingRegistration对象
+				// 并与mapping映射添加到registry注册表中
 				this.registry.put(mapping, new MappingRegistration<>(mapping, handlerMethod, directUrls, name));
 			}
 			finally {

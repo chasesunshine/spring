@@ -27,6 +27,8 @@ import org.springframework.web.servlet.SmartView;
 import org.springframework.web.servlet.View;
 
 /**
+ * 处理ModelAndView类型的返回值，将返回值中的View和Model设置到mavContainer中
+ *
  * Handles return values of type {@link ModelAndView} copying view and model
  * information to the {@link ModelAndViewContainer}.
  *

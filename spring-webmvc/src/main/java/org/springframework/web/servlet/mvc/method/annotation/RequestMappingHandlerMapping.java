@@ -183,11 +183,17 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	public void afterPropertiesSet() {
 		// 构建 RequestMappingInfo.BuilderConfiguration 对象
 		this.config = new RequestMappingInfo.BuilderConfiguration();
+		// 设置urlPathHelper默认为UrlPathHelper.class
 		this.config.setUrlPathHelper(getUrlPathHelper());
+		// 默认为AntPathMatcher,路径匹配校验器
 		this.config.setPathMatcher(getPathMatcher());
+		// 是否支持后缀补充，默认为true
 		this.config.setSuffixPatternMatch(useSuffixPatternMatch());
+		// 是否添加"/"后缀，默认为true
 		this.config.setTrailingSlashMatch(useTrailingSlashMatch());
+		// 是否采用mediaType匹配模式，比如.json/ .xml模式的匹配，默认为false
 		this.config.setRegisteredSuffixPatternMatch(useRegisteredSuffixPatternMatch());
+		// mediaType处理类
 		this.config.setContentNegotiationManager(getContentNegotiationManager());
 
 		// 调用父类，初始化

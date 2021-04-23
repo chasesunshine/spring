@@ -710,19 +710,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						"' to allow for resolving potential circular references");
 			}
 			// 为避免后期循环依赖，可以在bean初始化完成前将创建实例的ObjectFactory加入工厂
-//			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 
 			//只保留二级缓存，不向三级缓存中存放对象
 //			earlySingletonObjects.put(beanName,bean);
 //			registeredSingletons.add(beanName);
-
-			synchronized (this.singletonObjects) {
-				if (!this.singletonObjects.containsKey(beanName)) {
-					//实例化后的对象先添加到三级缓存中，三级缓存对应beanName的是一个lambda表达式(能够触发创建代理对象的机制)
-					this.singletonFactories.put(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
-					this.registeredSingletons.add(beanName);
-				}
-			}
+//
+//			synchronized (this.singletonObjects) {
+//				if (!this.singletonObjects.containsKey(beanName)) {
+//					//实例化后的对象先添加到三级缓存中，三级缓存对应beanName的是一个lambda表达式(能够触发创建代理对象的机制)
+//					this.singletonFactories.put(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+//					this.registeredSingletons.add(beanName);
+//				}
+//			}
 
 		}
 

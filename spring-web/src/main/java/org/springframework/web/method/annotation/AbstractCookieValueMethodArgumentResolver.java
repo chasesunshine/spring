@@ -26,6 +26,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CookieValue;
 
 /**
+ * 解析注释了@CookieValue的参数的基类
+ *
  * A base abstract class to resolve method arguments annotated with
  * {@code @CookieValue}. Subclasses extract the cookie value from the request.
  *

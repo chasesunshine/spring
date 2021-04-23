@@ -27,6 +27,8 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 解析Model类型参数，直接返回mavContainer中的model
+ *
  * Resolves {@link Model} arguments and handles {@link Model} return values.
  *
  * <p>A {@link Model} return type has a set purpose. Therefore this handler

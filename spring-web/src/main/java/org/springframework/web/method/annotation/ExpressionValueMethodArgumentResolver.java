@@ -27,6 +27,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 解析注释了@Value表达式的参数，主要设置了beanFactory，并用它完成具体解析，解析过程在父类中完成
+ *
  * Resolves method arguments annotated with {@code @Value}.
  *
  * <p>An {@code @Value} does not have a name but gets resolved from the default

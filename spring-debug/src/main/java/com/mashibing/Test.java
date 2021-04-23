@@ -59,11 +59,11 @@ public class Test {
 //        B b = new B();
 
         ApplicationContext context = new ClassPathXmlApplicationContext("test.xml");
-        Teacher bean = context.getBean(Teacher.class);
-        System.out.println(bean.getId());
-        System.out.println(bean.getName());
-        System.out.println(bean.getApplicationContext());
-        System.out.println(bean.getBeanFactory());
+//        Teacher bean = context.getBean(Teacher.class);
+//        System.out.println(bean.getId());
+//        System.out.println(bean.getName());
+//        System.out.println(bean.getApplicationContext());
+//        System.out.println(bean.getBeanFactory());
 
     }
 }

@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.lang.Nullable;
 
 /**
+ * 根据request找到响应的处理器handler和interceptors
+ *
  * Interface to be implemented by objects that define a mapping between
  * requests and handler objects.
  *

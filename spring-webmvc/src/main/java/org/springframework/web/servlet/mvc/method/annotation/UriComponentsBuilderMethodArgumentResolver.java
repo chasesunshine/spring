@@ -30,6 +30,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 
 /**
+ * 解析UriComponentsBuilder类型的参数
+ *
  * Resolvers argument values of type {@link UriComponentsBuilder}.
  *
  * <p>The returned instance is initialized via
@@ -40,12 +42,13 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public class UriComponentsBuilderMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
+	// 判断是否是Model类型
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> type = parameter.getParameterType();
 		return (UriComponentsBuilder.class == type || ServletUriComponentsBuilder.class == type);
 	}
-
+	// 解析具体的参数
 	@Override
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {

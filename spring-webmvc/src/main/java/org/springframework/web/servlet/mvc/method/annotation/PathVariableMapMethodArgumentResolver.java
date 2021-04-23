@@ -33,6 +33,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
+ * 解析注解@PathVariable的Map类型的参数
+ *
  * Resolves {@link Map} method arguments annotated with an @{@link PathVariable}
  * where the annotation does not specify a path variable name. The created
  * {@link Map} contains all URI template name/value pairs.

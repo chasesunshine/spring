@@ -55,6 +55,8 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 解析注解@ModelAttribute参数，如果其中的annotationNotRequired属性为true，还可以解析没有注解的非通用类型的参数
+ *
  * Resolve {@code @ModelAttribute} annotated method arguments and handle
  * return values from {@code @ModelAttribute} annotated methods.
  *

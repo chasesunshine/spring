@@ -30,6 +30,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 用作WebArgumentResolver解析器的适配器
+ *
  * An abstract base class adapting a {@link WebArgumentResolver} to the
  * {@link HandlerMethodArgumentResolver} contract.
  *

@@ -150,6 +150,10 @@ public class HandlerExecutionChain {
 
 
 	/**
+	 *  方法其实很简单，就是拿到拦截器数组，然后循环调用执行preHandle interceptorIndex 这个变量设计的比较巧妙，
+	 *  假设现在有3个拦截器，第3个拦截器的 preHandler返回false，那么interceptorIndex 此时为1，会执行 triggerAfterCompletion 方法
+	 *  第1个开始往前 大于等于0的拦截器对应上面的例子就是第2和3的拦截器的afterCompletion方法会执行
+	 *
 	 * Apply preHandle methods of registered interceptors.
 	 * @return {@code true} if the execution chain should proceed with the
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
@@ -177,6 +181,7 @@ public class HandlerExecutionChain {
 	}
 
 	/**
+	 * 	 从这里就可以看到 是倒序遍历拦截器数组 所以 postHandle的执行顺序刚好和定义的顺序相反，
 	 * Apply postHandle methods of registered interceptors.
 	 */
 	void applyPostHandle(HttpServletRequest request, HttpServletResponse response, @Nullable ModelAndView mv)

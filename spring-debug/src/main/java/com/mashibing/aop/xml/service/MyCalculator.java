@@ -26,4 +26,9 @@ public class MyCalculator /*implements Calculator */{
         System.out.println("show .....");
         return i;
     }
+
+    @Override
+    public String toString() {
+        return "super.toString()";
+    }
 }

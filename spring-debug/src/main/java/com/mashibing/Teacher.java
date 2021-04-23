@@ -5,7 +5,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class Teacher implements ApplicationContextAware, BeanFactoryAware {
+public class Teacher{
     private int id;
     private String name;
 
@@ -32,7 +32,8 @@ public class Teacher implements ApplicationContextAware, BeanFactoryAware {
         return applicationContext;
     }
 
-    // set方法谁来进行调用，人为调用？交给spring来调用即可
+    // 此处的set方法谁来进行调用？对象的创建都交给sping来管理了，那么方法的调用也应该交给spring容器
+    // 给出某一个公共的方法来完成这些set方法的调用即可
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

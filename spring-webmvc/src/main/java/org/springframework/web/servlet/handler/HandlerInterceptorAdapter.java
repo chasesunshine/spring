@@ -59,6 +59,8 @@ public abstract class HandlerInterceptorAdapter implements AsyncHandlerIntercept
 	}
 
 	/**
+	 *  方法在Controller方法异步执行时开始执行，而Interceptor的postHandle方法需要等到Controller的异步执行完之后才能执行
+	 *
 	 * This implementation is empty.
 	 */
 	@Override

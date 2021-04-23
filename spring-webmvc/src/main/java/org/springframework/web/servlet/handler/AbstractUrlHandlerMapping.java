@@ -188,8 +188,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	@Nullable
 	protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 		// Direct match?
-		// 直接匹配情况的处理
-		// 情况一，从handlerMap中，直接匹配处理器
+		// 直接根据url进行查找handler
 		Object handler = this.handlerMap.get(urlPath);
 		if (handler != null) {
 			// Bean name or resolved handler?
@@ -205,7 +204,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 		}
 
 		// Pattern match?
-		// 通配符匹配的处理
+		// 通过表达式进行匹配具体通过antPathMatcher实现
 		List<String> matchingPatterns = new ArrayList<>();
 		// 情况二，Pattern匹配合适的，并添加到 matchingPatterns 中
 		for (String registeredPattern : this.handlerMap.keySet()) {
@@ -357,7 +356,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	}
 
 	/**
-	 * 注册多个url到一个处理器
+	 * 注册url和bean的map，注册多个string的url到一个处理器中
 	 *
 	 * Register the specified handler for the given URL paths.
 	 * @param urlPaths the URLs that the bean should be mapped to
@@ -367,13 +366,14 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	 */
 	protected void registerHandler(String[] urlPaths, String beanName) throws BeansException, IllegalStateException {
 		Assert.notNull(urlPaths, "URL path array must not be null");
+		// 调用另外一个重载方法完成注册
 		for (String urlPath : urlPaths) {
 			registerHandler(urlPath, beanName);
 		}
 	}
 
 	/**
-	 * 将handler注册到map上
+	 * 注册url和bean的map，将具体的handler注入到url对应的map中
 	 *
 	 * Register the specified handler for the given URL path.
 	 * @param urlPath the URL the bean should be mapped to
@@ -397,7 +397,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 			}
 		}
 
-		// 获得urlPath对应的处理器
+		// 是否已经存在对应的handler
 		Object mappedHandler = this.handlerMap.get(urlPath);
 		// 检验mappedHandler是否已存在，如果已存在，并且不是当前resolvedHandler对象，则抛出异常
 		if (mappedHandler != null) {
@@ -413,6 +413,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 				if (logger.isTraceEnabled()) {
 					logger.trace("Root mapping to " + getHandlerDescription(handler));
 				}
+				// "/"设置为rootHandler
 				setRootHandler(resolvedHandler);
 			}
 			// 如果是/*路径，则设置为默认处理器
@@ -420,10 +421,11 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 				if (logger.isTraceEnabled()) {
 					logger.trace("Default mapping to " + getHandlerDescription(handler));
 				}
+				// 对"/*"的匹配设置默认的handler
 				setDefaultHandler(resolvedHandler);
 			}
-			// 添加到handlerMap中
 			else {
+				// 其余的路径绑定关系则存入handlerMap中
 				this.handlerMap.put(urlPath, resolvedHandler);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Mapped [" + urlPath + "] onto " + getHandlerDescription(handler));

@@ -28,6 +28,8 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 解析Map类型参数，包括ModelMap类型，直接返回mavContainer中的model
+ *
  * Resolves {@link Map} method arguments and handles {@link Map} return values.
  *
  * <p>A Map return value can be interpreted in more than one ways depending

@@ -26,6 +26,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 解析SessionStatus类型的参数，直接返回mavContainer中的SessionStatus
+ *
  * Resolves a {@link SessionStatus} argument by obtaining it from
  * the {@link ModelAndViewContainer}.
  *

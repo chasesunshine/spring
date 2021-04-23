@@ -38,6 +38,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
+ * 解析注解@MatrixVariable的Map类型参数
+ *
  * Resolves arguments of type {@link Map} annotated with {@link MatrixVariable @MatrixVariable}
  * where the annotation does not specify a name. In other words the purpose of this resolver
  * is to provide access to multiple matrix variables, either all or associated with a specific

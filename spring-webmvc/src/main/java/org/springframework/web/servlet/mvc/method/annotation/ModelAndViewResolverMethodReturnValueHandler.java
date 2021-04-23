@@ -31,6 +31,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.annotation.ModelAndViewResolver;
 
 /**
+ * 可以处理所有返回值，一般设置在最后一个，当别的处理器都不能处理时使用它处理。它内部封装了一个List类型的ModelAndViewResolver和一个annotationNotRequired为true的
+ * ModelAttributeMethodProcessor,ModelAndViewResolver是一个将返回值解析为ModelAndView类型的通用接口，可以自定义后配置到RequestMappingHandlerAdapter中，
+ * 处理返回值时先遍历所有的ModelAndViewResolver进行处理，如果有可以处理的，则用它处理并将结果返回，如果都无法处理则调用ModelAttributeMethodProcessor进行处理
+ *
  * This return value handler is intended to be ordered after all others as it
  * attempts to handle _any_ return value type (i.e. returns {@code true} for
  * all return types).

@@ -63,6 +63,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
+ * 处理返回值需要使用HttpMessageConverter写入response的基类，自己并未具体做处理，而是定义了相关工具
+ *
  * Extends {@link AbstractMessageConverterMethodArgumentResolver} with the ability to handle method
  * return values by writing to the response with {@link HttpMessageConverter HttpMessageConverters}.
  *

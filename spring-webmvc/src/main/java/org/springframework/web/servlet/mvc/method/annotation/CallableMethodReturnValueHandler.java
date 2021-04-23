@@ -26,6 +26,8 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 处理Callable类型的返回值，用于异步请求，使用WebAsyncManager完成
+ *
  * Handles return values of type {@link Callable}.
  *
  * @author Rossen Stoyanchev

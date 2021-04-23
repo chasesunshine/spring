@@ -28,6 +28,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 此实现类不具体解析参数，而是可以将多个别的解析器包含在其中，解析时调用其所包含的解析器具体解析参数
+ *
  * Resolves method parameters by delegating to a list of registered
  * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
  * Previously resolved method parameters are cached for faster lookups.

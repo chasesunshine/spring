@@ -25,6 +25,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.RequestToViewNameTranslator;
 
 /**
+ * 处理void和String类型返回值，如果返回值为空则直接返回，否则将返回值同mavContainer的setViewName方法设置到期View中，并判断返回值是不是redirect类型，
+ * 如果是则设置MavContainer的redirectModelScenario为true
+ *
  * Handles return values of types {@code void} and {@code String} interpreting them
  * as view name reference. As of 4.2, it also handles general {@code CharSequence}
  * types, e.g. {@code StringBuilder} or Groovy's {@code GString}, as view names.

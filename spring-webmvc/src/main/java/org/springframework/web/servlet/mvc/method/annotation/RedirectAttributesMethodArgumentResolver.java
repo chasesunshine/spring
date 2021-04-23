@@ -32,6 +32,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 /**
+ * 解析RedirectAttributes类型的参数，新建RedirectAttributesModelMap类型的RedirectAttributes并设置到mavContainer中，然后返回给我们的参数
+ *
  * Resolves method arguments of type {@link RedirectAttributes}.
  *
  * <p>This resolver must be listed ahead of

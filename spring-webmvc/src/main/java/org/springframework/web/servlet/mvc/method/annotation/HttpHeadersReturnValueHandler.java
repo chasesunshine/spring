@@ -28,6 +28,8 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 处理HttpHeaders类型的返回值，将HttpHeaders的返回值添加到response的Headers并设置mavContainer的requestHandled为true
+ *
  * Handles {@link HttpHeaders} return values.
  *
  * @author Stephane Nicoll

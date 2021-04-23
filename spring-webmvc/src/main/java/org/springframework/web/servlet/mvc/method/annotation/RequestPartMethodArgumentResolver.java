@@ -42,6 +42,8 @@ import org.springframework.web.multipart.support.MultipartResolutionDelegate;
 import org.springframework.web.multipart.support.RequestPartServletServerHttpRequest;
 
 /**
+ * 解析注解@RequestPart、MultipartFile类型以及javax.servlet.http.part类型的参数
+ *
  * Resolves the following method arguments:
  * <ul>
  * <li>Annotated with @{@link RequestPart}
