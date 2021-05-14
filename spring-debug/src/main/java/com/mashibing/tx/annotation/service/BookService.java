@@ -23,7 +23,7 @@ public class BookService {
      * @param username
      * @param id
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+//    @Transactional(propagation = Propagation.REQUIRED)
     public void checkout(String username,int id){
 
         bookDao.updateStock(id);
@@ -31,8 +31,8 @@ public class BookService {
         bookDao.updateBalance(username,price);
 //        try{
 
-        for (int i = 1 ;i>=0 ;i--)
-            System.out.println(10/i);
+//        for (int i = 1 ;i>=0 ;i--)
+//            System.out.println(10/i);
 //        }catch (Exception e){
 //            System.out.println("...............");
 //        }

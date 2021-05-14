@@ -142,14 +142,17 @@ public final class ModelFactory {
 				continue;
 			}
 
-			// 执行@ModelAttribute注释的方法
+			// container不包含参数名，执行方法
 			Object returnValue = modelMethod.invokeForRequest(request, container);
+			// 判断返回值是否是void类型，如果是void类型，方法自己将参数设置到model中，不处理
+			// 如果不是void，使用getNameForReturnValue获取参数名，
 			if (!modelMethod.isVoid()){
 				// 使用getNameForReturnValue获取参数名
 				String returnValueName = getNameForReturnValue(returnValue, modelMethod.getReturnType());
 				if (!ann.binding()) {
 					container.setBindingDisabled(returnValueName);
 				}
+				// 如果不存在container，添加进去
 				if (!container.containsAttribute(returnValueName)) {
 					container.addAttribute(returnValueName, returnValue);
 				}
@@ -170,15 +173,22 @@ public final class ModelFactory {
 	}
 
 	/**
+	 * 获取同时有@ModelAttribute注解又有@SessionAttributes注解中的参数
+	 *
 	 * Find {@code @ModelAttribute} arguments also listed as {@code @SessionAttributes}.
 	 */
 	private List<String> findSessionAttributeArguments(HandlerMethod handlerMethod) {
 		List<String> result = new ArrayList<>();
+		// 遍历方法中的参数
 		for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
+			// 如果有@modelAttribute注解
 			if (parameter.hasParameterAnnotation(ModelAttribute.class)) {
+				// 获取参数名和参数类型
 				String name = getNameForParameter(parameter);
 				Class<?> paramType = parameter.getParameterType();
+				// 根据获取到的参数名和参数类型检查参数是否在@sessionAttributes注解中
 				if (this.sessionAttributesHandler.isHandlerSessionAttribute(name, paramType)) {
+					// 如果在@SessionAttributes注解中,即为符合要求的参数,将参数名放入集合
 					result.add(name);
 				}
 			}
@@ -194,11 +204,13 @@ public final class ModelFactory {
 	 * @throws Exception if creating BindingResult attributes fails
 	 */
 	public void updateModel(NativeWebRequest request, ModelAndViewContainer container) throws Exception {
+		// 获取defaultModel
 		ModelMap defaultModel = container.getDefaultModel();
 		// 对SessionAttributes进行设置，如果处理器里调用了setComplete则将SessionAttribute清空，否则将defaultModel中的参数设置到SessionAttributes中
 		if (container.getSessionStatus().isComplete()){
 			this.sessionAttributesHandler.cleanupAttributes(request);
 		}
+		// 将mavContainer的defaultModel中的参数设置到SessionAttributes
 		else {
 			this.sessionAttributesHandler.storeAttributes(request, defaultModel);
 		}
@@ -222,8 +234,11 @@ public final class ModelFactory {
 			// 检查Model中是否已经存在，如果已经存在就不添加了
 			if (value != null && isBindingCandidate(name, value)) {
 				String bindingResultKey = BindingResult.MODEL_KEY_PREFIX + name;
+				// 如果model中不存在bindingResult
 				if (!model.containsAttribute(bindingResultKey)) {
+					// 通过dataBinderFactory创建webDataBinder
 					WebDataBinder dataBinder = this.dataBinderFactory.createBinder(request, value, name);
+					// 添加到model
 					model.put(bindingResultKey, dataBinder.getBindingResult());
 				}
 			}
@@ -279,7 +294,8 @@ public final class ModelFactory {
 	 * @return the derived name (never {@code null} or empty String)
 	 */
 	public static String getNameForReturnValue(@Nullable Object returnValue, MethodParameter returnType) {
-		// 获取返回值的@ModelAttribute注解
+		// 获取返回值的@ModelAttribute注解，也就是方法的@ModelAttribute注解，如果设置了value则直接将其作为参数名返回，
+		// 否则使用Convertions的静态方法getVariableNameForReturnType根据方法、返回值类型和返回值获取参数名
 		ModelAttribute ann = returnType.getMethodAnnotation(ModelAttribute.class);
 		// 如果设置了value则直接将其作为参数名返回
 		if (ann != null && StringUtils.hasText(ann.value())) {

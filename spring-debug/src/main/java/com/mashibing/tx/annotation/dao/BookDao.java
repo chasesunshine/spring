@@ -47,12 +47,15 @@ public class BookDao {
      * 减库存，减去某本书的库存
      * @param id
      */
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void updateStock(int id){
         String sql = "update book_stock set stock=stock-1 where id=?";
         jdbcTemplate.update(sql,id);
-//        for (int i = 1 ;i>=0 ;i--)
-//            System.out.println(10/i);
+        for (int i = 1 ;i>=0 ;i--)
+            System.out.println(10/i);
     }
 
+    public void test(){
+        updateStock(1);
+    }
 }

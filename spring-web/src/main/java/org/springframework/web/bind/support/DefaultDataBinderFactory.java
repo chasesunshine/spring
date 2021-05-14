@@ -54,9 +54,11 @@ public class DefaultDataBinderFactory implements WebDataBinderFactory {
 			NativeWebRequest webRequest, @Nullable Object target, String objectName) throws Exception {
 
 		WebDataBinder dataBinder = createBinderInstance(target, objectName, webRequest);
+		// WebBindingInitializer 在此处完成解析，全局生效
 		if (this.initializer != null) {
 			this.initializer.initBinder(dataBinder, webRequest);
 		}
+		// 执行所有的数据绑定器的初始化方法，为当前参数的数据绑定器进行初始化
 		initBinder(dataBinder, webRequest);
 		return dataBinder;
 	}

@@ -34,4 +34,14 @@ public class ModelAttributeController {
         System.out.println("modelAttribute:"+user);
         o3 = user;
     }
+
+    @ModelAttribute("className")
+    public String setModel(){
+        return this.getClass().getName();
+    }
+
+    @ModelAttribute
+    public String setModel2(){
+        return "mashibing";
+    }
 }

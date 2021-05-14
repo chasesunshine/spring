@@ -169,6 +169,7 @@ public final class Conventions {
 	public static String getVariableNameForReturnType(Method method, Class<?> resolvedType, @Nullable Object value) {
 		Assert.notNull(method, "Method must not be null");
 
+		// 如果返回值类型是Object类型，返回实际类型
 		if (Object.class == resolvedType) {
 			if (value == null) {
 				throw new IllegalArgumentException(
@@ -181,6 +182,7 @@ public final class Conventions {
 		boolean pluralize = false;
 		String reactiveSuffix = "";
 
+		// 如果返回值是数组或Collection会使用内部实际包装的类型，并在最后添加：List
 		if (resolvedType.isArray()) {
 			valueClass = resolvedType.getComponentType();
 			pluralize = true;

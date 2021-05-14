@@ -29,6 +29,8 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.bind.support.SimpleSessionStatus;
 
 /**
+ * 在控制器的调用过程中， 记录视图和model信息
+ *
  * Records model and view related decisions made by
  * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers} and
  * {@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers} during the course of invocation of

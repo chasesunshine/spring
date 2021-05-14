@@ -41,11 +41,13 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 public class ModelMethodProcessor implements HandlerMethodArgumentResolver, HandlerMethodReturnValueHandler {
 
+	// 支持解析Model类型的参数
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return Model.class.isAssignableFrom(parameter.getParameterType());
 	}
 
+	// 直接返回mavContainer中的model
 	@Override
 	@Nullable
 	public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
@@ -55,11 +57,13 @@ public class ModelMethodProcessor implements HandlerMethodArgumentResolver, Hand
 		return mavContainer.getModel();
 	}
 
+	// 支持解析Model类型的返回值
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
 		return Model.class.isAssignableFrom(returnType.getParameterType());
 	}
 
+	// 返回值不为null，且是model类型，将返回值加入到model，否则抛出异常
 	@Override
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
