@@ -1,7 +1,11 @@
 package com.mashibing.bean;
 
-public class User {
+import java.io.Serializable;
 
+public class User implements Serializable {
+
+
+    private static final long serialVersionUID = 2427258281767093876L;
     private String username;
     private int age;
 

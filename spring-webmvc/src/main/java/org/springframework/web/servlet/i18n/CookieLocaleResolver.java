@@ -35,6 +35,8 @@ import org.springframework.web.util.CookieGenerator;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 将Locale保存到cookie中，可以修改
+ *
  * {@link LocaleResolver} implementation that uses a cookie sent back to the user
  * in case of a custom setting, with a fallback to the specified default locale
  * or the request's accept-header locale.

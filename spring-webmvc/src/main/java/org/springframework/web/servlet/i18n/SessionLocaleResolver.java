@@ -28,6 +28,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 将Locale保存在session中，可以修改
+ *
  * {@link org.springframework.web.servlet.LocaleResolver} implementation that
  * uses a locale attribute in the user's session in case of a custom setting,
  * with a fallback to the specified default locale or the request's

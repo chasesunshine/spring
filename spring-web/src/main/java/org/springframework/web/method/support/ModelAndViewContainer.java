@@ -58,7 +58,7 @@ public class ModelAndViewContainer {
 	@Nullable
 	private Object view;
 
-	// 默认使用的model对象
+	// 默认使用的model对象,使用的情况最多
 	private final ModelMap defaultModel = new BindingAwareModelMap();
 
 	// redirect类型的model

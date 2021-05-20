@@ -24,6 +24,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 将主题保存到Session中，可以修改
+ *
  * {@link org.springframework.web.servlet.ThemeResolver} implementation that
  * uses a theme attribute in the user's session in case of a custom setting,
  * with a fallback to the default theme. This is most appropriate if the

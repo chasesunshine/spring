@@ -213,17 +213,22 @@ public abstract class AbstractFlashMapManager implements FlashMapManager {
 			return;
 		}
 
+		// 首先对flashMap中的转发地址和参数进行编码，这里的request主要用来获取当前编码方式
 		String path = decodeAndNormalizePath(flashMap.getTargetRequestPath(), request);
 		flashMap.setTargetRequestPath(path);
 
+		// 设置有效期
 		flashMap.startExpirationPeriod(getFlashMapTimeout());
 
+		// 用于获取互斥变量，是模板方法，如果子类返回值不为null则同步执行，否则不需要同步
 		Object mutex = getFlashMapsMutex(request);
 		if (mutex != null) {
 			synchronized (mutex) {
+				// 获取保存的List<FlashMap>,如果没有获取到则新建一个，然后添加现有的flashmap
 				List<FlashMap> allFlashMaps = retrieveFlashMaps(request);
 				allFlashMaps = (allFlashMaps != null ? allFlashMaps : new CopyOnWriteArrayList<>());
 				allFlashMaps.add(flashMap);
+				// 将添加完的List<FlashMap>更新到存储介质中，是模板方法，由子类实现
 				updateFlashMaps(allFlashMaps, request, response);
 			}
 		}

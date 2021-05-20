@@ -25,6 +25,8 @@ import org.springframework.context.i18n.LocaleContext;
 import org.springframework.lang.Nullable;
 
 /**
+ * LocaleResolver的子接口，增加了获取和设置LocaleContext的能力
+ *
  * Extension of {@link LocaleResolver}, adding support for a rich locale context
  * (potentially including locale and time zone information).
  *

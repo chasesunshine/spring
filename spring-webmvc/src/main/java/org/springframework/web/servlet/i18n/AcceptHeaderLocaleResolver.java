@@ -29,6 +29,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 
 /**
+ * 直接使用Header里的accept language值，不可以在程序中修改
+ *
  * {@link LocaleResolver} implementation that simply uses the primary locale
  * specified in the "accept-language" header of the HTTP request (that is,
  * the locale sent by the client browser, normally that of the client's OS).

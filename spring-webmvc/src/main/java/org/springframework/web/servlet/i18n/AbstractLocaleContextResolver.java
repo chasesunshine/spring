@@ -27,6 +27,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.LocaleContextResolver;
 
 /**
+ * 此抽象类中增加了对时区的支持
+ *
  * Abstract base class for {@link LocaleContextResolver} implementations.
  * Provides support for a default locale and a default time zone.
  *
