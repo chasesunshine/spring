@@ -60,8 +60,10 @@ public class ExceptionHandlerMethodResolver {
 	 * @param handlerType the type to introspect
 	 */
 	public ExceptionHandlerMethodResolver(Class<?> handlerType) {
+		// 从class及父类集合中找出带有@ExceptionHandler注解的所有方法
 		for (Method method : MethodIntrospector.selectMethods(handlerType, EXCEPTION_HANDLER_METHODS)) {
 			for (Class<? extends Throwable> exceptionType : detectExceptionMappings(method)) {
+				// 以异常Throwable为key，Method为value丢入到map缓存中
 				addExceptionMapping(exceptionType, method);
 			}
 		}
@@ -75,8 +77,10 @@ public class ExceptionHandlerMethodResolver {
 	@SuppressWarnings("unchecked")
 	private List<Class<? extends Throwable>> detectExceptionMappings(Method method) {
 		List<Class<? extends Throwable>> result = new ArrayList<>();
+		// 找出方法的@ExceptionHandler注解，将注解中的value数组属性加入到result中
 		detectAnnotationExceptionMappings(method, result);
 		if (result.isEmpty()) {
+			// 如果注解中的value属性没有指定，那么获取方法参数中的异常
 			for (Class<?> paramType : method.getParameterTypes()) {
 				if (Throwable.class.isAssignableFrom(paramType)) {
 					result.add((Class<? extends Throwable>) paramType);

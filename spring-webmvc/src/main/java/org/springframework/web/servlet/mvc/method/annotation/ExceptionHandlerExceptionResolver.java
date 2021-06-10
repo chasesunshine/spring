@@ -115,9 +115,11 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 	@Nullable
 	private ApplicationContext applicationContext;
 
+	// 缓存，key一般存储Controller，value是ExceptionHandlerMethodResolver
 	private final Map<Class<?>, ExceptionHandlerMethodResolver> exceptionHandlerCache =
 			new ConcurrentHashMap<>(64);
 
+	// 缓存，key存储ControllerAdviceBean，value是ExceptionHandlerMethodResolver类
 	private final Map<ControllerAdviceBean, ExceptionHandlerMethodResolver> exceptionHandlerAdviceCache =
 			new LinkedHashMap<>();
 
@@ -405,13 +407,13 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 	protected ModelAndView doResolveHandlerMethodException(HttpServletRequest request,
 			HttpServletResponse response, @Nullable HandlerMethod handlerMethod, Exception exception) {
 
-		// 获得异常对应的 ServletInvocableHandlerMethod 对象
+		// 获得异常对应的 ServletInvocableHandlerMethod 对象，handlerMethod是处理异常的方法
 		ServletInvocableHandlerMethod exceptionHandlerMethod = getExceptionHandlerMethod(handlerMethod, exception);
 		if (exceptionHandlerMethod == null) {
 			return null;
 		}
 
-		// 设置 ServletInvocableHandlerMethod 对象的相关属性
+		// 设置 ServletInvocableHandlerMethod 对象的相关属性，主要是为了处理HandlerMethod中方法的参数以及handlerMethod的返回值
 		if (this.argumentResolvers != null) {
 			exceptionHandlerMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
 		}
@@ -428,7 +430,8 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			if (logger.isDebugEnabled()) {
 				logger.debug("Using @ExceptionHandler " + exceptionHandlerMethod);
 			}
-			// 执行处理该异常的方法 ServletInvocableHandlerMethod 的调用
+			// 执行处理该异常的方法 ServletInvocableHandlerMethod 的调用，主要是对参数和返回值及进行处理，通过ModelAndViewContainer作为中间变量
+			// 将一些视图名、参数放到ModelAndViewContainer中
 			Throwable cause = exception.getCause();
 			if (cause != null) {
 				// Expose cause as provided argument as well

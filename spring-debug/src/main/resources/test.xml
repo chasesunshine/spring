@@ -39,5 +39,5 @@
         <property name="id" value="1"></property>
         <property name="name" value="zhangsan"></property>
     </bean>
-    <bean class="com.mashibing.MyBeanFactoryPostProcessor512"></bean>
+    <bean class="com.mashibing.MyBFPP"></bean>
 </beans>

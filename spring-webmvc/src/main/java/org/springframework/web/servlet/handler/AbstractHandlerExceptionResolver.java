@@ -53,7 +53,7 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 	// 优先级，默认最低
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
-	// 匹配的处理器对象的集合
+	// 匹配的处理器对象的集合,不在此集合内的handler不会处理
 	@Nullable
 	private Set<?> mappedHandlers;
 
@@ -64,7 +64,7 @@ public abstract class AbstractHandlerExceptionResolver implements HandlerExcepti
 	@Nullable
 	private Log warnLogger;
 
-	// 防止响应缓存
+	// 阻止响应数据缓存（响应http头部加入不缓存的头部）默认不阻止
 	private boolean preventResponseCaching = false;
 
 
