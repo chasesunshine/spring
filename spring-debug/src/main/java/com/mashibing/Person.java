@@ -1,57 +1,23 @@
 package com.mashibing;
 
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.Ordered;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
+public class Person implements BeanFactoryAware, ApplicationContextAware {
 
-@Component
-public class Person implements BeanClassLoaderAware, Ordered, InitializingBean {
-
-    private ClassLoader classLoader;
-    private Integer id;
+    private int id;
     private String name;
 
-    public Person() {
-        System.out.println("构造方法");
-    }
+    private ApplicationContext applicationContext;
+    private BeanFactory beanFactory;
 
-//    @Autowired(required = false)
-    public Person(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    @PostConstruct
-    public void init(){
-        System.out.println("init ......");
-    }
-
-    @PreDestroy
-    public void destroy(){
-        System.out.println("destroy");
-    }
-
-    public Person(String name,Integer id) {
-        this.id = id;
-        this.name = name;
-    }
-
-//    @Autowired
-    public Person(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -63,30 +29,21 @@ public class Person implements BeanClassLoaderAware, Ordered, InitializingBean {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+    // 这个set方法有谁来进行调用，是用户还是spring？一定不能是用户，
+    // 我应该什么时候去调用这个方法，怎么调用这个方法？给定好一个约束，在统一的地方对这些set方法来进行调用
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
-    public ClassLoader getClassLoader() {
-        return classLoader;
+    public BeanFactory getBeanFactory() {
+        return beanFactory;
     }
 
-    @Override
-    public int getOrder() {
-        return 0;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
+    public void setBeanFactory(BeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 }

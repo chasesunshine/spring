@@ -912,7 +912,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			asyncManager.setAsyncWebRequest(asyncWebRequest);
 			asyncManager.registerCallableInterceptors(this.callableInterceptors);
 			asyncManager.registerDeferredResultInterceptors(this.deferredResultInterceptors);
-
+			// 如果当前异步请求已经处理并得到结果，则将返回的结果放到mavContainer对象中，然后将invocable对象进行包装转换，转成需要的执行对象然后开始执行
 			if (asyncManager.hasConcurrentResult()) {
 				Object result = asyncManager.getConcurrentResult();
 				mavContainer = (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];
@@ -921,6 +921,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 					String formatted = LogFormatUtils.formatValue(result, !traceOn);
 					return "Resume with async result [" + formatted + "]";
 				});
+				// 转换具体的invocable执行对象
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
 

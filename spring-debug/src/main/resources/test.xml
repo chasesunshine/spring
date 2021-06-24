@@ -35,9 +35,10 @@
 <!--            </aop:aspect>-->
 <!--        </aop:config>-->
 
-    <bean class="com.mashibing.Student" id="student">
+    <bean id="person" class="com.mashibing.Person" >
         <property name="id" value="1"></property>
         <property name="name" value="zhangsan"></property>
     </bean>
-    <bean class="com.mashibing.MyBFPP"></bean>
+<!--    <bean class="com.mashibing.MyBFPP"></bean>-->
+    <bean class="com.mashibing.MyBeanFactoryPostProcessor21"></bean>
 </beans>

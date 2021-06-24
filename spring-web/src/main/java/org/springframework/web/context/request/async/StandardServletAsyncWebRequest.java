@@ -46,6 +46,7 @@ public class StandardServletAsyncWebRequest extends ServletWebRequest implements
 
 	private Long timeout;
 
+	// 跟之前的servlet中的对象一样
 	private AsyncContext asyncContext;
 
 	private AtomicBoolean asyncCompleted = new AtomicBoolean(false);
@@ -119,7 +120,9 @@ public class StandardServletAsyncWebRequest extends ServletWebRequest implements
 		if (isAsyncStarted()) {
 			return;
 		}
+		// 创建AsyncContext对象
 		this.asyncContext = getRequest().startAsync(getRequest(), getResponse());
+		// 因为对象本身实现了AsyncListener接口，所以将自己添加为一个监听器对象
 		this.asyncContext.addListener(this);
 		if (this.timeout != null) {
 			this.asyncContext.setTimeout(this.timeout);
@@ -148,11 +151,13 @@ public class StandardServletAsyncWebRequest extends ServletWebRequest implements
 
 	@Override
 	public void onTimeout(AsyncEvent event) throws IOException {
+		// 调用timeoutHandlers中的逻辑进行操作
 		this.timeoutHandlers.forEach(Runnable::run);
 	}
 
 	@Override
 	public void onComplete(AsyncEvent event) throws IOException {
+		// 调用completionHandlers中的逻辑进行操作
 		this.completionHandlers.forEach(Runnable::run);
 		this.asyncContext = null;
 		this.asyncCompleted.set(true);

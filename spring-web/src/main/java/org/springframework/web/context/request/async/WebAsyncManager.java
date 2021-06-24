@@ -68,17 +68,20 @@ public final class WebAsyncManager {
 
 	private static final Log logger = LogFactory.getLog(WebAsyncManager.class);
 
+	// CallableProcessingInterceptor类型，专门用来处理Callable和WebAsyncTask类型超时的拦截器
 	private static final CallableProcessingInterceptor timeoutCallableInterceptor =
 			new TimeoutCallableProcessingInterceptor();
 
+	// DeferredResultProcessingInterceptor类型，专门用于处理DeferredResult类型超时的拦截器
 	private static final DeferredResultProcessingInterceptor timeoutDeferredResultInterceptor =
 			new TimeoutDeferredResultProcessingInterceptor();
 
 	private static Boolean taskExecutorWarning = true;
 
-
+	// 为了支持异步处理而封装的request
 	private AsyncWebRequest asyncWebRequest;
 
+	// 用于执行Callable和WebAsyncTask类型处理，如果WebAsyncTask没有定义executor则使用WebAsyncManager中的taskExecutor
 	private AsyncTaskExecutor taskExecutor = DEFAULT_TASK_EXECUTOR;
 
 	private volatile Object concurrentResult = RESULT_NONE;
@@ -92,8 +95,10 @@ public final class WebAsyncManager {
 	 */
 	private volatile boolean errorHandlingInProgress;
 
+	// 用于所有Callable和WebAsyncTask类型的拦截器
 	private final Map<Object, CallableProcessingInterceptor> callableInterceptors = new LinkedHashMap<>();
 
+	// 用于所有DeferredResult类型超时的拦截器
 	private final Map<Object, DeferredResultProcessingInterceptor> deferredResultInterceptors = new LinkedHashMap<>();
 
 
@@ -249,6 +254,8 @@ public final class WebAsyncManager {
 	}
 
 	/**
+	 * 用于处理Callable类型的异步请求
+	 *
 	 * Start concurrent request processing and execute the given task with an
 	 * {@link #setTaskExecutor(AsyncTaskExecutor) AsyncTaskExecutor}. The result
 	 * from the task execution is saved and the request dispatched in order to
@@ -268,6 +275,10 @@ public final class WebAsyncManager {
 	}
 
 	/**
+	 * 处理WebAsyncTask类型的异步请求
+	 *
+	 * 所有的启动方法都做了以下几件事，1、启动异步处理，2、给request设置相应属性，3、调用对应的拦截器
+	 *
 	 * Use the given {@link WebAsyncTask} to configure the task executor as well as
 	 * the timeout value of the {@code AsyncWebRequest} before delegating to
 	 * {@link #startCallableProcessing(Callable, Object...)}.
@@ -282,11 +293,13 @@ public final class WebAsyncManager {
 		Assert.notNull(webAsyncTask, "WebAsyncTask must not be null");
 		Assert.state(this.asyncWebRequest != null, "AsyncWebRequest must not be null");
 
+		// 如果webAsyncTask设置了超时时间，则将其设置到request
 		Long timeout = webAsyncTask.getTimeout();
 		if (timeout != null) {
 			this.asyncWebRequest.setTimeout(timeout);
 		}
 
+		// 如果webAsyncTask中定义了executor则设置到taskExecutor中
 		AsyncTaskExecutor executor = webAsyncTask.getExecutor();
 		if (executor != null) {
 			this.taskExecutor = executor;
@@ -295,14 +308,17 @@ public final class WebAsyncManager {
 			logExecutorWarning();
 		}
 
+		// 创建并初始化拦截器临时变量，包括三部分，1、webAsyncTask中包含的拦截器，2、所有CallableInterceptors属性包含的拦截器，3、超时拦截器
 		List<CallableProcessingInterceptor> interceptors = new ArrayList<>();
 		interceptors.add(webAsyncTask.getInterceptor());
 		interceptors.addAll(this.callableInterceptors.values());
 		interceptors.add(timeoutCallableInterceptor);
 
+		// 从webAsyncTask中取出真正执行请求的Callable任务
 		final Callable<?> callable = webAsyncTask.getCallable();
 		final CallableInterceptorChain interceptorChain = new CallableInterceptorChain(interceptors);
 
+		// 给request添加超时处理器
 		this.asyncWebRequest.addTimeoutHandler(() -> {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Async request timeout for " + formatRequestUri());
@@ -313,6 +329,7 @@ public final class WebAsyncManager {
 			}
 		});
 
+		// 给request添加请求错误的处理器
 		this.asyncWebRequest.addErrorHandler(ex -> {
 			if (!this.errorHandlingInProgress) {
 				if (logger.isDebugEnabled()) {
@@ -324,11 +341,15 @@ public final class WebAsyncManager {
 			}
 		});
 
+		// 给request添加请求处理完成的处理器
 		this.asyncWebRequest.addCompletionHandler(() ->
 				interceptorChain.triggerAfterCompletion(this.asyncWebRequest, callable));
 
+		// 执行拦截器链中的applyBeforeConcurrentHandling
 		interceptorChain.applyBeforeConcurrentHandling(this.asyncWebRequest, callable);
+		// 启动异步处理
 		startAsyncProcessing(processingContext);
+		//使用taskExecutor执行请求
 		try {
 			Future<?> future = this.taskExecutor.submit(() -> {
 				Object result = null;
@@ -342,6 +363,7 @@ public final class WebAsyncManager {
 				finally {
 					result = interceptorChain.applyPostProcess(this.asyncWebRequest, callable, result);
 				}
+				// 设置处理结果并发送请求
 				setConcurrentResultAndDispatch(result);
 			});
 			interceptorChain.setTaskFuture(future);
@@ -383,10 +405,12 @@ public final class WebAsyncManager {
 			if (this.concurrentResult != RESULT_NONE) {
 				return;
 			}
+			// 用来保存异步处理结果
 			this.concurrentResult = result;
 			this.errorHandlingInProgress = (result instanceof Throwable);
 		}
 
+		// 检测当前request是否已设置为异步处理完成状态
 		if (this.asyncWebRequest.isAsyncComplete()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Async result set but request already complete: " + formatRequestUri());
@@ -402,6 +426,8 @@ public final class WebAsyncManager {
 	}
 
 	/**
+	 * 处理DeferredResult类型的异步请求
+	 *
 	 * Start concurrent request processing and initialize the given
 	 * {@link DeferredResult} with a {@link DeferredResultHandler} that saves
 	 * the result and dispatches the request to resume processing of that
@@ -476,10 +502,13 @@ public final class WebAsyncManager {
 
 	private void startAsyncProcessing(Object[] processingContext) {
 		synchronized (WebAsyncManager.this) {
+			// 清空之前并发处理的结果
 			this.concurrentResult = RESULT_NONE;
+			// 将processingContext设置给concurrentResultContext属性
 			this.concurrentResultContext = processingContext;
 			this.errorHandlingInProgress = false;
 		}
+		// 调用asyncWebRequest的startAsync方法启动异步处理
 		this.asyncWebRequest.startAsync();
 
 		if (logger.isDebugEnabled()) {

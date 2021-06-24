@@ -39,6 +39,8 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	void setTimeout(@Nullable Long timeout);
 
 	/**
+	 * 添加请求超时处理器，相当于onTimeout
+	 *
 	 * Add a handler to invoke when concurrent handling has timed out.
 	 */
 	void addTimeoutHandler(Runnable runnable);
@@ -51,6 +53,8 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	void addErrorHandler(Consumer<Throwable> exceptionHandler);
 
 	/**
+	 * 添加请求处理完成处理器，相当于onComplete
+	 *
 	 * Add a handler to invoke when request processing completes.
 	 */
 	void addCompletionHandler(Runnable runnable);
@@ -64,6 +68,8 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	void startAsync();
 
 	/**
+	 * 判断是否启动了异步处理
+	 *
 	 * Whether the request is in async mode following a call to {@link #startAsync()}.
 	 * Returns "false" if asynchronous processing never started, has completed,
 	 * or the request was dispatched for further processing.
@@ -77,6 +83,7 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	void dispatch();
 
 	/**
+	 * 判断异步处理是否完成
 	 * Whether asynchronous processing has completed.
 	 */
 	boolean isAsyncComplete();

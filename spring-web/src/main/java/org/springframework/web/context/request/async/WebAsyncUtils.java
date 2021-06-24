@@ -40,6 +40,8 @@ public abstract class WebAsyncUtils {
 
 
 	/**
+	 * 通过request获取WebAsyncManager
+	 *
 	 * Obtain the {@link WebAsyncManager} for the current request, or if not
 	 * found, create and associate it with the request.
 	 */
@@ -75,6 +77,8 @@ public abstract class WebAsyncUtils {
 	}
 
 	/**
+	 * 创建AsyncWebRequest
+	 *
 	 * Create an AsyncWebRequest instance. By default, an instance of
 	 * {@link StandardServletAsyncWebRequest} gets created.
 	 * @param request the current request
