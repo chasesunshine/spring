@@ -713,8 +713,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 
 			//只保留二级缓存，不向三级缓存中存放对象
-//			earlySingletonObjects.put(beanName,bean);
-//			registeredSingletons.add(beanName);
+			earlySingletonObjects.put(beanName,bean);
+			registeredSingletons.add(beanName);
 //
 //			synchronized (this.singletonObjects) {
 //				if (!this.singletonObjects.containsKey(beanName)) {

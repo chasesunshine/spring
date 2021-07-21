@@ -40,5 +40,5 @@
         <property name="name" value="zhangsan"></property>
     </bean>
 <!--    <bean class="com.mashibing.MyBFPP"></bean>-->
-    <bean class="com.mashibing.MyBeanFactoryPostProcessor21"></bean>
+    <bean class="com.mashibing.MyBeanFactoryPostProcessor"></bean>
 </beans>
