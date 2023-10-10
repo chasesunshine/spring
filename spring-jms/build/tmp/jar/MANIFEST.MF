@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 Implementation-Title: spring-jms
 Automatic-Module-Name: spring.jms
 Implementation-Version: 5.2.9.BUILD-SNAPSHOT
-Created-By: 1.8.0_172 (Oracle Corporation)
+Created-By: 1.8.0_282 (Oracle Corporation)
 
