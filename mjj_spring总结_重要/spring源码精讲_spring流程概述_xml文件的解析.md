@@ -122,7 +122,7 @@
 		}
 
 
-18. XmlBeanDefinitionReader 类 （ Document doc = doLoadDocument(inputSource, resource); 点进去 ）
+18-1. XmlBeanDefinitionReader 类 （ Document doc = doLoadDocument(inputSource, resource); 点进去 ）
 		// 此处获取xml文件的document对象，这个解析过程是由documentLoader完成的,从String[] -string-Resource[]- resource,最终开始将resource读取成一个document文档，根据文档的节点信息封装成一个个的BeanDefinition对象
 		Document doc = doLoadDocument(inputSource, resource);
 		int count = registerBeanDefinitions(doc, resource);
@@ -153,6 +153,13 @@
 	    	DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
 	    	return builder.parse(inputSource);
 	    }
+
+
+18-2. XmlBeanDefinitionReader 类 （ int count = registerBeanDefinitions(doc, resource); 点进去 ）
+		// 此处获取xml文件的document对象，这个解析过程是由documentLoader完成的,从String[] -string-Resource[]- resource,最终开始将resource读取成一个document文档，根据文档的节点信息封装成一个个的BeanDefinition对象
+		Document doc = doLoadDocument(inputSource, resource);
+		int count = registerBeanDefinitions(doc, resource);
+
 
 
 19-2. XmlBeanDefinitionReader 类 （ documentReader.registerBeanDefinitions(doc, createReaderContext(resource)); 点进去 ）
@@ -189,27 +196,25 @@
 		}
 
 
-24-2. DefaultBeanDefinitionDocumentReader 类 （ BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele); 点进去 ）
+25-2. DefaultBeanDefinitionDocumentReader 类 （ BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele); 点进去 ）
 		// beanDefinitionHolder是beanDefinition对象的封装类，封装了BeanDefinition，bean的名字和别名，用它来完成向IOC容器的注册
 		// 得到这个beanDefinitionHolder就意味着beandefinition是通过BeanDefinitionParserDelegate对xml元素的信息按照spring的bean规则进行
 		// 解析得到的
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 
 
-25-2. BeanDefinitionParserDelegate 类 （ return parseBeanDefinitionElement(ele, null); 点进去 ）
+26-2. BeanDefinitionParserDelegate 类 （ return parseBeanDefinitionElement(ele, null); 点进去 ）
 		public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
 			return parseBeanDefinitionElement(ele, null);
 		}
 
 
-26-2. BeanDefinitionParserDelegate 类 （ AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean); 点进去 ）
+27-2. BeanDefinitionParserDelegate 类 （ AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean); 点进去 ）
 		// 对bean元素的详细解析
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 
 
-
-
-27-2. BeanDefinitionParserDelegate 类 （ 这地方是 解析 xml 文件中的 各个 node节点 也就是 bean标签的解析 ， parseConstructorArgElements(ele, bd); 这个需要点进去仔细看 ）
+28-2. BeanDefinitionParserDelegate 类 （ 这地方是 解析 xml 文件中的 各个 node节点 也就是 bean标签的解析 ， parseConstructorArgElements(ele, bd); 这个需要点进去仔细看 ）
 		try {
 			// 创建装在bean信息的AbstractBeanDefinition对象，实际的实现是GenericBeanDefinition
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
@@ -238,3 +243,25 @@
 
 			return bd;
 		}
+
+
+25-3. DefaultBeanDefinitionDocumentReader 类 （ BeanDefinitionReaderUtils.registerBeanDefinition( 点进去 ）
+		// Register the final decorated instance.
+		// 向ioc容器注册解析得到的beandefinition的地方
+		BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+
+
+26-3. BeanDefinitionReaderUtils 类 （ registry.registerBeanDefinition( 点进去 ）
+		// Register bean definition under primary name.
+		// 使用beanName做唯一标识注册
+		String beanName = definitionHolder.getBeanName();
+		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
+
+
+27-3. BeanDefinitionRegistry 类 （ void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) 点进去 ）
+		void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+			throws BeanDefinitionStoreException;
+
+
+28-3. DefaultListableBeanFactory 类 （ 这里就是 beanDefinition 的处理完成结果了 ）
+		this.beanDefinitionMap.put(beanName, beanDefinition);
