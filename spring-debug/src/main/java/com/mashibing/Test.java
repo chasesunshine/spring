@@ -6,6 +6,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.mashibing.selftag.User;
 
 public class Test {
 
@@ -26,8 +27,8 @@ public class Test {
 ////        A bean1 = ac.getBean(A.class);
 ////        System.out.println(bean1);
 ////        ac.close();
-////        User user = (User) ac.getBean("msb");
-////        System.out.println(user.getUsername());
+        User user = (User) ac.getBean("msb");
+        System.out.println(user.getUsername());
 //
 ////        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("selfEditor.xml");
 ////        Customer bean = ac.getBean(Customer.class);
