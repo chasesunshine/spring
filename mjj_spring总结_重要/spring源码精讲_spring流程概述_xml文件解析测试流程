@@ -1,0 +1,36 @@
+1. spring-debug/src/main/java/com/mashibing/selftag/User.java
+
+
+2. spring-debug/src/main/java/com/mashibing/selftag/UserBeanDefinitionParser.java
+
+
+3. spring-debug/src/main/java/com/mashibing/selftag/UserNamespaceHandler.java
+
+
+4. spring-debug/src/main/resources/META-INF/spring.handlers
+
+
+5. spring-debug/src/main/resources/META-INF/spring.schemas
+
+
+6. spring-debug/src/main/resources/META-INF/user.xsd
+
+
+7. spring-debug/src/main/resources/applicationContext.xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xmlns:msb="http://www.mashibing.com/schema/user"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.mashibing.com/schema/user http://www.mashibing.com/schema/user.xsd">
+
+        <msb:user id="msb" userName="lian" email="lian@msb.com" password="123456"></msb:user>
+    </beans>
+
+
+8. spring-debug/src/main/java/com/mashibing/Test.java （ 运行测试 ）
+    MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
+    User user = (User) ac.getBean("msb");
+    System.out.println(user.getUsername());
