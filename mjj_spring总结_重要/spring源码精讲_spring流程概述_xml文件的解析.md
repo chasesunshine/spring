@@ -265,3 +265,56 @@
 
 28-3. DefaultListableBeanFactory 类 （ 这里就是 beanDefinition 的处理完成结果了 ）
 		this.beanDefinitionMap.put(beanName, beanDefinition);
+
+
+// xml文件自定义标签完成解析工作
+23-4. DefaultBeanDefinitionDocumentReader 类 （ delegate.parseCustomElement(ele); 点进去 ）
+		else {
+			delegate.parseCustomElement(ele);
+		}
+
+
+24-4. BeanDefinitionParserDelegate 类 （ return parseCustomElement(ele, null); 点进去 ）
+		public BeanDefinition parseCustomElement(Element ele) {
+			return parseCustomElement(ele, null);
+		}
+
+
+25-4. BeanDefinitionParserDelegate 类 （ return handler.parse(ele,  点进去 ）
+		public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+				// 获取对应的命名空间
+				String namespaceUri = getNamespaceURI(ele);
+				if (namespaceUri == null) {
+				return null;
+			}
+			// 根据命名空间找到对应的NamespaceHandlerspring
+			NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
+			if (handler == null) {
+				error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
+				return null;
+			}
+			// 调用自定义的NamespaceHandler进行解析
+			return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
+		}
+
+
+26-4. NamespaceHandler 类 （ BeanDefinition parse(Element element, ParserContext parserContext); 点进去 ）
+		BeanDefinition parse(Element element, ParserContext parserContext);
+
+
+27-4. NamespaceHandlerSupport 类 （ return (parser != null ? parser.parse(element, parserContext) : null); 点进去 ）
+		public BeanDefinition parse(Element element, ParserContext parserContext) {
+			// 获取元素的解析器
+			BeanDefinitionParser parser = findParserForElement(element, parserContext);
+			return (parser != null ? parser.parse(element, parserContext) : null);
+		}
+
+
+28-4. BeanDefinitionParser 类 （ BeanDefinition parse(Element element, ParserContext parserContext); 点进去 ）
+		BeanDefinition parse(Element element, ParserContext parserContext);
+
+
+29-4. AbstractBeanDefinitionParser类 （ registerBeanDefinition(holder, parserContext.getRegistry()); 是 BeanDefinition 注册的最终结果 ）
+		// 将AbstractBeanDefinition转换为BeanDefinitionHolder并注册
+		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, id, aliases);
+		registerBeanDefinition(holder, parserContext.getRegistry());

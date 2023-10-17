@@ -18,7 +18,7 @@ public class Test {
 ////        User bean2 = (User) ac.getBean("myFactoryBean");
 ////        System.out.println(bean2.getUsername());
 //
-////        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
+        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 ////        System.out.println(ac.getBean(MyPropertySource.class).getName());
 ////        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-${username}.xml");
 ////        Person bean = ac.getBean(Person.class);
@@ -58,9 +58,9 @@ public class Test {
 //        A a = new A();
 //        B b = new B();
 
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test.xml");
-        Student bean = context.getBean(Student.class);
-        context.close();
+//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test.xml");
+//        Student bean = context.getBean(Student.class);
+//        context.close();
 
         //想通过student获取其他bean对象怎么办？
 
