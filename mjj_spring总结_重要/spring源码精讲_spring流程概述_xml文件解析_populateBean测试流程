@@ -1,0 +1,90 @@
+1. spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java
+        // Initialize the bean instance.
+        // 初始化bean实例
+        Object exposedObject = bean;
+        try {
+        	// 对bean的属性进行填充，将各个属性值注入，其中，可能存在依赖于其他bean的属性，则会递归初始化依赖的bean
+        	populateBean(beanName, mbd, instanceWrapper);
+        	// 执行初始化逻辑
+        	exposedObject = initializeBean(beanName, exposedObject, mbd);
+        }
+
+
+2. spring-debug/src/main/java/com/mashibing/selfEditor/Address.java
+
+
+3. spring-debug/src/main/java/com/mashibing/selfEditor/AddressPropertyEditor.java
+
+
+4. spring-debug/src/main/java/com/mashibing/selfEditor/AddressPropertyEditorRegistrar.java  （这个可以配合 xml 文件中的配置选择性 删除 这个类）
+        import org.springframework.beans.PropertyEditorRegistrar;
+        import org.springframework.beans.PropertyEditorRegistry;
+
+        import java.beans.PropertyEditor;
+
+        public class AddressPropertyEditorRegistrar implements PropertyEditorRegistrar {
+
+            @Override
+            public void registerCustomEditors(PropertyEditorRegistry registry) {
+                registry.registerCustomEditor(Address.class,new AddressPropertyEditor());
+            }
+        }
+
+        <!--<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+            <property name="propertyEditorRegistrars">
+                <list>
+                    <bean class="com.mashibing.selfEditor.AddressPropertyEditorRegistrar"></bean>
+                </list>
+            </property>
+        </bean>-->
+
+
+5. spring-debug/src/main/java/com/mashibing/selfEditor/Customer.java
+
+
+6. spring-debug/src/main/resources/selfEditor.xml
+
+
+7. spring-debug/src/main/java/com/mashibing/Test.java
+        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("selfEditor.xml");
+        Customer bean = ac.getBean(Customer.class);
+        System.out.println(bean);
+
+
+# 测试结果
+    > Task :spring-debug:Test.main()
+    扩展initPropertySource
+    扩展实现postProcessBeanFactory方法
+    71734534534534534
+    Disconnected from the target VM, address: 'localhost:53752', transport: 'socket'
+    Connected to the target VM, address: '127.0.0.1:53740', transport: 'socket'
+    Customer{name='zhangsan', address=Address{province='河北省', city='邯郸市', town='武安市'}}
+
+    BUILD SUCCESSFUL in 1m 18s
+    87 actionable tasks: 1 executed, 86 up-to-date
+
+
+# 结论：
+    public class AddressPropertyEditor  extends PropertyEditorSupport {
+
+        @Override
+        public void setAsText(String text) throws IllegalArgumentException {
+            String[] s = text.split("_");
+            Address address = new Address();
+            address.setProvince(s[0]);
+            address.setCity(s[1]);
+            address.setTown(s[2]);
+            this.setValue(address);
+        }
+    }
+
+    xml文件：
+        <bean id="customer" class="com.mashibing.selfEditor.Customer">
+             <property name="name" value="zhangsan"></property>
+             <property name="address" value="河北省_邯郸市_武安市"></property>
+        </bean>
+
+
+
+    * 重要： populateBean(beanName, mbd, instanceWrapper);  在执行的时候 这个类-PropertyEditorSupport 来进行 xml文件 的解析 与属性填充
+
