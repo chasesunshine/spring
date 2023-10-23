@@ -119,40 +119,7 @@
 			}
 			// 逻辑处理的核心步骤
 			return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
-		}
-
-
-18-1. XmlBeanDefinitionReader 类 （ Document doc = doLoadDocument(inputSource, resource); 点进去 ）
-		// 此处获取xml文件的document对象，这个解析过程是由documentLoader完成的,从String[] -string-Resource[]- resource,最终开始将resource读取成一个document文档，根据文档的节点信息封装成一个个的BeanDefinition对象
-		Document doc = doLoadDocument(inputSource, resource);
-		int count = registerBeanDefinitions(doc, resource);
-
-
-19-1. XmlBeanDefinitionReader 类 （ return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler, 点进去 ）
-	    protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
-	    	return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
-	    			getValidationModeForResource(resource), isNamespaceAware());
-	    }
-
-
-20-1. DocumentLoader 类 （ Document loadDocument( 点进去 ）
-	    Document loadDocument(
-			InputSource inputSource, EntityResolver entityResolver,
-			ErrorHandler errorHandler, int validationMode, boolean namespaceAware)
-			throws Exception;
-
-
-21-1. DefaultDocumentLoader 类 （ return builder.parse(inputSource); 这一步就是 xml文件的最后解析 成果 ）
-	    public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
-	    		ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
-
-	    	DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
-	    	if (logger.isTraceEnabled()) {
-	    		logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
-	    	}
-	    	DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
-	    	return builder.parse(inputSource);
-	    }
+		}	
 
 
 18-2. XmlBeanDefinitionReader 类 （ int count = registerBeanDefinitions(doc, resource); 点进去 ）
@@ -183,88 +150,6 @@
 		preProcessXml(root);
 		parseBeanDefinitions(root, this.delegate);
 		postProcessXml(root);
-
-23-2. DefaultBeanDefinitionDocumentReader 类 （ parseDefaultElement(ele, delegate); 点进去 ）
-		if (delegate.isDefaultNamespace(ele)) {
-			parseDefaultElement(ele, delegate);
-		}
-
-
-24-2. DefaultBeanDefinitionDocumentReader 类 （ processBeanDefinition(ele, delegate); 点进去 ）
-		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
-			processBeanDefinition(ele, delegate);
-		}
-
-
-25-2. DefaultBeanDefinitionDocumentReader 类 （ BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele); 点进去 ）
-		// beanDefinitionHolder是beanDefinition对象的封装类，封装了BeanDefinition，bean的名字和别名，用它来完成向IOC容器的注册
-		// 得到这个beanDefinitionHolder就意味着beandefinition是通过BeanDefinitionParserDelegate对xml元素的信息按照spring的bean规则进行
-		// 解析得到的
-		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
-
-
-26-2. BeanDefinitionParserDelegate 类 （ return parseBeanDefinitionElement(ele, null); 点进去 ）
-		public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
-			return parseBeanDefinitionElement(ele, null);
-		}
-
-
-27-2. BeanDefinitionParserDelegate 类 （ AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean); 点进去 ）
-		// 对bean元素的详细解析
-		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
-
-
-28-2. BeanDefinitionParserDelegate 类 （ 这地方是 解析 xml 文件中的 各个 node节点 也就是 bean标签的解析 ， parseConstructorArgElements(ele, bd); 这个需要点进去仔细看 ）
-		try {
-			// 创建装在bean信息的AbstractBeanDefinition对象，实际的实现是GenericBeanDefinition
-			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
-
-			// 解析bean标签的各种其他属性
-			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
-			// 设置description信息
-			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
-
-			// 解析元数据
-			parseMetaElements(ele, bd);
-			// 解析lookup-method属性
-			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
-			// 解析replaced-method属性
-			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
-
-			// 解析构造函数参数
-			parseConstructorArgElements(ele, bd);
-			// 解析property子元素
-			parsePropertyElements(ele, bd);
-			// 解析qualifier子元素
-			parseQualifierElements(ele, bd);
-
-			bd.setResource(this.readerContext.getResource());
-			bd.setSource(extractSource(ele));
-
-			return bd;
-		}
-
-
-25-3. DefaultBeanDefinitionDocumentReader 类 （ BeanDefinitionReaderUtils.registerBeanDefinition( 点进去 ）
-		// Register the final decorated instance.
-		// 向ioc容器注册解析得到的beandefinition的地方
-		BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
-
-
-26-3. BeanDefinitionReaderUtils 类 （ registry.registerBeanDefinition( 点进去 ）
-		// Register bean definition under primary name.
-		// 使用beanName做唯一标识注册
-		String beanName = definitionHolder.getBeanName();
-		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
-
-
-27-3. BeanDefinitionRegistry 类 （ void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) 点进去 ）
-		void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
-			throws BeanDefinitionStoreException;
-
-
-28-3. DefaultListableBeanFactory 类 （ 这里就是 beanDefinition 的处理完成结果了 ）
-		this.beanDefinitionMap.put(beanName, beanDefinition);
 
 
 // xml文件自定义标签完成解析工作
@@ -310,11 +195,51 @@
 		}
 
 
-28-4. BeanDefinitionParser 类 （ BeanDefinition parse(Element element, ParserContext parserContext); 点进去 ）
+28-5. BeanDefinitionParser 类 （ BeanDefinition parse(Element element, ParserContext parserContext); 点进去 ）
 		BeanDefinition parse(Element element, ParserContext parserContext);
 
 
-29-4. AbstractBeanDefinitionParser类 （ registerBeanDefinition(holder, parserContext.getRegistry()); 是 BeanDefinition 注册的最终结果 ）
-		// 将AbstractBeanDefinition转换为BeanDefinitionHolder并注册
-		BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, id, aliases);
-		registerBeanDefinition(holder, parserContext.getRegistry());
+29-5. AnnotationConfigBeanDefinitionParser 类 （ AnnotationConfigUtils.registerAnnotationConfigProcessors(parserContext.getRegistry(), source); 点进去 ）
+		// Obtain bean definitions for all relevant BeanPostProcessors.
+		Set<BeanDefinitionHolder> processorDefinitions =
+			AnnotationConfigUtils.registerAnnotationConfigProcessors(parserContext.getRegistry(), source);
+
+
+30-5. AnnotationConfigUtils 类 （ 这地方是处理 @Autowired 等注解的地方  例如：RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);）
+		// 注册内部管理的用于处理@configuration注解的后置处理器的bean
+		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
+			def.setSource(source);
+			// 注册BeanDefinition到注册表中
+			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
+		}
+
+		// 注册内部管理的用于处理@Autowired，@Value,@Inject以及@Lookup注解的后置处理器bean
+		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
+			def.setSource(source);
+			beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
+		}
+
+		// Check for JSR-250 support, and if present add the CommonAnnotationBeanPostProcessor.
+		// 注册内部管理的用于处理JSR-250注解，例如@Resource,@PostConstruct,@PreDestroy的后置处理器bean
+		if (jsr250Present && !registry.containsBeanDefinition(COMMON_ANNOTATION_PROCESSOR_BEAN_NAME)) {
+			RootBeanDefinition def = new RootBeanDefinition(CommonAnnotationBeanPostProcessor.class);
+			def.setSource(source);
+			beanDefs.add(registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME));
+		}
+
+
+31-5. AutowiredAnnotationBeanPostProcessor 类 （ this.autowiredAnnotationTypes.add(Autowired.class); 这个构造器就是添加 @Autowired 的地方 ）
+		public AutowiredAnnotationBeanPostProcessor() {
+			this.autowiredAnnotationTypes.add(Autowired.class);
+			this.autowiredAnnotationTypes.add(Value.class);
+			try {
+				this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
+				ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
+				logger.trace("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
+			}
+			catch (ClassNotFoundException ex) {
+				// JSR-330 API not available - simply skip.
+			}
+		}

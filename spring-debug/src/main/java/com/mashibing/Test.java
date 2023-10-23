@@ -20,7 +20,7 @@ public class Test {
 ////        User bean2 = (User) ac.getBean("myFactoryBean");
 ////        System.out.println(bean2.getUsername());
 //
-////        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
+        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 ////        System.out.println(ac.getBean(MyPropertySource.class).getName());
 ////        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-${username}.xml");
 ////        Person bean = ac.getBean(Person.class);
@@ -31,9 +31,9 @@ public class Test {
 ////        User user = (User) ac.getBean("msb");
 ////        System.out.println(user.getUsername());
 //
-        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("selfEditor.xml");
-        Customer bean = ac.getBean(Customer.class);
-        System.out.println(bean);
+//        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("selfEditor.xml");
+//        Customer bean = ac.getBean(Customer.class);
+//        System.out.println(bean);
 ////        ConversionService bean = ac.getBean(ConversionService.class);
 ////        Student convert = bean.convert("1_zhangsan", Student.class);
 ////        System.out.println(convert);
