@@ -86,6 +86,7 @@ final class PostProcessorRegistrationDelegate {
                     // 添加到registryProcessors，用于后续执行postProcessBeanFactory方法
                     registryProcessors.add(registryProcessor);
                 } else {
+
                     // 否则，只是普通的BeanFactoryPostProcessor，添加到regularPostProcessors，用于后续执行postProcessBeanFactory方法
                     regularPostProcessors.add(postProcessor);
                 }
