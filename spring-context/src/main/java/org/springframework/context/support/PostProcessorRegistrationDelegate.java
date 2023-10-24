@@ -106,7 +106,7 @@ final class PostProcessorRegistrationDelegate {
                     beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
             // 遍历处理所有符合规则的postProcessorNames
             for (String ppName : postProcessorNames) {
-                // 检测是否实现了PriorityOrdered接口
+                // 检测是否实现了PriorityOrdered接口postProcessorNames = {String[1]@1412} ["com.mashibing.s..."]postProcessorNames = {String[1]@1412} ["com.mashibing.s..."]
                 if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
                     // 获取名字对应的bean实例，添加到currentRegistryProcessors中
                     currentRegistryProcessors.add(beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class));
