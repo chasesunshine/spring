@@ -96,7 +96,7 @@
         processConfigurationClass(new ConfigurationClass(metadata, beanName), DEFAULT_EXCLUSION_FILTER);
     }
 
-14-2. ConfigurationClassParser 类 （ sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter); 点进去 ）
+14-2. ConfigurationClassParser 类 （ sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter); 点进去 这个方法点进去要仔细看 ）
     do {
         // 解析各种注解
         sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
