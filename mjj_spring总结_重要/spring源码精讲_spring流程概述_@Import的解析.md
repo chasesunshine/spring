@@ -221,3 +221,47 @@
 	     * 在ConfigurationClassPostProcessor处理configClass时会随之一起处理
 	     */
 	    configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());
+
+
+# 如何调用 AutoConfigurationImportSelector 类 中 protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) 方法
+16-2-1. ConfigurationClassParser 类 （ this.deferredImportSelectorHandler.handle( 点进去 ）
+    if (selector instanceof DeferredImportSelector) {
+        this.deferredImportSelectorHandler.handle(
+        configClass, (DeferredImportSelector) selector);
+    }
+
+16-2-2. ConfigurationClassParser 类 （ handler.processGroupImports(); 点进去 ）
+    handler.processGroupImports();
+
+16-2-3. ConfigurationClassParser 类 （ grouping.getImports() 点进去 ）
+    grouping.getImports().forEach(entry -> {
+        ConfigurationClass configurationClass = this.configurationClasses.get(
+        entry.getMetadata());
+
+16-2-4. ConfigurationClassParser 类 （ this.group.process( 点进去 ）
+    this.group.process(deferredImport.getConfigurationClass().getMetadata(),
+        deferredImport.getImportSelector());
+
+16-2-5. DeferredImportSelector 类 （ void process(AnnotationMetadata metadata, DeferredImportSelector selector); 点进去 ）
+    void process(AnnotationMetadata metadata, DeferredImportSelector selector);
+
+16-2-6. AutoConfigurationImportSelector 类 （ ((AutoConfigurationImportSelector)deferredImportSelector).getAutoConfigurationEntry( 点进去 ）
+    AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector)deferredImportSelector).getAutoConfigurationEntry(this.getAutoConfigurationMetadata(), annotationMetadata);
+
+16-2-7. AutoConfigurationImportSelector 类 （ this.getCandidateConfigurations(annotationMetadata, attributes); 点进去 ）
+    List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
+
+16-2-8. AutoConfigurationImportSelector 类 （ this.getSpringFactoriesLoaderFactoryClass() 这里就是 处理 @EnableAutoConfiguration 注解 ）
+    List<String> configurations = SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader());
+
+16-2-9. AutoConfigurationImportSelector 类 （ SpringFactoriesLoader.loadFactoryNames( 点进去 ）
+    List<String> configurations = SpringFactoriesLoader.loadFactoryNames(this.getSpringFactoriesLoaderFactoryClass(), this.getBeanClassLoader());
+
+16-2-10. SpringFactoriesLoader 类 （ loadSpringFactories 点进去 ）
+    public static List<String> loadFactoryNames(Class<?> factoryClass, @Nullable ClassLoader classLoader) {
+        String factoryClassName = factoryClass.getName();
+        return (List)loadSpringFactories(classLoader).getOrDefault(factoryClassName, Collections.emptyList());
+    }
+
+16-2-11. SpringFactoriesLoader 类 （ 这里就是加载 META-INF/spring.factories ）
+    Enumeration<URL> urls = classLoader != null ? classLoader.getResources("META-INF/spring.factories") : ClassLoader.getSystemResources("META-INF/spring.factories");
