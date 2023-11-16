@@ -267,3 +267,9 @@
     Enumeration<URL> urls = classLoader != null ? classLoader.getResources("META-INF/spring.factories") : ClassLoader.getSystemResources("META-INF/spring.factories");
 ## 测试
     详见  mjj_spring总结_重要/spring源码精讲_spring流程概述_@Import的解析_测试.png
+## 如何回答自动装配流程
+    当我们在执行spring里面的 BeanFactoryPostProcessor 的时候，里面有一个核心处理类 ，ConfigurationClassPostProcessor ，这个类主要用来处理我们相关的一些注解的解析工作
+    这些解析工作包含@Component、@PropertySource、@Import 等，在我们解析 @Import 的时候 ，我们会从我们的启动类开始一步一步查找，这时候会发现里面会识别到一个 AutoConfigurationImportSelector 类，
+    这个类在进行解析的时候，会有一个延迟加载的属性，在延迟加载的时候，会通过 .getImports() 方法，这个 .getImports() 里面会获取到 一个 AutoConfigurationEntry 对象 ，
+    在获取这个 AutoConfigurationEntry 对象 的时候 ，会调用里面的 .getCandidateConfigurations(annotationMetadata, attributes) 这个方法 ，此时就能把 配置文件里面所对应的属性值
+    都加载进来 来完成整体的 自动装配 这个环节
