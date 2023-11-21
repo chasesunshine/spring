@@ -18,8 +18,8 @@ public class Test {
         System.out.println(bean1);
         User bean = (User) ac.getBean("myFactoryBean");
         System.out.println(bean.getUsername());
-////        User bean2 = (User) ac.getBean("myFactoryBean");
-////        System.out.println(bean2.getUsername());
+        User bean2 = (User) ac.getBean("myFactoryBean");
+        System.out.println(bean2.getUsername());
 //
 //        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 ////        System.out.println(ac.getBean(MyPropertySource.class).getName());
