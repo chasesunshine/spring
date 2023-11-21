@@ -7,20 +7,21 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import com.mashibing.selftag.User;
+//import com.mashibing.selftag.User;
+import com.mashibing.supplier.User;
 
 public class Test {
 
     public static void main(String[] args) {
-////        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryBean.xml");
-////        MyFactoryBean bean1 = (MyFactoryBean) ac.getBean( "&myFactoryBean");
-////        System.out.println(bean1);
-////        User bean = (User) ac.getBean("myFactoryBean");
-////        System.out.println(bean.getUsername());
+        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryBean.xml");
+        MyFactoryBean bean1 = (MyFactoryBean) ac.getBean( "&myFactoryBean");
+        System.out.println(bean1);
+        User bean = (User) ac.getBean("myFactoryBean");
+        System.out.println(bean.getUsername());
 ////        User bean2 = (User) ac.getBean("myFactoryBean");
 ////        System.out.println(bean2.getUsername());
 //
-        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
+//        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 ////        System.out.println(ac.getBean(MyPropertySource.class).getName());
 ////        ApplicationContext ac = new ClassPathXmlApplicationContext("spring-${username}.xml");
 ////        Person bean = ac.getBean(Person.class);
