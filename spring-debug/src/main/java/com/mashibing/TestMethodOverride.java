@@ -17,14 +17,16 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class TestMethodOverride {
     public static void main(String[] args) {
         ApplicationContext ac = new ClassPathXmlApplicationContext("methodOverride.xml");
-        Apple bean = ac.getBean(Apple.class);
-        System.out.println(bean.getBanana());
-        Apple bean2 = ac.getBean(Apple.class);
-        System.out.println(bean2.getBanana());
-        //        FruitPlate fruitplate1 = (FruitPlate) ac.getBean("fruitplate1");
-//        fruitplate1.getFruit();
-//        FruitPlate fruitplate2 = (FruitPlate) ac.getBean("fruitplate1");
-//        fruitplate2.getFruit();
+//        Apple bean = ac.getBean(Apple.class);
+//        System.out.println(bean.getBanana());
+//        Apple bean2 = ac.getBean(Apple.class);
+//        System.out.println(bean2.getBanana());
+        FruitPlate fruitplate1 = (FruitPlate) ac.getBean("fruitplate1");
+        fruitplate1.getFruit();
+        FruitPlate fruitplate2 = (FruitPlate) ac.getBean("fruitplate1");
+        fruitplate2.getFruit();
+        System.out.println(fruitplate1.getClass());
+        System.out.println(fruitplate2.getClass());
 //        FruitPlate fruitplate2 = (FruitPlate) ac.getBean("fruitplate2");
 //        fruitplate2.getFruit();
     }
