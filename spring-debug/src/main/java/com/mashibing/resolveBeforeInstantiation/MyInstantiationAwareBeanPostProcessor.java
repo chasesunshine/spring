@@ -11,12 +11,13 @@ public class MyInstantiationAwareBeanPostProcessor implements InstantiationAware
     public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
         System.out.println("beanName:"+beanName+"----执行postProcessBeforeInstantiation方法");
         if (beanClass == BeforeInstantiation.class){
-//            Enhancer enhancer = new Enhancer();
-//            enhancer.setSuperclass(beanClass);
-//            enhancer.setCallback(new MyMethodInterceptor());
-//            BeforeInstantiation beforeInstantiation = (BeforeInstantiation) enhancer.create();
-//            System.out.println("创建代理对象："+beforeInstantiation);
-            return new BeforeInstantiation();
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(beanClass);
+            enhancer.setCallback(new MyMethodInterceptor());
+            BeforeInstantiation beforeInstantiation = (BeforeInstantiation) enhancer.create();
+            System.out.println("创建代理对象："+beforeInstantiation);
+//            return new BeforeInstantiation();
+            return beforeInstantiation;
         }
         return null;
     }

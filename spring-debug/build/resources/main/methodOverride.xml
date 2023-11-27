@@ -7,7 +7,7 @@
         <property name="banana" ref="banana"></property>
     </bean>
 
-    <bean id="banana" class="com.mashibing.methodOverrides.lookup.Banana">
+    <bean id="banana" class="com.mashibing.methodOverrides.lookup.Banana" scope="prototype">
 <!--    <bean id="banana" class="com.mashibing.methodOverrides.lookup.Banana">-->
     </bean>
 
