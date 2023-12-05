@@ -13,13 +13,13 @@ import com.mashibing.supplier.User;
 public class Test {
 
     public static void main(String[] args) {
-        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryBean.xml");
-        MyFactoryBean bean1 = (MyFactoryBean) ac.getBean( "&myFactoryBean");
-        System.out.println(bean1);
-        User bean = (User) ac.getBean("myFactoryBean");
-        System.out.println(bean.getUsername());
-        User bean2 = (User) ac.getBean("myFactoryBean");
-        System.out.println(bean2.getUsername());
+//        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("factoryBean.xml");
+//        MyFactoryBean bean1 = (MyFactoryBean) ac.getBean( "&myFactoryBean");
+//        System.out.println(bean1);
+//        User bean = (User) ac.getBean("myFactoryBean");
+//        System.out.println(bean.getUsername());
+//        User bean2 = (User) ac.getBean("myFactoryBean");
+//        System.out.println(bean2.getUsername());
 //
 //        MyClassPathXmlApplicationContext ac = new MyClassPathXmlApplicationContext("applicationContext.xml");
 ////        System.out.println(ac.getBean(MyPropertySource.class).getName());
@@ -46,10 +46,10 @@ public class Test {
 ////        ac.close();
 ////        Person person2 = ac.getBean("person", Person.class);
 //
-////        ApplicationContext ac = new ClassPathXmlApplicationContext("person.xml");
-////        Person bean = ac.getBean(Person.class);
-////        Person bean2 = ac.getBean(Person.class);
-//
+        ApplicationContext ac = new ClassPathXmlApplicationContext("person.xml");
+        Person bean = ac.getBean(Person.class);
+        Person bean2 = ac.getBean(Person.class);
+
 ////        System.out.println(System.getProperties());
 ////        System.out.println(System.getenv());
 //
