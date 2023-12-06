@@ -9,7 +9,7 @@ public class PersonInstantiationAwareBeanPostProcessor implements InstantiationA
 
     @Override
     public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
-        System.out.println("PersonInstantiationAwareBeanPostProcessor---被调用执行");
+//        System.out.println("PersonInstantiationAwareBeanPostProcessor---被调用执行");
         Person person = null;
         if (bean instanceof Person){
             person = (Person) bean;

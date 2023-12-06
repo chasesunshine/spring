@@ -228,13 +228,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Return the instantiation strategy to use for creating bean instances.
-	 */
-	protected InstantiationStrategy getInstantiationStrategy() {
-		return this.instantiationStrategy;
-	}
-
-	/**
 	 * 解析策略的方法参数的设置和获取
 	 *
 	 * Set the ParameterNameDiscoverer to use for resolving method parameter
@@ -243,6 +236,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	public void setParameterNameDiscoverer(@Nullable ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
+	}
+
+	/**
+	 * Return the instantiation strategy to use for creating bean instances.
+	 */
+	protected InstantiationStrategy getInstantiationStrategy() {
+		return this.instantiationStrategy;
 	}
 
 	/**

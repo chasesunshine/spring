@@ -46,9 +46,9 @@ public class Test {
 ////        ac.close();
 ////        Person person2 = ac.getBean("person", Person.class);
 //
-        ApplicationContext ac = new ClassPathXmlApplicationContext("person.xml");
-        Person bean = ac.getBean(Person.class);
-        Person bean2 = ac.getBean(Person.class);
+//        ApplicationContext ac = new ClassPathXmlApplicationContext("person.xml");
+//        Person bean = ac.getBean(Person.class);
+//        Person bean2 = ac.getBean(Person.class);
 
 ////        System.out.println(System.getProperties());
 ////        System.out.println(System.getenv());
@@ -61,7 +61,11 @@ public class Test {
 //        A a = new A();
 //        B b = new B();
 
-//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test.xml");
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext
+                ("test.xml");
+        Person bean = context.
+                getBean("person",Person.class);
+        context.close();
 //        Student bean = context.getBean(Student.class);
 //        context.close();
 
