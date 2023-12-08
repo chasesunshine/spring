@@ -212,6 +212,24 @@
 		}
 
 
+22. CommonAnnotationBeanPostProcessor 类（ 构造方法，设置@PostConstruct和@PreDestory注解 ， CommonAnnotationBeanPostProcessor extends（继承） InitDestroyAnnotationBeanPostProcessor ）
+        /**
+         * 构造方法，设置@PostConstruct和@PreDestory注解
+         *
+         * Create a new CommonAnnotationBeanPostProcessor,
+         * with the init and destroy annotation types set to
+         * {@link javax.annotation.PostConstruct} and {@link javax.annotation.PreDestroy},
+         * respectively.
+         */
+        public CommonAnnotationBeanPostProcessor() {
+            setOrder(Ordered.LOWEST_PRECEDENCE - 3);
+            setInitAnnotationType(PostConstruct.class);
+            setDestroyAnnotationType(PreDestroy.class);
+            ignoreResourceType("javax.xml.ws.WebServiceContext");
+        }
+
+
+
 
 
 备注：
@@ -219,6 +237,6 @@
     表示的是 spring 生命周期 创建 bean对象 的整体流程中， 初始化和销毁 bean对象 的过程，
     通过扫描 bean对象 中带有 @PostConstruct 和 @PreDestroy 注解的方法 来代表 初始化和销毁方法，
     在 spring bean 生命周期，执行 beanpostprocessor.before 的时候 执行 初始化和销毁方法（以上 20、21）
-
+    22 表示 InitDestroyAnnotationBeanPostProcessor 的子类 构造方法 设置@PostConstruct和@PreDestory注解
 
 
