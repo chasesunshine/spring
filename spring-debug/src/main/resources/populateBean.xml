@@ -6,44 +6,45 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
     <!--给复杂类型的赋值都在property标签内进行-->
+    <!--
     <bean id="person" class="com.mashibing.populateBean.Person">
         <property name="name">
-            <!--赋空值-->
+            &lt;!&ndash;赋空值&ndash;&gt;
             <null></null>
         </property>
-        <!--通过ref引用其他对象，引用外部bean-->
+        &lt;!&ndash;通过ref引用其他对象，引用外部bean&ndash;&gt;
         <property name="address" ref="address"></property>
-        <!--引用内部bean-->
-        <!-- <property name="address">
+        &lt;!&ndash;引用内部bean&ndash;&gt;
+        &lt;!&ndash; <property name="address">
              <bean class="com.mashibing.bean.Address">
                  <property name="province" value="北京"></property>
                  <property name="city" value="北京"></property>
                  <property name="town" value="西城区"></property>
              </bean>
-         </property>-->
-        <!--为list赋值-->
+         </property>&ndash;&gt;
+        &lt;!&ndash;为list赋值&ndash;&gt;
         <property name="books">
             <list>
-                <!--内部bean-->
+                &lt;!&ndash;内部bean&ndash;&gt;
                 <bean id="book1" class="com.mashibing.populateBean.Book">
                     <property name="name" value="多线程与高并发"></property>
                     <property name="author" value="马士兵"></property>
                     <property name="price" value="1000"></property>
                 </bean>
-                <!--外部bean-->
+                &lt;!&ndash;外部bean&ndash;&gt;
                 <ref bean="book2"></ref>
             </list>
         </property>
-        <!--给map赋值-->
+        &lt;!&ndash;给map赋值&ndash;&gt;
         <property name="maps" ref="myMap"></property>
-        <!--给property赋值-->
+        &lt;!&ndash;给property赋值&ndash;&gt;
         <property name="properties">
             <props>
                 <prop key="aaa">aaa</prop>
                 <prop key="bbb">222</prop>
             </props>
         </property>
-        <!--给数组赋值-->
+        &lt;!&ndash;给数组赋值&ndash;&gt;
         <property name="hobbies">
             <array>
                 <value>book</value>
@@ -51,7 +52,7 @@
                 <value>game</value>
             </array>
         </property>
-        <!--给set赋值-->
+        &lt;!&ndash;给set赋值&ndash;&gt;
         <property name="sets">
             <set>
                 <value>111</value>
@@ -70,12 +71,12 @@
         <property name="author" value="马士兵"></property>
         <property name="price" value="1200"></property>
     </bean>
-    <!--级联属性-->
+    &lt;!&ndash;级联属性&ndash;&gt;
     <bean id="person2" class="com.mashibing.populateBean.Person">
         <property name="address" ref="address"></property>
         <property name="address.province" value="北京"></property>
     </bean>
-    <!--util名称空间创建集合类型的bean-->
+    &lt;!&ndash;util名称空间创建集合类型的bean&ndash;&gt;
     <util:map id="myMap">
         <entry key="key1" value="value1"></entry>
         <entry key="key2" value-ref="book2"></entry>
@@ -87,4 +88,8 @@
             </bean>
         </entry>
     </util:map>
+    -->
+
+    <context:component-scan base-package="com.mashibing.populateBean.annotation"></context:component-scan>
+
 </beans>
