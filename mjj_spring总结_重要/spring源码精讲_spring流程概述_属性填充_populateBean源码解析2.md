@@ -182,8 +182,9 @@
 * 21步和12步就形成了闭环 ， 就是为了 填充 person 的 address对象
 
 
-* 以下是 address 对象 填充属性的 过程
-15-1. BeanDefinitionValueResolver 类 （ Object valueObject = evaluate(typedStringValue); 点进去 ，这地方因为是填充 address 的 String 类型 ，所以 走的是 value instanceof TypedStringValue ）
+
+* 以下是 address 对象 属性值处理 的 过程
+15-1. BeanDefinitionValueResolver 类 （ Object valueObject = evaluate(typedStringValue); 点进去 ，这地方因为是 address 的属性 的值是 String 类型 ，所以 走的是 value instanceof TypedStringValue ）
         // 对TypedStringValue进行解析
         else if (value instanceof TypedStringValue) {
         	// Convert value to target type here.
@@ -234,5 +235,45 @@
         Object evaluate(@Nullable String value, BeanExpressionContext evalContext) throws BeansException;
 
 
-20-1. StandardBeanExpressionResolver类 （ 这地方就是 获取 populateBean.xml 中 address 对象 设置的 province、city、town 属性 对应的 值 ）
+20-1. StandardBeanExpressionResolver类 （ 这地方就是 获取 populateBean.xml 中 address 对象 处理的 province、city、town 属性 对应的 值 ）
         return expr.getValue(sec);
+
+
+
+* 以下是 address 对象 属性填充 的 过程
+14-2. AbstractAutowireCapableBeanFactory 类 （ bw.setPropertyValues(new MutablePropertyValues(deepCopy)); 点进去 ）
+        //按原样使用deepCopy构造一个新的MutablePropertyValues对象然后设置到bw中以对bw的属性值更新
+  		bw.setPropertyValues(new MutablePropertyValues(deepCopy));
+
+
+15-2. AbstractNestablePropertyAccessor 类 （ nestedPa.setPropertyValue(tokens, pv); 点进去 ）
+		nestedPa.setPropertyValue(tokens, pv);
+
+
+16-2. AbstractNestablePropertyAccessor 类 （ processLocalProperty(tokens, pv); 点进去 ）
+		processLocalProperty(tokens, pv);
+
+
+17-2. AbstractNestablePropertyAccessor 类 （ ph.setValue(valueToApply); 点进去 ）
+		ph.setValue(valueToApply);
+
+
+18-2. AbstractNestablePropertyAccessor 类 （ public abstract void setValue(@Nullable Object value) throws Exception; 点进去 ）
+		public abstract void setValue(@Nullable Object value) throws Exception;
+
+
+19-2. BeanWrapperImpl 类 （ writeMethod.invoke(getWrappedInstance(), value); 点进去 ）
+		writeMethod.invoke(getWrappedInstance(), value);
+
+
+20-2. Method 类 （ return ma.invoke(obj, args); 点进去  这里是源码了）
+		return ma.invoke(obj, args);
+
+
+21-2. MethodAccessor 类 （ 点进去 ）
+		public Object invoke(Object obj, Object[] args)
+			throws IllegalArgumentException, InvocationTargetException;
+
+
+22-2. NativeMethodAccessorImpl 类 （ 这地方就是对属性的填充 ）
+		return invoke0(method, obj, args);
