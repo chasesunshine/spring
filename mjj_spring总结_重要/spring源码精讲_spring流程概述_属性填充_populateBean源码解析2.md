@@ -182,10 +182,36 @@
 * 21步和12步就形成了闭环 ， 就是为了 填充 person 的 address对象
 
 
-* 以下是 填充属性的 过程
-15-1. BeanDefinitionValueResolver 类 （ Object valueObject = evaluate(typedStringValue); 点进去 ）
-        //在typedStringValue封装的value可解析成表达式的情况下,将typedStringValue封装的value评估为表达式并解析出表达式的值
-        Object valueObject = evaluate(typedStringValue);
+* 以下是 address 对象 填充属性的 过程
+15-1. BeanDefinitionValueResolver 类 （ Object valueObject = evaluate(typedStringValue); 点进去 ，这地方因为是填充 address 的 String 类型 ，所以 走的是 value instanceof TypedStringValue ）
+        // 对TypedStringValue进行解析
+        else if (value instanceof TypedStringValue) {
+        	// Convert value to target type here.
+        	// 在此处将value转换为目标类型，将value强转为TypedStringValue对象
+        	TypedStringValue typedStringValue = (TypedStringValue) value;
+        	//在typedStringValue封装的value可解析成表达式的情况下,将typedStringValue封装的value评估为表达式并解析出表达式的值
+        	Object valueObject = evaluate(typedStringValue);
+        	try {
+        		//在typedStringValue中解析目标类型
+        		Class<?> resolvedTargetType = resolveTargetType(typedStringValue);
+        		//如果resolvedTargetType不为null
+        		if (resolvedTargetType != null) {
+        			//使用typeConverter将值转换为所需的类型
+        			return this.typeConverter.convertIfNecessary(valueObject, resolvedTargetType);
+        		}
+        		else {
+        			//返回并解析出来表达式的值
+        			return valueObject;
+        		}
+        	}
+        	//捕捉在解析目标类型或转换类型过程中抛出的异常
+        	catch (Throwable ex) {
+        		// Improve the message by showing the context.
+        		throw new BeanCreationException(
+        				this.beanDefinition.getResourceDescription(), this.beanName,
+        				"Error converting typed String value for " + argName, ex);
+        	}
+        }
 
 
 16-1. BeanDefinitionValueResolver 类 （ Object result = doEvaluate(value.getValue()); 点进去 ）
