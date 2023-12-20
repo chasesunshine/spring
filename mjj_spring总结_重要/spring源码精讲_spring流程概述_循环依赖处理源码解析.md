@@ -122,3 +122,19 @@
         }
 
 
+
+# 有两篇文章讲的不错
+1. Spring循环依赖那些事儿（含Spring详细流程图）
+    https://zhuanlan.zhihu.com/p/630002681
+
+2. 《Spring系列》第10章 循环依赖
+   https://blog.csdn.net/weixin_44051038/article/details/129847458
+
+
+注意两个地方的代码：
+1.  AbstractAutowireCapableBeanFactory 类		
+    // 为避免后期循环依赖，可以在bean初始化完成前将创建实例的ObjectFactory加入工厂
+    addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+2.  DefaultSingletonBeanRegistry 类
+    protected Object getSingleton(String beanName, boolean allowEarlyReference) {
+
