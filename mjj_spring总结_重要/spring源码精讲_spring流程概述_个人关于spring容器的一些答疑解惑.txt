@@ -1,0 +1,22 @@
+Q:  您好，我这边spring源码精讲看到50%，我目前理解下来，spring容器其实就是 DefaultListableBeanFactory 类，请问理解对不对
+A:  可以把容器理解为DefaultListableBeanFactory
+A:  但是具体存储对象的map结构是singletonObject
+
+
+Q:  换个说法，是 DefaultListableBeanFactory  这个类来创建容器的，这个容器我理解为 private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+A:  并不是BeanDefinitionMap
+A:  这个集合只是用来存储bean对象的定义信息的
+
+
+Q:  singletonObject是在DefaultSingletonBeanRegistry里面的，DefaultListableBeanFactory继承自 DefaultSingletonBeanRegistry ，
+    所以 我可以理解为 singletonObject 是 DefaultListableBeanFactory一部分，所以 我觉得 DefaultListableBeanFactory 是 容器的载体类
+A:  这个没问题
+
+
+Q:  这时候我还有一个疑问，既然 singletonObject map是容器，那么 get bean 两种方式的 byName和byType所对应的两个map 算不算是容器
+A:  byName和byType都是来获取bean对象的，也都是从一级缓存中获取的
+
+
+Q:  最后一个问题，这么多的 容器 map ， 我们是不是以不同的方式去从不同的容器map中取，比如 context.getbean()是从singletonobject这个map中取，xml文件中 <... autowire="byName">是从 byName的这个map中取?
+A:  map只是用来存储具体对象的，因为有很多map结构存放不同的对象，这些map需要归属于一个整体的对象，那个就是BeanFactory
+
