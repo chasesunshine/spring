@@ -138,3 +138,7 @@
 2.  DefaultSingletonBeanRegistry 类
     protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
+
+# 重要点：（课程：如何改变源码中的三级缓存）
+    1. 不使用三级缓存，直接额外的方式获取生成代理对象也可以
+    2. 在整个三级缓存中，对象仅能存在一份
