@@ -292,7 +292,13 @@
 
 
 
-
+总结:
+1、创建AspectJPointcutAdvisor#0-4,先使用其带参的构造方法进行对象的创建，但是想使用带参数的构造方法必须要把参数对象准备好，因此要准备创建内置包含的对象AspectJAroundAdvice
+2、创建AspectJAroundAdvice，也需要使用带参的构造方法进行创建，也需要提前准备好具体的参数对象，包含三个参数:
+	1、MethodLocatingFactoryBean
+	2、AspectJExpressionPointcut
+	3、SimpleBeanFactoryAwareAspectInstanceFactory
+3、分别创建上述的三个对象,上述三个对象的创建过程都是调用无参的构造方法，直接反射生成即可,
 
 
 
