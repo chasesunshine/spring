@@ -150,3 +150,6 @@
             Object o1 = methodProxy.invokeSuper(o, objects);
             return o1;
         }
+
+
+总结： 还是需要自己一步步debug去看，按照上面的流程 
