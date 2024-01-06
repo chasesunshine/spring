@@ -388,7 +388,7 @@ aop.xml代码：
 
 
 
-# 注意点： 注解方式的配置 会影响 aop 的执行顺序 （spring-debug/src/main/resources/aop.xml） 这个需要自己去debug看 
+# 注意点： 注解方式的配置顺序 会影响 aop 的执行顺序 topo排序-这个比较麻烦 （spring-debug/src/main/resources/aop.xml） 这个需要自己去debug看 
 （ 具体看 spring-aop/src/main/java/org/springframework/aop/aspectj/autoproxy/AspectJAwareAdvisorAutoProxyCreator.java 中  List<PartiallyComparableAdvisorHolder> sorted = PartialOrder.sort(partiallyComparableAdvisors); 这里 debug）
 
     <aop:around method="around" pointcut-ref="myPoint"></aop:around>
