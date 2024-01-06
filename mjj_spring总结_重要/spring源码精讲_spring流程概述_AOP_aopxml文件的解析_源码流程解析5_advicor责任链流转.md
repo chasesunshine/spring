@@ -211,10 +211,23 @@ aop.xml代码：
         return invokeAdviceMethodWithGivenArgs(argBinding(jp, jpMatch, returnValue, t));
 
 
-19. AbstractAspectJAdvice 类 （ return this.aspectJAdviceMethod.invoke( 点进去 ）
+19. AbstractAspectJAdvice 类 （ return this.aspectJAdviceMethod.invoke( 点进去       this.aspectJAdviceMethod 为 public java.lang.Object com.mashibing.aop.xml.util.LogUtil.around(org.aspectj.lang.ProceedingJoinPoint) throws java.lang.Throwable ）
         // 反射调用通知方法
         // this.aspectInstanceFactory.getAspectInstance()获取的是切面的实例
         return this.aspectJAdviceMethod.invoke(this.aspectInstanceFactory.getAspectInstance(), actualArgs);
+
+
+19-1. java.lang.reflect.Method 类 （ return ma.invoke(obj, args); 点进去 ）
+        return ma.invoke(obj, args); 
+
+19-2. sun.reflect.DelegatingMethodAccessorImpl 类 （ return delegate.invoke(obj, args); 点进去 ）
+        return delegate.invoke(obj, args); 
+
+19-3. sun.reflect.NativeMethodAccessorImpl 类 （ return invoke0(method, obj, args); 点进去 ）
+        return invoke0(method, obj, args);
+
+19-4. 执行到 spring-debug/src/main/java/com/mashibing/aop/xml/util/LogUtil.java 类
+        执行到 LogUtil 类的这一步了 ， Signature signature = pjp.getSignature();
 
 
 20. 控制台上打印日志
@@ -245,17 +258,50 @@ aop.xml代码：
 24. 和 4 步 一样
 
 
-25. MethodBeforeAdviceInterceptor 类 （ 控制台打印 log Before ---add方法开始执行：参数是[1, 1] ）
+25. MethodBeforeAdviceInterceptor 类 （ this.advice.before( debug进去 ）
         // 执行前置通知的方法
         this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
 
 
-26. MethodBeforeAdviceInterceptor 类 （ return mi.proceed(); debug进去 ）
+25-1. AspectJMethodBeforeAdvice 类 （ invokeAdviceMethod( debug进去 ）
+        invokeAdviceMethod(getJoinPointMatch(), null, null);
+
+25-2. AbstractAspectJAdvice 类 （ invokeAdviceMethodWithGivenArgs( debug进去 ）
+        return invokeAdviceMethodWithGivenArgs(argBinding(getJoinPoint(), jpMatch, returnValue, ex));
+
+25-3. AbstractAspectJAdvice 类 （ return this.aspectJAdviceMethod.invoke( debug进去 ）
+        return this.aspectJAdviceMethod.invoke(this.aspectInstanceFactory.getAspectInstance(), actualArgs);
+
+25-4. java.lang.reflect.Method 类 （ return ma.invoke(obj, args); 点进去 ）
+        return ma.invoke(obj, args);
+
+25-5. sun.reflect.DelegatingMethodAccessorImpl 类 （ return delegate.invoke(obj, args); 点进去 ）
+        return delegate.invoke(obj, args);
+
+25-6. sun.reflect.NativeMethodAccessorImpl 类 （ return invoke0(method, obj, args); 点进去 ）
+        return invoke0(method, obj, args);
+
+25-7. 执行到 spring-debug/src/main/java/com/mashibing/aop/xml/util/LogUtil.java 类 （ 执行以下逻辑 ）
+        private int start(JoinPoint joinPoint){
+            //获取方法签名
+            Signature signature = joinPoint.getSignature();
+            //获取参数信息
+            Object[] args = joinPoint.getArgs();
+            System.out.println("log Before ---"+signature.getName()+"方法开始执行：参数是"+Arrays.asList(args));
+            return 100;
+        }
+
+25-8. 控制台打印 log Before ---add方法开始执行：参数是[1, 1]
+
+
+26. 回到 MethodBeforeAdviceInterceptor 类 （ this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis()); 这个已经执行完了，执行下一步 return mi.proceed(); ）
+        // 执行前置通知的方法
+    	this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
         // 执行下一个通知/拦截器，但是该拦截器是最后一个了，所以会调用目标方法
         return mi.proceed();
 
 
-27. 递归 回到 CglibAopProxy 类 （ return super.proceed(); 点进去 ）
+27. 递归 回到 CglibAopProxy 类
                try {
                	return super.proceed();
                }
@@ -289,3 +335,16 @@ aop.xml代码：
         log Around ---环绕返回通知：add方法返回结果是：2
         log After ---add方法执行结束。。。。。over
         log AfterReturning ---add方法执行结束，结果是：2
+
+
+
+# 注解方式 执行AOP 
+    spring-debug/src/main/java/com/mashibing/aop/annotation
+    和以上一样的 debug 方式 
+最终执行结果：
+        log Around---环绕通知start：add方法开始执行，参数为：[1, 1]
+        log Before---add方法开始执行：参数是[1, 1]
+        log AfterReturning---add方法执行结束，结果是：2
+        log After---add方法执行结束。。。。。over
+        log Around---环绕通知stopadd方法执行结束
+        log Around---环绕返回通知：add方法返回结果是：2

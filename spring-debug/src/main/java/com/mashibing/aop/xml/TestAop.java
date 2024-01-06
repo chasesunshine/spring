@@ -16,7 +16,7 @@ public class TestAop {
         MyCalculator bean = ac.getBean(MyCalculator.class);
         System.out.println(bean.toString());
         bean.add(1,1);
-        bean.sub(1,1);
+//        bean.sub(1,1);
 
     }
 
