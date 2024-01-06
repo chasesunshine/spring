@@ -339,8 +339,45 @@ aop.xml代码：
 
 
 # 注解方式 执行AOP 
+## 第一种 
     spring-debug/src/main/java/com/mashibing/aop/annotation
     和以上一样的 debug 方式 
+    spring-debug/src/main/java/com/mashibing/aop/annotation/util/LogUtil.java
+    代码方法执行顺序
+    @Around
+    @Before
+    @After
+    @AfterReturning
+    @AfterThrowing
+最终执行结果：
+        log Around---环绕通知start：add方法开始执行，参数为：[1, 1]
+        log Before---add方法开始执行：参数是[1, 1]
+        log AfterReturning---add方法执行结束，结果是：2
+        log After---add方法执行结束。。。。。over
+        log Around---环绕通知stopadd方法执行结束
+        log Around---环绕返回通知：add方法返回结果是：2
+
+## 第二种 （ @Order注解并不影响执行顺序 ）
+    spring-debug/src/main/java/com/mashibing/aop/annotation
+    和以上一样的 debug 方式 
+    spring-debug/src/main/java/com/mashibing/aop/annotation/util/LogUtil.java
+    代码方法执行顺序
+
+    @Around
+    @Order(4)
+
+    @Before
+    @Order(5)
+
+    @After
+    @Order(3)
+
+    @AfterReturning
+    @Order(2)
+
+    @AfterThrowing
+    @Order(1)
+
 最终执行结果：
         log Around---环绕通知start：add方法开始执行，参数为：[1, 1]
         log Before---add方法开始执行：参数是[1, 1]
