@@ -385,3 +385,49 @@ aop.xml代码：
         log After---add方法执行结束。。。。。over
         log Around---环绕通知stopadd方法执行结束
         log Around---环绕返回通知：add方法返回结果是：2
+
+
+
+# 注意点： 注解方式的配置 会影响 aop 的执行顺序 （spring-debug/src/main/resources/aop.xml） 这个需要自己去debug看 
+（ 具体看 spring-aop/src/main/java/org/springframework/aop/aspectj/autoproxy/AspectJAwareAdvisorAutoProxyCreator.java 中  List<PartiallyComparableAdvisorHolder> sorted = PartialOrder.sort(partiallyComparableAdvisors); 这里 debug）
+
+    <aop:around method="around" pointcut-ref="myPoint"></aop:around>
+    <aop:before method="start" pointcut-ref="myPoint"></aop:before>
+    <aop:after method="logFinally" pointcut-ref="myPoint"></aop:after>
+    <aop:after-returning method="stop" pointcut-ref="myPoint" returning="result"></aop:after-returning>
+    <aop:after-throwing method="logException" pointcut-ref="myPoint" throwing="e"></aop:after-throwing>
+执行结果：around    before    after    after-returning     after-throwing
+    log Around ---环绕通知start：add方法开始执行，参数为：[1, 1]
+    log Before ---add方法开始执行：参数是[1, 1]
+    log Around ---环绕通知stopadd方法执行结束
+    log Around ---环绕返回通知：add方法返回结果是：2
+    log After ---add方法执行结束。。。。。over
+    log AfterReturning ---add方法执行结束，结果是：2
+
+
+    <aop:after-throwing method="logException" pointcut-ref="myPoint" throwing="e"></aop:after-throwing>
+    <aop:after-returning method="stop" pointcut-ref="myPoint" returning="result"></aop:after-returning>
+    <aop:around method="around" pointcut-ref="myPoint"></aop:around>
+    <aop:after method="logFinally" pointcut-ref="myPoint"></aop:after>
+    <aop:before method="start" pointcut-ref="myPoint"></aop:before>
+执行结果：after-throwing    after-returning    around    after    before
+    log Around ---环绕通知start：add方法开始执行，参数为：[1, 1]
+    log Before ---add方法开始执行：参数是[1, 1]
+    log After ---add方法执行结束。。。。。over
+    log Around ---环绕通知stopadd方法执行结束
+    log Around ---环绕返回通知：add方法返回结果是：2
+    log AfterReturning ---add方法执行结束，结果是：2
+
+
+    <aop:around method="around" pointcut-ref="myPoint"></aop:around>
+    <aop:after method="logFinally" pointcut-ref="myPoint"></aop:after>
+    <aop:before method="start" pointcut-ref="myPoint"></aop:before>
+    <aop:after-returning method="stop" pointcut-ref="myPoint" returning="result"></aop:after-returning>
+    <aop:after-throwing method="logException" pointcut-ref="myPoint" throwing="e"></aop:after-throwing>
+执行结果：around    after    before    after-returning     after-throwing
+    log Around ---环绕通知start：add方法开始执行，参数为：[1, 1]
+    log Before ---add方法开始执行：参数是[1, 1]
+    log AfterReturning ---add方法执行结束，结果是：2
+    log After ---add方法执行结束。。。。。over
+    log Around ---环绕通知stopadd方法执行结束
+    log Around ---环绕返回通知：add方法返回结果是：2
