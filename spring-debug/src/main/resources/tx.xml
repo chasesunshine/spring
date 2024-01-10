@@ -23,6 +23,7 @@
     <bean id="bookDao" class="com.mashibing.tx.xml.dao.BookDao">
         <property name="jdbcTemplate" ref="jdbcTemplate"></property>
     </bean>
+
     <aop:config>
         <aop:pointcut id="txPoint" expression="execution(* com.mashibing.tx.xml.*.*.*(..))"/>
         <aop:advisor advice-ref="myAdvice" pointcut-ref="txPoint"></aop:advisor>
