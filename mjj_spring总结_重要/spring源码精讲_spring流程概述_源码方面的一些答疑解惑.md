@@ -175,7 +175,7 @@
 答： 就是为了保证我们创建的对象 都保证是 单例 ，
     其实就是 会通过 proxy.invokeSuper 调用父类方法来创建我们的对象，这时候会直接根据我们当前的 beanfactory 来获取 对象，而不会再去 new 一个对象，这时候就可以保证对象的 单例
     详见： mjj_spring总结_重要/png/img_4.png
-
+答：直接百度 spring为什么Configuration修饰的类要使用代理 （自己百度去看）
 
 
 
