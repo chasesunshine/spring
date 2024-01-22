@@ -1,13 +1,13 @@
 package com.mashibing;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+//import org.springframework.beans.factory.BeanFactory;
+//import org.springframework.beans.factory.BeanFactoryAware;
+//import org.springframework.context.ApplicationContext;
+//import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+//
+//import javax.annotation.PostConstruct;
+//import javax.annotation.PreDestroy;
 
 @Component
 public class Person {//implements BeanFactoryAware, ApplicationContextAware {
@@ -52,14 +52,14 @@ public class Person {//implements BeanFactoryAware, ApplicationContextAware {
 //        this.beanFactory = beanFactory;
 //    }
 
-    @PostConstruct
-    public void initMjj(){
-        System.out.println("init ...");
-    }
-
-    @PreDestroy
-    private void destory(){
-        System.out.println("destory...");
-    }
+//    @PostConstruct
+//    public void initMjj(){
+//        System.out.println("init ...");
+//    }
+//
+//    @PreDestroy
+//    private void destory(){
+//        System.out.println("destory...");
+//    }
 
 }

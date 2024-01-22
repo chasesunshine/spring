@@ -24,6 +24,7 @@ public class BookService {
         try {
             bookDao.updateStock(id);
         } catch (Exception e) {
+            System.out.println("测试---------------------------------------------");
             e.printStackTrace();
         }
 //        for (int i = 1 ;i>=0 ;i--)

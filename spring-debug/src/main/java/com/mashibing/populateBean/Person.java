@@ -1,7 +1,7 @@
 package com.mashibing.populateBean;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+//import javax.annotation.PostConstruct;
+//import javax.annotation.PreDestroy;
 import java.util.*;
 
 public class Person {
@@ -121,28 +121,28 @@ public class Person {
         this.sets = sets;
     }
 
-    @PostConstruct
-    public void init(){
-        System.out.println("init---person");
-    }
-
-    @PreDestroy
-    public void destroy(){
-        System.out.println("destroy---person");
-    }
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                ", gender='" + gender + '\'' +
-                ", address=" + address +
-                ", hobbies=" + Arrays.toString(hobbies) +
-                ", books=" + books +
-                ", sets=" + sets +
-                ", maps=" + maps +
-                ", properties=" + properties +
-                '}';
-    }
+//    @PostConstruct
+//    public void init(){
+//        System.out.println("init---person");
+//    }
+//
+//    @PreDestroy
+//    public void destroy(){
+//        System.out.println("destroy---person");
+//    }
+//    @Override
+//    public String toString() {
+//        return "Person{" +
+//                "id=" + id +
+//                ", name='" + name + '\'' +
+//                ", age=" + age +
+//                ", gender='" + gender + '\'' +
+//                ", address=" + address +
+//                ", hobbies=" + Arrays.toString(hobbies) +
+//                ", books=" + books +
+//                ", sets=" + sets +
+//                ", maps=" + maps +
+//                ", properties=" + properties +
+//                '}';
+//    }
 }
