@@ -21,12 +21,12 @@ public class BookService {
      */
     public void checkout(String username,int id){
 
-        try {
+//        try {
             bookDao.updateStock(id);
-        } catch (Exception e) {
-            System.out.println("测试---------------------------------------------");
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            System.out.println("测试---------------------------------------------");
+//            e.printStackTrace();
+//        }
 //        for (int i = 1 ;i>=0 ;i--)
 //            System.out.println(10/i);
 //        int price = bookDao.getPrice(id);

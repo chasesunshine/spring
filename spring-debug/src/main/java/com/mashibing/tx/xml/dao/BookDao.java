@@ -41,7 +41,7 @@ public class BookDao {
     public void updateStock(int id){
         String sql = "update book_stock set stock=stock-1 where id=?";
         jdbcTemplate.update(sql,id);
-//        for (int i = 1 ;i>=0 ;i--)
-//            System.out.println(10/i);
+        for (int i = 1 ;i>=0 ;i--)
+            System.out.println(10/i);
     }
 }
