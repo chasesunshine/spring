@@ -314,7 +314,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Eagerly check singleton cache for manually registered singletons.
 		/**提前检查单例缓存中是否有手动注册的单例对象，跟循环依赖有关联*/
 		Object sharedInstance = getSingleton(beanName);
-		// 如果bean的单例对象找到了，且没有创建bean实例时要使用的参数
+		// 如果bean的单例对象找到了，且没有创建bean实例时要使用的参数    mjj个人理解：就是一个对象，容器里面找到了它的单例对象，但是它里面的成员变量没有找到
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
