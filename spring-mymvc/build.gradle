@@ -15,6 +15,7 @@ plugins {
     id "com.github.ben-manes.versions" version '0.24.0'
 }
 
+
 group 'org.springframework'
 version '5.2.9.BUILD-SNAPSHOT'
 
@@ -54,6 +55,8 @@ repositories {
 //    compile 'com.fasterxml.jackson.core:jackson-annotations:2.12.3'
 //    compile 'com.fasterxml.jackson.core:jackson-core:2.12.3'
 //}
+
+
 configure(allprojects) { project ->
     apply plugin: "io.spring.dependency-management"
 
