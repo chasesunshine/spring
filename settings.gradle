@@ -37,5 +37,3 @@ rootProject.children.each {project ->
 	project.buildFileName = "${project.name}.gradle"
 }
 include 'spring-debug'
-
-includeBuild("../spring-mymvc")
