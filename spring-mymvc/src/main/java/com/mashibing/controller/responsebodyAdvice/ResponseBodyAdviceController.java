@@ -1,4 +1,4 @@
-package com.mashibing.controller.responsebodyAdvice;
+package src.main.java.com.mashibing.controller.responsebodyAdvice;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,4 +1,4 @@
-package com.mashibing.controller.exception;
+package src.main.java.com.mashibing.controller.exception;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;

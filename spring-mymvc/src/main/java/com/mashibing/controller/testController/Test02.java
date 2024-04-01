@@ -1,4 +1,4 @@
-package com.mashibing.controller.testController;
+package src.main.java.com.mashibing.controller.testController;
 
 import org.springframework.web.HttpRequestHandler;
 

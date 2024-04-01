@@ -1,4 +1,4 @@
-package com.mashibing.adapter;
+package src.main.java.com.mashibing.adapter;
 
 public class AnnotationController implements Controller{
     public void doAnnotationHandler(){  

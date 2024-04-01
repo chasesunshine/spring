@@ -1,4 +1,4 @@
-package com.mashibing.controller.ModelAttribute;
+package src.main.java.com.mashibing.controller.ModelAttribute;
 
 public class User {
     private Integer id;

@@ -1,4 +1,4 @@
-package com.mashibing.controller;
+package src.main.java.com.mashibing.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

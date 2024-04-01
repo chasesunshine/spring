@@ -1,4 +1,4 @@
-package com.mashibing.controller.sessionAttribute;
+package src.main.java.com.mashibing.controller.sessionAttribute;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

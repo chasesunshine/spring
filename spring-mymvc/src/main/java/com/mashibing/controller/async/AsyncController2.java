@@ -1,4 +1,4 @@
-package com.mashibing.controller.async;
+package src.main.java.com.mashibing.controller.async;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,8 +8,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 @Controller
 public class AsyncController2 {

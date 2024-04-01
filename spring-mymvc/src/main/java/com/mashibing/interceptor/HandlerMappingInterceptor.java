@@ -1,4 +1,4 @@
-package com.mashibing.interceptor;
+package src.main.java.com.mashibing.interceptor;
 
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;

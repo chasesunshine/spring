@@ -1,4 +1,4 @@
-package com.mashibing.util;
+package src.main.java.com.mashibing.util;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;

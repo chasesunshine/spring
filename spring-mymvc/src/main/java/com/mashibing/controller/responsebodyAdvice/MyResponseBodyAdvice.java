@@ -1,6 +1,6 @@
-package com.mashibing.controller.responsebodyAdvice;
+package src.main.java.com.mashibing.controller.responsebodyAdvice;
 
-import com.mashibing.bean.User;
+import src.main.java.com.mashibing.bean.User;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;

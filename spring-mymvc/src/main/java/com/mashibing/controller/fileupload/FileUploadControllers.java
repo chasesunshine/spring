@@ -1,4 +1,4 @@
-package com.mashibing.controller.fileupload;
+package src.main.java.com.mashibing.controller.fileupload;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.mashibing.bean;
+package src.main.java.com.mashibing.bean;
 
 import java.io.Serializable;
 

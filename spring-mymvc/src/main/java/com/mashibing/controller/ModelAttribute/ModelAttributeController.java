@@ -1,4 +1,4 @@
-package com.mashibing.controller.ModelAttribute;
+package src.main.java.com.mashibing.controller.ModelAttribute;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

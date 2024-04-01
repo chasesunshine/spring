@@ -1,4 +1,4 @@
-package com.mashibing.controller;
+package src.main.java.com.mashibing.controller;
 
 public class User {
     private Integer id;
