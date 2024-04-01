@@ -38,3 +38,4 @@ rootProject.children.each {project ->
 }
 include 'spring-debug'
 
+includeBuild("../spring-mymvc")
