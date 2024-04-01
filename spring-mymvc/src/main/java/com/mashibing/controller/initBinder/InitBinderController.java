@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.controller.initBinder;
+package com.mashibing.controller.initBinder;
 
 import javafx.scene.input.DataFormat;
 import org.springframework.beans.propertyeditors.CustomDateEditor;

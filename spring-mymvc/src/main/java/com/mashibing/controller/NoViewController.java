@@ -1,6 +1,6 @@
-package src.main.java.com.mashibing.controller;
+package com.mashibing.controller;
 
-import src.main.java.com.mashibing.bean.User;
+import com.mashibing.bean.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,9 +13,9 @@ public class NoViewController {
     // 作业：思考一下，如何将当前对象直接返回？？
     @RequestMapping("/noView")
     @ResponseBody
-    public src.main.java.com.mashibing.bean.User noView(ModelMap map){
+    public com.mashibing.bean.User noView(ModelMap map){
         System.out.println("no view.......");
-        src.main.java.com.mashibing.bean.User user = new User();
+        com.mashibing.bean.User user = new User();
         user.setAge(12);
         user.setUsername("zhangsan");
 //        map.put("user",user);

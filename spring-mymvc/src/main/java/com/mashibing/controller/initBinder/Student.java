@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.controller.initBinder;
+package com.mashibing.controller.initBinder;
 
 public class Student {
 

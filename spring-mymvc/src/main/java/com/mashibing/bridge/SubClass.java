@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.bridge;
+package com.mashibing.bridge;
 
 /**
  * 在此方法中只声明了一个方法，但是从字节码中可以看到三个方法，

@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.adapter;
+package com.mashibing.adapter;
 
 import java.util.ArrayList;
 import java.util.List;

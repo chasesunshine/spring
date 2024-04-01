@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.controller.controllerAdvice;
+package com.mashibing.controller.controllerAdvice;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.WebDataBinder;

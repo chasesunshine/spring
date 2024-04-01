@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.adapter;
+package com.mashibing.adapter;
 
 public class SimpleController implements Controller{
     public void doSimplerHandler(){  

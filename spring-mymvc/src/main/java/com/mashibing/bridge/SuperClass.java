@@ -1,4 +1,4 @@
-package src.main.java.com.mashibing.bridge;
+package com.mashibing.bridge;
 
 /**
  * 桥接方法是jdk1.5之后引入泛型之后，为了使java的泛型方法生成的字节码和1.5版本前的字节码相兼容，由编译器自动生成的方法
