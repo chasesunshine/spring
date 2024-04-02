@@ -13,32 +13,34 @@ repositories {
 }
 
 dependencies {
-    compile(project(":spring-context"))
-    compile(project(":spring-context-support")) // freemarker需要，不加可能报错
-    compile(project(":spring-webmvc"))
-    compile(project(":spring-beans"))
-    compile(project(":spring-core"))
-    compile(project(":spring-jdbc"))
-    compile(project(":spring-orm"))
-    compile(project(":spring-tx"))
-    compile(project(":spring-web"))
-    compile(project(":spring-context-indexer"))
-    compile(project(":spring-expression"))
-    compile(project(":spring-instrument"))
-    compile(project(":spring-jcl"))
-    compile(project(":spring-jms"))
-    compile(project(":spring-messaging"))
-    compile(project(":spring-oxm"))
-    compile(project(":spring-test"))
-    compile(project(":spring-webflux"))
-    compile(project(":spring-websocket"))
-    compile 'javax.servlet:javax.servlet-api:3.1.0'
-    compile 'javax.servlet.jsp.jstl:jstl:1.2'
-    compile 'org.apache.taglibs:taglibs-standard-spec:1.2.5'
-    compile 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'commons-fileupload:commons-fileupload:1.4'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.12.3'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.12.3'
+    implementation(project(":spring-context"))
+    implementation(project(":spring-context-support")) // freemarker需要，不加可能报错
+    implementation(project(":spring-webmvc"))
+    implementation(project(":spring-beans"))
+    implementation(project(":spring-core"))
+    implementation(project(":spring-jdbc"))
+    implementation(project(":spring-orm"))
+    implementation(project(":spring-tx"))
+    implementation(project(":spring-web"))
+    implementation(project(":spring-context-indexer"))
+    implementation(project(":spring-expression"))
+    implementation(project(":spring-instrument"))
+    implementation(project(":spring-jcl"))
+    implementation(project(":spring-jms"))
+    implementation(project(":spring-messaging"))
+    implementation(project(":spring-oxm"))
+    implementation(project(":spring-test"))
+    implementation(project(":spring-webflux"))
+    implementation(project(":spring-websocket"))
+    implementation 'javax.servlet:javax.servlet-api:3.1.0'
+    implementation 'javax.servlet.jsp.jstl:jstl:1.2'
+    implementation 'org.apache.taglibs:taglibs-standard-spec:1.2.5'
+    implementation 'org.apache.taglibs:taglibs-standard-impl:1.2.5'
+    testimplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.12.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'
+
+//    implementation 'javax.servlet:javax.servlet-api:4.0.1'
 }
