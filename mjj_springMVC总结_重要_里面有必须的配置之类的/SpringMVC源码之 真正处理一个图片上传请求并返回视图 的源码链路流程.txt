@@ -1,0 +1,129 @@
+# URL ： http://localhost:8080/Gradle___org_springframework___spring_mymvc_5_2_9_BUILD_SNAPSHOT_war/fileupload.jsp
+  controller ： spring-mymvc/src/main/java/com/mashibing/controller/fileupload/FileUploadController.java
+
+1. spring-webmvc/src/main/java/org/springframework/web/servlet/FrameworkServlet.java （ 这地方开始 处理其他类型的请求 ，接下来会走到 doGet() 方法里面 ）
+        // 处理其他类型的请求
+        super.service(request, response);
+
+
+2. spring-webmvc/src/main/java/org/springframework/web/servlet/FrameworkServlet.java （ processRequest(request, response); 点进去 ）
+        @Override
+        protected final void doGet(HttpServletRequest request, HttpServletResponse response)
+        		throws ServletException, IOException {
+
+        	processRequest(request, response);
+        }
+
+
+3. spring-webmvc/src/main/java/org/springframework/web/servlet/FrameworkServlet.java （ doService(request, response); 点进去 ）
+        // 执行真正的逻辑
+        doService(request, response);
+
+
+4. spring-webmvc/src/main/java/org/springframework/web/servlet/FrameworkServlet.java （ 点进去 ）
+	    protected abstract void doService(HttpServletRequest request, HttpServletResponse response)
+			    throws Exception;
+
+
+5. spring-webmvc/src/main/java/org/springframework/web/servlet/DispatcherServlet.java （ doDispatch(request, response); 点进去 ）
+        // 执行请求的分发
+        doDispatch(request, response);
+
+
+6. spring-webmvc/src/main/java/org/springframework/web/servlet/DispatcherServlet.java （ HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler()); 点进去 ）
+        // Actually invoke the handler.
+        // 真正的调用handler方法，也就是执行对应的方法，并返回视图
+        mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+
+
+7. spring-webmvc/src/main/java/org/springframework/web/servlet/HandlerAdapter.java （ 点进去 ）
+        @Nullable
+        ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception;
+
+
+8. spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/AbstractHandlerMethodAdapter.java （ return handleInternal(request, response, (HandlerMethod) handler); 点进去 ）
+        /**
+         * This implementation expects the handler to be an {@link HandlerMethod}.
+         */
+        @Override
+        @Nullable
+        public final ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
+        		throws Exception {
+
+        	return handleInternal(request, response, (HandlerMethod) handler);
+        }
+
+
+9. spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/AbstractHandlerMethodAdapter.java （ 点进去 ）
+        @Nullable
+        protected abstract ModelAndView handleInternal(HttpServletRequest request,
+        		HttpServletResponse response, HandlerMethod handlerMethod) throws Exception;
+
+
+10. spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/RequestMappingHandlerAdapter.java （ mav = invokeHandlerMethod(request, response, handlerMethod); 点进去 ）
+        // No synchronization on session demanded at all...
+        mav = invokeHandlerMethod(request, response, handlerMethod);
+
+
+11. spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/RequestMappingHandlerAdapter.java （ invocableMethod.invokeAndHandle(webRequest, mavContainer); 点进去 ）
+        // 执行调用
+        invocableMethod.invokeAndHandle(webRequest, mavContainer);
+
+
+12. spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/ServletInvocableHandlerMethod.java （ Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs); 点进去 ，这个方法会返回执行结果 ）
+		// 调用父类的invokeForRequest执行请求
+		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
+
+
+13. spring-web/src/main/java/org/springframework/web/method/support/InvocableHandlerMethod.java （ return doInvoke(args); 点进去 ）
+		// 具体调用method
+		return doInvoke(args);
+
+
+14. spring-web/src/main/java/org/springframework/web/method/support/InvocableHandlerMethod.java （ return getBridgedMethod().invoke(getBean(), args); 点进去 ）
+        // 执行
+        return getBridgedMethod().invoke(getBean(), args);
+
+
+15. java.lang.reflect.Method （  return ma.invoke(obj, args); 点进去 ）
+        return ma.invoke(obj, args);
+
+
+16. sun.reflect.DelegatingMethodAccessorImpl （ return delegate.invoke(obj, args); 点进去 ）
+        return delegate.invoke(obj, args);
+
+
+17. sun.reflect.NativeMethodAccessorImpl （ return invoke0(method, obj, args); 点进去 ）
+        return invoke0(method, obj, args);
+
+
+18. spring-mymvc/src/main/java/com/mashibing/controller/controllerAdvice/ControllerAdviceController.java （ 执行到这一步 ）
+
+
+19. 链路一直走下去 ， 到 spring-mymvc/src/main/java/com/mashibing/controller/fileupload/FileUploadController.java （ 执行到这一步 ）
+
+
+20. 回到 第12步 ： spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/ServletInvocableHandlerMethod.java
+        // 调用父类的invokeForRequest执行请求
+        Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
+
+
+21. 走完以上流程
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
